@@ -1,0 +1,56 @@
+import type { HumanAppearance } from "../game/catalog.js";
+export type C2 = CanvasRenderingContext2D;
+export type P3 = [string, string, string];
+export const OL = '#2b1608';
+const mkc = (w = 32, h = 32): HTMLCanvasElement => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+export const px = (g: C2, x: number, y: number, c: string, w = 1, h = 1): void => { g.fillStyle = c; g.fillRect(x, y, w, h); };
+export function blob(g: C2, cx: number, cy: number, rx: number, ry: number, p: P3): void {
+  for (let y = Math.floor(cy - ry); y <= cy + ry; y++) for (let x = Math.floor(cx - rx); x <= cx + rx; x++) {
+    const dx = (x + .5 - cx) / rx, dy = (y + .5 - cy) / ry; if (dx * dx + dy * dy > 1) continue;
+    const s = -dx * .5 - dy * .8; px(g, x, y, s > .3 ? p[0] : s > -.3 ? p[1] : p[2]);
+  }
+}
+function ring(g: C2, cx: number, cy: number, r: number, p: P3): void {
+  for (let y = Math.floor(cy - r); y <= cy + r; y++) for (let x = Math.floor(cx - r); x <= cx + r; x++) {
+    const dx = x + .5 - cx, dy = y + .5 - cy, d = Math.hypot(dx, dy); if (d > r || d < r - 3.2) continue;
+    const s = (-dx - dy) / r; px(g, x, y, s > .3 ? p[0] : s > -.3 ? p[1] : p[2]);
+  }
+}
+export function box(g: C2, x: number, y: number, w: number, h: number, p: P3): void {
+  const a = Math.max(1, Math.round(h * .25)), b = Math.max(1, Math.round(h * .3));
+  px(g, x, y, p[1], w, h); px(g, x, y, p[0], w, a); px(g, x, y + h - b, p[2], w, b);
+}
+function outline(c: HTMLCanvasElement): HTMLCanvasElement {
+  const g = c.getContext('2d')!, w = c.width, h = c.height, d = g.getImageData(0, 0, w, h).data;
+  const a = (x: number, y: number): boolean => x >= 0 && y >= 0 && x < w && y < h && d[(y * w + x) * 4 + 3] > 0;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (!a(x, y) && (a(x - 1, y) || a(x + 1, y) || a(x, y - 1) || a(x, y + 1))) px(g, x, y, OL);
+  return c;
+}
+const art = (f: (g: C2) => void): HTMLCanvasElement => { const c = mkc(); f(c.getContext('2d')!); return outline(c); };
+const eye = (g: C2, x: number, y: number): void => { px(g, x, y, '#fff', 3, 3); px(g, x + 1, y + 1, OL, 1, 2); };
+const BR: P3 = ['#fbd98a', '#e5a043', '#b3681f'], YL: P3 = ['#fff3a0', '#ffd84a', '#d9a21e'], PZ: P3 = ['#d89a62', '#a8622d', '#6e3c18'];
+const CR: P3 = ['#f3c47a', '#d99a45', '#a8651f'], RD: P3 = ['#ff8a7a', '#d8403c', '#9c2420'], SK: P3 = ['#ffe0c2', '#f2b992', '#c98a68'];
+export const WD: P3 = ['#ecc890', '#d49a55', '#a8662a'];
+export const SPR: Record<string, () => HTMLCanvasElement> = {
+  croissant: () => art(g => { blob(g, 6, 22, 4, 3.5, BR); blob(g, 26, 22, 4, 3.5, BR); blob(g, 10, 17, 5.5, 5, BR); blob(g, 22, 17, 5.5, 5, BR); blob(g, 16, 14, 8, 7.5, BR); px(g, 11, 13, BR[2], 1, 5); px(g, 21, 13, BR[2], 1, 5); px(g, 8, 20, BR[2], 1, 3); px(g, 24, 20, BR[2], 1, 3); eye(g, 12, 12); eye(g, 17, 12); px(g, 14, 18, OL, 4, 1); px(g, 13, 17, OL); px(g, 18, 17, OL); }),
+  butter: () => art(g => { box(g, 6, 14, 20, 12, YL); box(g, 8, 10, 18, 6, ['#fffbd0', '#fff3a0', '#ffe066']); eye(g, 11, 17); eye(g, 18, 17); px(g, 14, 22, OL, 5, 1); px(g, 13, 21, OL); px(g, 19, 21, OL); }),
+  baguette: () => art(g => { blob(g, 16, 16, 8, 14, BR); px(g, 13, 6, BR[2], 6, 1); px(g, 12, 23, BR[2], 8, 1); px(g, 14, 26, BR[2], 4, 1); eye(g, 11, 12); eye(g, 18, 12); px(g, 10, 11, OL, 5, 1); px(g, 17, 11, OL, 5, 1); px(g, 13, 19, OL, 6, 1); }),
+  pretzel: () => art(g => { ring(g, 10, 12, 6.5, PZ); ring(g, 22, 12, 6.5, PZ); blob(g, 16, 21, 9, 6, PZ); for (const [a, b] of [[8, 9], [23, 10], [13, 22], [19, 24]]) px(g, a, b, '#fff', 2, 1); eye(g, 12, 19); eye(g, 17, 19); px(g, 14, 25, OL, 4, 1); }),
+  pie: () => art(g => { blob(g, 16, 21, 13, 8, CR); blob(g, 16, 18, 10, 5.5, RD); px(g, 7, 18, CR[0], 18, 1); px(g, 15, 13, CR[0], 1, 10); blob(g, 16, 9, 4, 4, RD); px(g, 16, 3, '#6a4a2a', 1, 3); px(g, 17, 1, '#ffe066', 3, 3); eye(g, 11, 17); eye(g, 18, 17); px(g, 10, 16, OL, 5, 1); px(g, 17, 16, OL, 5, 1); }),
+  pin: () => art(g => { box(g, 3, 13, 26, 7, WD); box(g, 0, 14, 4, 5, ['#a8662a', '#8a4f1c', '#6a3a10']); box(g, 28, 14, 4, 5, ['#a8662a', '#8a4f1c', '#6a3a10']); }),
+  shovel: () => art(g => { box(g, 15, 3, 3, 14, WD); box(g, 12, 2, 9, 3, ['#a8662a', '#8a4f1c', '#6a3a10']); box(g, 10, 17, 13, 11, ['#e4eaf0', '#b8c2cc', '#7b8794']); }),
+};
+
+export function human(f: number, o: HumanAppearance): HTMLCanvasElement {
+  return art(g => {
+    const l = f ? 0 : 2, r = f ? 2 : 0;
+    px(g, 12, 24, o.pa, 4, 5 - l); px(g, 11, 29 - l, OL, 5, 2); px(g, 17, 24, o.pa, 4, 5 - r); px(g, 17, 29 - r, OL, 5, 2);
+    box(g, 10, 14, 12, 11, o.s); box(g, 21, 16, 4, 3, SK); box(g, 3, 16, 8, 3, SK);
+    px(g, 2, 11, '#cfd6dd', 1, 9); px(g, 1, 10, '#cfd6dd', 1, 2); px(g, 3, 10, '#cfd6dd', 1, 2);
+    blob(g, 16, 9, 6, 6, SK); blob(g, 16, 5.5, 6.5, 3.5, o.h);
+    eye(g, 12, 8); eye(g, 17, 8); px(g, 14, 12, OL, 5, 2); px(g, 15, 13, '#c0392b', 3, 1);
+    if (o.x === 'band') px(g, 10, 7, '#d8403c', 12, 2);
+    if (o.x === 'tie') { px(g, 15, 15, '#d8403c', 2, 7); px(g, 11, 7, OL, 10, 1); }
+    if (o.x === 'hat') { blob(g, 16, 3.5, 8, 2.5, ['#5fb47a', '#3c8d5a', '#25603a']); box(g, 22, 17, 7, 9, ['#ffffff', '#e8e8e8', '#b8b8b8']); }
+  });
+}
