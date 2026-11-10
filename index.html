@@ -14,12 +14,18 @@
       <section id="menu" class="screen active" aria-label="Main menu">
         <canvas id="menu-art" aria-hidden="true" width="160" height="90"></canvas>
         <div id="title-block"><h1>SEKACHOUX <span>TD</span></h1><p>BAKERY DEFENSE</p></div>
-        <nav id="main-actions" aria-label="Main menu actions">
-          <button class="wood-button" data-action="adventure">Start Baking</button>
-          <button class="wood-button" data-action="levels">Level Select</button>
-          <button class="wood-button" data-action="almanac">Bakery Almanac</button>
-          <button class="wood-button" disabled>Survival - Coming Soon</button>
+        <nav id="main-actions" aria-label="Bakery menu">
+          <button class="bakery-action bakery-primary" data-action="start-baking">Start Baking</button>
+          <button class="bakery-action" data-action="levels">Level Select</button>
+          <button class="bakery-action" data-action="pastry-book">Pastry Book</button>
+          <button class="bakery-action" data-action="hooman-dex">Hooman Dex</button>
         </nav>
+        <div id="menu-profile" aria-label="Player profile">
+          <span class="profile-label">BAKED FOR</span>
+          <strong id="profile-name">#guest#000001</strong>
+          <button id="edit-name" data-action="edit-name" aria-label="Edit your baker name">Edit Name</button>
+        </div>
+        <p id="studio-credit">A <strong>SekaFaji Games</strong> creation</p>
         <button class="small-button menu-fullscreen" data-action="fullscreen">Fullscreen</button>
       </section>
       <section id="level-screen" class="screen panel-screen" aria-label="Level select">
@@ -27,8 +33,15 @@
         <div id="level-list"></div>
         <button class="wood-button" data-action="menu">Back to Bakery</button>
       </section>
-      <section id="almanac-screen" class="screen panel-screen" aria-label="Bakery almanac">
-        <h2>Bakery Almanac</h2><div id="almanac-list"></div>
+      <section id="almanac-screen" class="screen panel-screen" aria-label="Bakery encyclopedia">
+        <h2 id="almanac-title">Pastry Book</h2>
+        <div class="codex-tabs" role="group" aria-label="Encyclopedia sections">
+          <button class="wood-button" id="tab-pastries" data-action="pastry-book">Pastry Book</button>
+          <button class="wood-button" id="tab-hoomans" data-action="hooman-dex">Hooman Dex</button>
+        </div>
+        <p id="almanac-count" class="panel-caption"></p>
+        <div id="almanac-list"></div>
+        <p id="almanac-empty" class="codex-empty" hidden>Meet Hoomans during bakery shifts to discover them here.</p>
         <button class="wood-button" data-action="menu">Back to Bakery</button>
       </section>
       <section id="game-screen" class="screen" aria-label="Bakery defense game">
@@ -50,10 +63,20 @@
           <div id="lane-reveal" aria-hidden="true"></div>
         </div>
       </section>
-      <section id="level-preview" class="screen interstitial" role="dialog" aria-modal="true" aria-label="Today's customers">
-        <div class="preview-heading"><small id="preview-level"></small><h2>TODAY'S CUSTOMERS</h2><p id="preview-lesson"></p></div>
+      <section id="level-preview" class="screen interstitial" role="dialog" aria-modal="true" aria-label="Today's Hoomans">
+        <div class="preview-heading"><small id="preview-level"></small><h2>TODAY'S HOOMANS</h2><p id="preview-lesson"></p></div>
         <div id="preview-enemies" class="preview-lineup"></div>
         <div class="preview-foot"><span>THE BAKERY OPENS SOON</span><button class="wood-button" data-action="start-bake">OPEN THE BAKERY</button></div>
+      </section>
+      <section id="identity-dialog" class="screen overlay" role="dialog" aria-modal="true" aria-labelledby="identity-title">
+        <form id="name-form" class="modal-card name-card">
+          <h2 id="identity-title">Your Baker Name</h2>
+          <label for="player-name-input">Your name on the bakery sign</label>
+          <input id="player-name-input" type="text" maxlength="18" autocomplete="off" spellcheck="false" aria-describedby="player-name-help player-name-error" />
+          <p id="player-name-help">Up to 18 letters, numbers, spaces, _ or -. Leave it empty to use the guest name.</p>
+          <p id="player-name-error" role="alert" hidden>Use 18 characters or fewer: letters, numbers, spaces, _ or -.</p>
+          <div class="name-actions"><button class="wood-button" type="submit">Save Name</button><button class="wood-button" type="button" data-action="cancel-name">Cancel</button></div>
+        </form>
       </section>
       <section id="modal" class="screen overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-card"><h2 id="modal-title"></h2><p id="modal-message"></p>

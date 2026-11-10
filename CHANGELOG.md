@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.0 - Bakery menu, baker identity and Hooman Dex (2026-11-10)
+
+- Replace the generic menu backdrop with a detailed original pixel-art bakery interior.
+- Integrate the menu's action buttons into the bakery's chalkboard sign and player identity into the counter nameplate.
+- Add default `#guest#000001`, local editable baker names, input validation and a persisted name editor.
+- Add **SekaFaji Games** studio branding to the bakery menu.
+- Separate **Pastry Book** and **Hooman Dex** within the encyclopedia.
+- Reveal Hoomans in the Dex only after encountering them in gameplay; future enemy types are not spoiled.
+- Migrate previously-cleared stages to discovered Hoomans for returning players.
+- Rename the incoming-customer preview to **Today's Hoomans**.
+- Preserve all gameplay, rolling pins, level unlocks and existing save progression.
+
+
 ## 0.2.1 - Rolling pin cleanup and menu wording (2026-11-10)
 
 - Reworked the lane-saver so the rolling pin reads more clearly as the bakery replacement for a lawn mower.

@@ -34,5 +34,6 @@ export interface GameState {
 export type GameEvent =
   | { type: 'banner'; message: string; duration: number }
   | { type: 'tip'; message: string }
+  | { type: 'hooman'; kind: string }
   | { type: 'win' }
   | { type: 'lose' };

@@ -7,6 +7,7 @@ export class GameEngine {
   readonly state: GameState;
   private readonly events: GameEvent[] = [];
   private ended = false;
+  private readonly encountered = new Set<string>();
 
   constructor(levelIndex: number, private readonly random: () => number = Math.random) {
     const level = LEVELS[levelIndex];
@@ -63,7 +64,13 @@ export class GameEngine {
   }
 
   private spawnEnemy(kind: string, row: number, x = COLUMNS + .3): void {
-    this.state.enemies.push({ kind, row, x, health: ENEMIES[kind].hp, slow: 0 });
+    const enemy = ENEMIES[kind];
+    if (!enemy) throw new RangeError(`Unknown Hooman type: ${kind}`);
+    this.state.enemies.push({ kind, row, x, health: enemy.hp, slow: 0 });
+    if (!this.encountered.has(kind)) {
+      this.encountered.add(kind);
+      this.events.push({ type: 'hooman', kind });
+    }
   }
 
   private beginStep(step: TutorialStep): void {

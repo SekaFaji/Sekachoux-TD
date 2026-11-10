@@ -2,6 +2,9 @@ import { createSpriteAtlas, drawBattlefield, drawMenuBackground, type SpriteAtla
 import { DEFENDERS, ENEMIES } from '../game/catalog.js';
 import { campaignLevelLabel, nextPlayableLevel, stageCompleteMessage } from '../game/campaign.js';
 import { GameEngine } from '../game/engine.js';
+import { loadDiscoveredHoomans, recordDiscoveredHooman } from '../game/discovery.js';
+import { GUEST_NAME, loadPlayerName, savePlayerName } from '../profile/identity.js';
+import type { EnemyKind } from '../game/levels.js';
 import { LEVELS } from '../game/levels.js';
 import { loadUnlocked, saveUnlocked } from '../game/progress.js';
 import { COLUMNS, ROWS, TILE } from '../game/types.js';
@@ -24,6 +27,8 @@ export class GameApp {
   private engine: GameEngine | null = null;
   private selected: string | null = null;
   private unlocked = loadUnlocked();
+  private knownHoomans: EnemyKind[] = loadDiscoveredHoomans(this.unlocked);
+  private playerName = loadPlayerName();
   private playing = false;
   private animation = 0;
   private previewTimer = 0;
@@ -39,7 +44,10 @@ export class GameApp {
     byId<HTMLImageElement>('butter-icon').src = this.sprites.url('butter');
     byId<HTMLImageElement>('shovel-icon').src = this.sprites.url('shovel');
     drawMenuBackground(byId<HTMLCanvasElement>('menu-art'), this.sprites);
+    this.updateProfile();
+    byId<HTMLFormElement>('name-form').addEventListener('submit', e => { e.preventDefault(); this.submitName(); });
     this.frame.addEventListener('click', e => this.onButtonClick(e));
+    this.frame.addEventListener('keydown', e => { if (e.key === 'Escape') this.closeNameEditor(); });
     this.canvas.addEventListener('pointerdown', e => this.onBoardPointer(e));
     document.addEventListener('visibilitychange', () => { if (document.hidden && this.playing) this.pause(); });
     window.addEventListener('blur', () => { if (this.playing) this.pause(); });
@@ -98,24 +106,65 @@ export class GameApp {
     this.show('level-screen');
   }
 
-  private buildAlmanac(): void {
+  private buildAlmanac(tab: 'pastries' | 'hoomans'): void {
     const list = byId<HTMLElement>('almanac-list');
     list.replaceChildren();
-    const add = (key: string, name: string, description: string, stat: string) => {
+    const pastries = tab === 'pastries';
+    byId<HTMLElement>('almanac-title').textContent = pastries ? 'Pastry Book' : 'Hooman Dex';
+    byId<HTMLElement>('tab-pastries').classList.toggle('active-tab', pastries);
+    byId<HTMLElement>('tab-hoomans').classList.toggle('active-tab', !pastries);
+    const entries = pastries
+      ? (LEVELS[Math.max(0, this.unlocked - 1)]?.available ?? []).map(kind => ({ key: kind, name: DEFENDERS[kind].n, description: DEFENDERS[kind].d, stat: `${DEFENDERS[kind].c} butter` }))
+      : this.knownHoomans.map(kind => ({ key: `${kind}0`, name: ENEMIES[kind].n, description: ENEMIES[kind].d, stat: `Health ${ENEMIES[kind].hp}` }));
+    byId<HTMLElement>('almanac-count').textContent = pastries
+      ? `${entries.length} of ${Object.keys(DEFENDERS).length} pastries earned`
+      : `${entries.length} of ${Object.keys(ENEMIES).length} Hoomans discovered`;
+    const empty = byId<HTMLElement>('almanac-empty');
+    empty.hidden = entries.length !== 0;
+    for (const entry of entries) {
       const article = document.createElement('article');
       const image = new Image();
       image.alt = '';
-      image.src = this.sprites.url(key);
+      image.src = this.sprites.url(entry.key);
       const info = document.createElement('div');
       const heading = document.createElement('b');
-      heading.textContent = name;
-      info.append(heading, document.createTextNode(`${stat} - ${description}`));
+      heading.textContent = entry.name;
+      const role = document.createElement('span');
+      role.className = 'codex-detail';
+      role.textContent = `${entry.stat} - ${entry.description}`;
+      info.append(heading, role);
       article.append(image, info);
       list.append(article);
-    };
-    for (const [key, value] of Object.entries(DEFENDERS)) add(key, value.n, value.d, `Cost ${value.c}`);
-    for (const [key, value] of Object.entries(ENEMIES)) add(`${key}0`, value.n, value.d, `Health ${value.hp}`);
+    }
     this.show('almanac-screen');
+  }
+
+  private updateProfile(): void {
+    byId<HTMLElement>('profile-name').textContent = this.playerName;
+  }
+
+  private openNameEditor(): void {
+    const input = byId<HTMLInputElement>('player-name-input');
+    input.value = this.playerName === GUEST_NAME ? '' : this.playerName;
+    byId<HTMLElement>('player-name-error').hidden = true;
+    byId<HTMLElement>('identity-dialog').classList.add('active');
+    input.focus();
+  }
+
+  private closeNameEditor(): void {
+    byId<HTMLElement>('identity-dialog').classList.remove('active');
+  }
+
+  private submitName(): void {
+    const value = byId<HTMLInputElement>('player-name-input').value;
+    const saved = savePlayerName(value);
+    if (saved === null) {
+      byId<HTMLElement>('player-name-error').hidden = false;
+      return;
+    }
+    this.playerName = saved;
+    this.updateProfile();
+    this.closeNameEditor();
   }
 
   private buildCards(): void {
@@ -283,9 +332,12 @@ export class GameApp {
     } else if (action === 'shovel' && this.engine && this.playing && !this.engine.level.tutorial) {
       this.selected = this.selected === 'shovel' ? null : 'shovel';
       this.updateInterface();
-    } else if (action === 'adventure') this.startLevel(nextPlayableLevel(this.unlocked));
+    } else if (action === 'start-baking') this.startLevel(nextPlayableLevel(this.unlocked));
     else if (action === 'levels') { this.stopAnimation(); this.buildLevels(); }
-    else if (action === 'almanac') { this.stopAnimation(); this.buildAlmanac(); }
+    else if (action === 'pastry-book') { this.stopAnimation(); this.buildAlmanac('pastries'); }
+    else if (action === 'hooman-dex') { this.stopAnimation(); this.buildAlmanac('hoomans'); }
+    else if (action === 'edit-name') this.openNameEditor();
+    else if (action === 'cancel-name') this.closeNameEditor();
     else if (action === 'menu') { this.stopAnimation(); this.show('menu'); }
     else if (action === 'level') this.startLevel(Number(button.dataset.level));
     else if (action === 'retry' && this.engine) this.startLevel(this.engine.state.levelIndex);
@@ -337,6 +389,7 @@ export class GameApp {
     for (const event of this.engine.takeEvents()) {
       if (event.type === 'banner') this.showBanner(event.message, event.duration);
       else if (event.type === 'tip') this.setTip(event.message);
+      else if (event.type === 'hooman') this.knownHoomans = recordDiscoveredHooman(this.knownHoomans, event.kind);
       else if (event.type === 'win') {
         const index = this.engine.state.levelIndex;
         const reward = this.unlocked <= index + 1 ? this.engine.level.reward : undefined;
