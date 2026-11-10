@@ -1,124 +1,134 @@
 import type { SpriteAtlas } from './render.js';
 
 /**
- * Original hand-authored pixel scene. Navigation is HTML layered over painted
- * fixtures, so keyboard focus, screen readers and touch still work normally.
- * Rendered once at 480x270 and scaled without smoothing.
+ * Original art for a welcoming bakery storefront and its attached recipe-board menu.
+ * A painted 480x270 pixel diorama is scaled using nearest-neighbour interpolation.
+ * All interactive wording and controls live in HTML above the scenery.
  */
 export function drawBakeryScene(canvas: HTMLCanvasElement, sprites: SpriteAtlas): void {
-  const c = canvas.getContext('2d');
-  if (!c) throw new Error('Bakery menu canvas unavailable');
-  canvas.width = 480; canvas.height = 270; c.imageSmoothingEnabled = false;
-  const rect = (x: number, y: number, w: number, h: number, color: string): void => {
-    c.fillStyle = color; c.fillRect(x, y, w, h);
+  const g = canvas.getContext('2d');
+  if (!g) throw new Error('Bakery menu canvas unavailable');
+  canvas.width = 480;
+  canvas.height = 270;
+  g.imageSmoothingEnabled = false;
+  const r = (x: number,y: number,w: number,h: number,color: string): void => {
+    g.fillStyle=color; g.fillRect(x,y,w,h);
   };
-  const frame = (x: number, y: number, w: number, h: number, edge: string, face: string, highlight: string): void => {
-    rect(x, y, w, h, edge); rect(x + 3, y + 3, w - 6, h - 6, face);
-    rect(x + 4, y + 4, w - 8, 2, highlight);
-    rect(x + 4, y + 4, 2, h - 8, highlight);
+  const edge=(x:number,y:number,w:number,h:number,dark:string,light:string,face:string):void=>{
+    r(x,y,w,h,dark);r(x+3,y+3,w-6,h-6,face);
+    r(x+4,y+4,w-8,2,light);r(x+4,y+4,2,h-8,light);
   };
-  // Bakery plaster walls with warm skylight and staggered brick details.
-  for (let y = 0; y < 190; y++) {
-    const glow = Math.round(205 + 25 * (1 - y / 190));
-    rect(0, y, 480, 1, `rgb(${glow},${Math.round(glow * .78)},${Math.round(glow * .53)})`);
+  const diamond=(x:number,y:number,color:string):void=>{
+    r(x,y+2,7,3,color);r(x+2,y,3,7,color);
+  };
+
+  // Soft mint-and-ivory painted plaster with warm bakery light from the window.
+  for(let y=0;y<270;y++){
+    const t=y/270;
+    r(0,y,480,1,'rgb('+Math.round(233-33*t)+','+Math.round(239-27*t)+','+Math.round(222-24*t)+')');
   }
-  for (let y = 8; y < 191; y += 18) {
-    rect(0, y, 480, 1, '#b99066');
-    for (let x = y % 36 ? 16 : 0; x < 480; x += 34) {
-      rect(x, y, 1, 17, '#bd956b'); rect(x + 4, y + 4, 8, 1, '#e7c79e');
+  for(let y=28;y<224;y+=29){
+    for(let x=0;x<480;x+=48){
+      const offset=(Math.floor(y/29)%2)*24;
+      r(x+offset,y,23,1,'#d4dfd0');
+      r(x+offset+17,y+1,1,6,'#dae2d6');
     }
   }
-  // Ceiling rafters and heavy timber posts.
-  rect(0, 0, 480, 12, '#4d2818'); rect(0, 10, 480, 4, '#8e4c2a');
-  rect(0, 13, 480, 2, '#e1a260');
-  for (const x of [0, 292, 474]) {
-    rect(x, 13, 7, 200, '#572c19'); rect(x + 2, 15, 2, 183, '#9d5a2e');
-    for (let y = 32; y < 190; y += 37) rect(x + 1, y, 5, 2, '#c18b4f');
+  // Raised structural beams, sage trim and a blush-copper molding.
+  r(0,0,480,13,'#385a4b'); r(0,11,480,4,'#729e84');r(0,15,480,2,'#d3ad79');
+  r(0,77,480,5,'#476c5b');r(0,81,480,2,'#ddbd87');
+  r(0,226,480,8,'#395849');r(0,233,480,3,'#d39b69');
+  for(const x of [0,295,476]){
+    r(x,18,4,214,'#547766');r(x+1,20,1,206,'#a9c4a8');
+    for(let y=90;y<229;y+=42) r(x,y,4,2,'#d9b386');
   }
-  // Window onto the bakery's sunny courtyard. Thick timber frame is deliberately chunky.
-  frame(16, 83, 122, 107, '#4d2b1c', '#e1b375', '#f3cf91');
-  rect(23, 89, 108, 94, '#7ab7de');
-  for (let y = 89; y < 146; y++) rect(24, y, 107, 1, `rgb(${100 + ((y - 89) >> 2)},${173 + ((y - 89) >> 3)},${213 + ((y - 89) >> 3)})`);
-  rect(24, 150, 107, 33, '#79a360');
-  rect(24, 157, 107, 26, '#6c9256');
-  for (let x = 22; x < 130; x += 31) {
-    rect(x, 144 + (x % 7), 3, 34, '#e9d9b2'); rect(x + 2, 149, 1, 22, '#ac916b');
+
+  // Main sign: a hanging bakery-style porcelain plaque.
+  r(45,12,2,13,'#866b4d');r(255,12,2,13,'#866b4d');
+  edge(17,23,270,54,'#3a594a','#f8e4b8','#eef1da');
+  r(23,29,258,42,'#fff8e7');
+  r(25,31,254,2,'#f9e4be');r(25,67,254,1,'#c0d8c5');
+  for(const x of [25,275]) for(const y of [30,65])diamond(x,y,'#d6a466');
+  r(20,74,264,2,'#bd885f');
+  // Small crest which doesn't interfere with the live title text.
+  r(34,39,12,1,'#a9c8b1');r(39,35,2,11,'#a9c8b1');
+  r(255,39,12,1,'#a9c8b1');r(260,35,2,11,'#a9c8b1');
+
+  // Wide arched shop window: softly lit shelves and street beyond.
+  edge(15,93,270,127,'#4a6c5c','#e9cb95','#f1d6a7');
+  for(let y=101;y<209;y++){
+    const t=(y-101)/108;
+    r(23,y,254,1,'rgb('+Math.round(150+38*t)+','+Math.round(199+20*t)+','+Math.round(189-9*t)+')');
   }
-  // Distant bakery rooftops beyond the window.
-  rect(40, 118, 30, 34, '#eac29c'); rect(39, 115, 32, 4, '#ba6342');
-  rect(83, 128, 32, 27, '#e2b995'); rect(81, 124, 37, 5, '#aa5b40');
-  rect(48, 133, 7, 11, '#94613d'); rect(94, 137, 8, 11, '#94613d');
-  // Crossbars and window sill.
-  rect(75, 87, 7, 99, '#704225'); rect(78, 90, 2, 95, '#d2a36a');
-  rect(22, 124, 109, 5, '#704225'); rect(24, 125, 104, 2, '#f5cd93');
-  rect(9, 181, 133, 9, '#6d3d26'); rect(10, 181, 131, 3, '#dfaa6f');
-  // A row of patterned floor tiles recedes behind the bakery counter.
-  rect(0, 190, 480, 80, '#a86b42');
-  for (let y = 190; y < 270; y += 18) {
-    for (let x = 0; x < 480; x += 28) {
-      rect(x + ((y / 18) % 2) * 14, y, 27, 17, (x + y) % 3 ? '#c18b62' : '#d9ab80');
-    }
-    rect(0, y, 480, 2, '#765039');
+  // Glowing distant skyline, planter silhouettes.
+  r(24,163,252,45,'#bad0b1');
+  for(const [x,y,w] of [[27,151,37],[77,137,49],[139,158,37],[195,143,42],[244,153,34]] as const){
+    r(x,y,w,166-y,'#d1d4bb');r(x+3,y+4,w-6,3,'#e9dcc1');
   }
-  // A brick oven is visible behind the pastry display.
-  rect(141, 104, 129, 95, '#74432e'); rect(146, 109, 119, 86, '#c78451');
-  for (let y = 115; y < 189; y += 13) {
-    rect(149, y, 113, 2, '#a05e3b');
-    for (let x = 151 + ((y / 13 | 0) % 2) * 13; x < 259; x += 26) rect(x, y + 1, 1, 12, '#a05e3b');
+  for(const x of [32,71,194,249]){
+    r(x,153,3,46,'#5a7d64');
+    for(let i=0;i<5;i++){r(x-7+i*2,140+i%2*5,21-i*3,7,'#81ae87');}
   }
-  // Oven arch, inside fire and its metallic baking tray.
-  c.fillStyle = '#4b231b'; c.beginPath(); c.arc(208, 156, 39, Math.PI, 0); c.lineTo(247, 191); c.lineTo(169, 191); c.closePath(); c.fill();
-  c.fillStyle = '#251610'; c.beginPath(); c.arc(208, 160, 32, Math.PI, 0); c.lineTo(240, 190); c.lineTo(176, 190); c.closePath(); c.fill();
-  rect(184, 183, 50, 4, '#be7045'); rect(197, 171, 6, 13, '#faad43'); rect(202, 165, 7, 19, '#ffd16a');
-  rect(210, 172, 6, 12, '#ff8331'); rect(216, 176, 6, 8, '#f7a83a');
-  rect(177, 191, 62, 6, '#4b291e'); rect(180, 192, 56, 2, '#ecc48a');
-  // Baguettes on angled racks to the right of the oven, behind the chalkboard.
-  rect(273, 114, 25, 81, '#774627'); rect(275, 116, 20, 75, '#ad7344');
-  for (let y = 122; y < 183; y += 16) {
-    rect(277, y + 1, 16, 10, '#8c522d'); rect(279, y, 11, 7, '#dc9750');
-    rect(281, y + 1, 2, 2, '#ffe0a0'); rect(286, y + 3, 3, 2, '#bc6e32');
+  // A bright red-and-cream bakery awning, with careful restrained highlights.
+  r(11,90,278,12,'#c77862');
+  for(let i=0;i<18;i++){
+    const x=12+i*15;
+    r(x,92,8,10,i%2===0?'#f8efde':'#b85d4b');
+    r(x,101,8,3,i%2===0?'#e6dfd1':'#a24b40');
   }
-  // A glass display case and pastry trays are the visual anchor of the left half.
-  rect(29, 183, 259, 49, '#5b3020'); rect(33, 188, 250, 38, '#b57743');
-  rect(36, 193, 244, 27, '#d3b58c');
-  for (let x = 47; x <= 250; x += 38) {
-    rect(x, 210, 32, 4, '#6b4933');
-    rect(x + 3, 204, 26, 6, '#e4a655'); rect(x + 7, 201, 18, 4, '#f4cc79');
-    rect(x + 9, 202, 4, 1, '#fff3be'); rect(x + 20, 204, 3, 1, '#b5793d');
+  r(11,89,278,2,'#fff9e7');r(11,104,278,2,'#8c6455');
+  // Mullions anchor the window and show reflections without visual noise.
+  r(95,106,5,105,'#5c7b67');r(101,108,1,100,'#e3f4e1');
+  r(188,106,5,105,'#5c7b67');r(194,108,1,100,'#e3f4e1');
+  r(24,165,252,4,'#6d927d');r(24,166,252,1,'#e1efd5');
+  r(37,109,3,45,'#fff8f0a8');r(43,109,1,36,'#fff8f0');
+  r(214,109,2,31,'#fff8f0a8');r(219,109,1,25,'#fff8f0');
+
+  // A glass pastry showcase: shelves, crisp copper frames and plump pastries.
+  r(28,175,244,49,'#526f64');
+  r(32,180,236,38,'#e5ebd9');
+  r(35,183,229,30,'#a8c4b7');
+  r(38,187,222,23,'#d6e9db');
+  for(const [x,kind,size] of [[45,'croissant',37],[92,'butter',35],[137,'baguette',35],[178,'pretzel',37],[220,'pie',36]] as const){
+    r(x-3,204,42,4,'#a77a52');
+    g.drawImage(sprites.images[kind],x,170,size,size);
   }
-  rect(35, 186, 246, 5, '#eee6c8'); rect(35, 190, 246, 3, '#8bb1bb');
-  rect(35, 193, 2, 29, '#b6dae2'); rect(278, 193, 2, 29, '#6b8991');
-  rect(37, 213, 240, 4, '#afc9bf80'); rect(35, 224, 246, 5, '#6e3c22');
-  // A couple of larger character pastries displayed on the counter.
-  c.drawImage(sprites.images.croissant, 51, 174, 37, 37);
-  c.drawImage(sprites.images.butter, 106, 178, 30, 30);
-  c.drawImage(sprites.images.pretzel, 226, 179, 31, 31);
-  // Lower solid counter panel and inset joinery.
-  rect(17, 231, 279, 39, '#4c271b'); rect(21, 231, 270, 35, '#925a35');
-  rect(23, 233, 263, 3, '#dfab6e');
-  for (const x of [25, 109, 193]) frame(x, 241, 75, 24, '#5d331d', '#764224', '#a76b40');
-  // Menu chalkboard is built into the bakery wall. Navigation overlays this fixture.
-  frame(302, 68, 165, 179, '#301c14', '#67402b', '#b48456');
-  frame(309, 75, 151, 165, '#3b261a', '#273a32', '#677568');
-  rect(315, 81, 138, 153, '#1e3029'); rect(318, 83, 132, 148, '#263c31');
-  rect(325, 84, 118, 1, '#5f7a5c');
-  for (let i = 0; i < 27; i++) {
-    const x = 320 + ((i * 43) % 129), y = 91 + ((i * 31) % 126);
-    rect(x, y, 1 + (i % 2), 1, i % 3 ? '#385347' : '#465a4c');
+  r(32,212,237,3,'#fff4db');r(32,215,237,4,'#789c8d');
+  r(29,181,4,40,'#d8e7da');r(267,181,4,40,'#648879');
+  r(51,180,1,31,'#ffffff88');r(54,184,1,27,'#f4faf0');
+  r(154,179,1,35,'#ffffff6a');
+  // Painted base cabinets with antique brass handles and a clear customer nameplate.
+  r(12,222,281,48,'#395648');r(17,226,272,44,'#628876');
+  r(19,227,269,4,'#d4b28c');
+  for(let i=0;i<3;i++){
+    const x=24+i*87;
+    edge(x,236,79,31,'#355247','#9fbc9d','#537865');
+    r(x+33,247,13,2,'#e3b57b');
+    r(x+37,244,5,7,'#f8dba3');
   }
-  // Chalkboard metal nails and flour-sack emblems.
-  for (const [x,y] of [[306,72],[461,72],[306,242],[461,242]]) {
-    rect(x, y, 4, 4, '#deb476'); rect(x + 1, y + 1, 1, 1, '#fff0bd');
+  // Small hand-painted flour sacks and spatula on the counter rim.
+  r(7,239,18,25,'#f5e9d4');r(9,236,14,5,'#fff8ea');
+  r(8,263,17,2,'#b9af9b');r(13,242,1,11,'#c9ac85');
+  r(279,240,10,24,'#ead8bb');r(281,237,6,4,'#f7ecd2');
+  r(279,263,10,2,'#b6a281');
+
+  // The menu board is a fixture attached to the shop wall, not a floating pop-up.
+  // Button positions are controlled in CSS and sit within this painted frame.
+  r(298,51,180,207,'#304b40');r(301,54,174,201,'#caab80');
+  r(306,59,164,190,'#466d5c');r(309,62,158,184,'#243f35');
+  r(312,65,152,178,'#304b40');
+  r(314,67,148,1,'#749782');
+  r(315,238,146,2,'#426858');
+  for(const [x,y] of [[302,56],[469,56],[302,251],[469,251]] as const){
+    r(x,y,5,5,'#e5b672');r(x+1,y+1,2,2,'#fff1bb');
   }
-  // Wooden bakery sign hanging on chains, intentionally aligned with HTML heading.
-  rect(41, 14, 2, 12, '#37241b'); rect(261, 14, 2, 12, '#37241b');
-  frame(21, 23, 266, 58, '#422215', '#7f4b2c', '#d9a061');
-  rect(27, 29, 254, 45, '#a86a3d');
-  rect(30, 31, 247, 3, '#e1ab66'); rect(31, 68, 246, 2, '#643520');
-  // Brass corner pins and a center-of-sign baker's stamp.
-  for (const x of [28, 276]) for (const y of [29, 70]) rect(x, y, 3, 3, '#ffe0a3');
-  // Paper shop tags and a small flour sack in the corner.
-  frame(17, 233, 165, 32, '#4c2a1c', '#dfb77a', '#fae8b3');
-  rect(23, 236, 153, 2, '#fff0c1');
-  // The scene has no baked-in button labels. All navigation stays accessible HTML.
+  // A chalk sprig and tiny oven-mitt decorations set this apart from generic menu boxes.
+  for(let i=0;i<5;i++){
+    r(320+i*2,78-i*2,2,2,'#a3c5a7');
+    r(325+i*3,80+i*2,2,2,'#d0dbc1');
+  }
+  for(let i=0;i<5;i++){
+    r(438+i*2,77+i,2,2,'#b8d3ac');r(450-i*2,79+i,2,2,'#d7e4c8');
+  }
+  // No labels are burned into the canvas: buttons remain keyboard-friendly HTML.
 }

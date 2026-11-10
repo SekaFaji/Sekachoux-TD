@@ -16,7 +16,7 @@ export class GameEngine {
       levelIndex, butter: level.startingButter, defenders: [], enemies: [], projectiles: [],
       drops: [], effects: [], pins: level.activeRows.map(row => ({ row, x: .5, active: false, used: false })),
       elapsed: 0, spawnTimer: 10, dropTimer: 4, cooldowns: {}, firstWave: false, finalWave: false,
-      collected: 0, placed: {}, kills: 0, tutorialIndex: 0, intro: 2.6, introLabel: '',
+      collected: 0, placed: {}, kills: 0, lastDefeated: null, tutorialIndex: 0, intro: 2.6, introLabel: '',
     };
   }
 
@@ -178,7 +178,13 @@ export class GameEngine {
     }
     for (const drop of s.drops) { drop.y = Math.min(drop.targetY, drop.y + .75 * dt); drop.life -= dt; }
     for (const effect of s.effects) effect.life -= dt;
-    s.kills += s.enemies.filter(z => z.health <= 0).length;
+    const defeated = s.enemies.filter(z => z.health <= 0);
+    if (defeated.length) {
+      const finalHooman = defeated[defeated.length - 1];
+      // Preserve the physical drop location for earned recipe cards.
+      s.lastDefeated = { x: finalHooman.x, row: finalHooman.row };
+    }
+    s.kills += defeated.length;
     s.projectiles = s.projectiles.filter(shot => !shot.consumed);
     s.enemies = s.enemies.filter(z => z.health > 0);
     s.defenders = s.defenders.filter(p => p.health > 0);

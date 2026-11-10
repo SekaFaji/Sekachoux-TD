@@ -43,6 +43,8 @@ export class GameApp {
   private bannerTimer = 0;
   private previousFrame = 0;
   private frameCount = 0;
+  private pendingReward: { kind: string; levelIndex: number } | null = null;
+  private rewardTimer = 0;
 
   constructor() {
     this.sprites = createSpriteAtlas();
@@ -179,22 +181,26 @@ export class GameApp {
     byId<HTMLElement>('almanac-count').textContent = `${entries.filter(entry => !entry.locked).length} of ${entries.length} ${pastries ? 'pastries earned' : 'Hoomans discovered'}`;
     for (const entry of entries) {
       const article = document.createElement('article');
-      article.className = entry.locked ? 'codex-card-locked' : 'codex-card-known';
+      article.className = 'recipe-card ' + (entry.locked ? 'codex-card-locked' : 'codex-card-known');
       article.setAttribute('aria-label', entry.locked ? (pastries ? 'Undiscovered pastry' : 'Undiscovered Hooman') : entry.name);
+      const header = document.createElement('span');
+      header.className = 'recipe-card-label';
+      header.textContent = pastries ? 'PASTRY RECIPE' : 'HOOMAN FILE';
       const portrait = document.createElement('div');
       portrait.className = 'codex-portrait';
       const image = new Image();
       image.alt = '';
       image.src = this.sprites.url(entry.imageKey);
       portrait.append(image);
-      const info = document.createElement('div');
       const heading = document.createElement('b');
       heading.textContent = entry.name;
       const role = document.createElement('span');
       role.className = 'codex-detail';
-      role.textContent = `${entry.stat} - ${entry.description}`;
-      info.append(heading, role);
-      article.append(portrait, info);
+      role.textContent = entry.description;
+      const stat = document.createElement('span');
+      stat.className = 'recipe-stat';
+      stat.textContent = entry.stat;
+      article.append(header, portrait, heading, role, stat);
       list.append(article);
     }
     this.show('almanac-screen');
@@ -358,6 +364,57 @@ export class GameApp {
     } else info.style.display = 'none';
   }
 
+  /** A new pastry card drops where the last defeated Hooman fell. */
+  private showRewardDrop(kind: string, levelIndex: number): void {
+    if (!this.engine) return;
+    const layer = byId<HTMLElement>('reward-drop-layer');
+    const button = byId<HTMLButtonElement>('reward-drop-card');
+    const unit = DEFENDERS[kind];
+    const fallen = this.engine.state.lastDefeated;
+    const x = fallen?.x ?? 4.5;
+    const row = fallen?.row ?? 2;
+    button.style.left = String(Math.max(14, Math.min(84, x / COLUMNS * 100))) + '%';
+    button.style.top = String(Math.max(26, Math.min(77, (row + .5) / ROWS * 100))) + '%';
+    byId<HTMLImageElement>('reward-drop-image').src = this.sprites.url(kind);
+    byId<HTMLImageElement>('reward-drop-image').alt = unit.n;
+    byId<HTMLElement>('reward-drop-name').textContent = unit.n;
+    button.setAttribute('aria-label', 'Collect ' + unit.n + ' recipe card');
+    this.pendingReward = { kind, levelIndex };
+    layer.hidden = false;
+    this.sound.play('butter');
+    clearTimeout(this.rewardTimer);
+    this.rewardTimer = window.setTimeout(() => this.collectReward(), 5000);
+    button.focus();
+  }
+
+  private collectReward(): void {
+    const reward = this.pendingReward;
+    if (!reward) return;
+    this.pendingReward = null;
+    clearTimeout(this.rewardTimer);
+    this.rewardTimer = 0;
+    byId<HTMLElement>('reward-drop-layer').hidden = true;
+    this.sound.play('win');
+    this.showWinModal(reward.levelIndex, reward.kind);
+  }
+
+  private showWinModal(index: number, reward?: string): void {
+    const last = index === LEVELS.length - 1;
+    this.modal(
+      reward ? 'NEW RECIPE COLLECTED!' : last ? 'BAKERY SAVED!' : 'SHIFT COMPLETE!',
+      reward ? 'Your new pastry joins the Recipe Book. It can be baked from the next shift!' : stageCompleteMessage(index),
+      last ? ['Main Menu', 'menu'] : ['Next Shift', 'next'], ['Level Select', 'levels']
+    );
+    if (reward) {
+      const unit = DEFENDERS[reward];
+      byId<HTMLElement>('reward-feature').hidden = false;
+      byId<HTMLImageElement>('reward-image').src = this.sprites.url(reward);
+      byId<HTMLImageElement>('reward-image').alt = unit.n;
+      byId<HTMLElement>('reward-name').textContent = unit.n;
+      byId<HTMLElement>('reward-description').textContent = unit.d;
+    }
+  }
+
   private onBoardPointer(event: PointerEvent): void {
     if (!this.playing || !this.engine || this.engine.state.intro > 0) return;
     const cell = pointerToGrid(event.clientX, event.clientY, this.canvas.getBoundingClientRect());
@@ -388,6 +445,7 @@ export class GameApp {
       return;
     }
     if (action === 'skip-intro') { this.beginBattle(); return; }
+    if (action === 'collect-reward') { this.collectReward(); return; }
     if (action === 'card' && this.engine && this.playing) {
       const kind = button.dataset.kind ?? '';
       if (this.engine.allowed(kind)) this.selected = this.selected === kind ? null : kind;
@@ -423,6 +481,10 @@ export class GameApp {
 
   private stopAnimation(): void {
     this.playing = false;
+    clearTimeout(this.rewardTimer);
+    this.rewardTimer = 0;
+    this.pendingReward = null;
+    byId<HTMLElement>('reward-drop-layer').hidden = true;
     cancelAnimationFrame(this.animation);
     this.animation = 0;
     cancelAnimationFrame(this.introAnimation);
@@ -469,21 +531,14 @@ export class GameApp {
       else if (event.type === 'tip') this.setTip(event.message);
       else if (event.type === 'hooman') this.knownHoomans = recordDiscoveredHooman(this.knownHoomans, event.kind);
       else if (event.type === 'win') {
-        this.sound.play('win');
         const index = this.engine.state.levelIndex;
         const reward = this.unlocked <= index + 1 ? this.engine.level.reward : undefined;
         this.unlocked = saveUnlocked(Math.max(this.unlocked, index + 2));
         this.stopAnimation();
-        const last = index === LEVELS.length - 1;
-        this.modal(last ? 'BAKERY SAVED!' : 'SHIFT COMPLETE!', stageCompleteMessage(index),
-          last ? ['Main Menu', 'menu'] : ['Next Shift', 'next'], ['Level Select', 'levels']);
-        if (reward) {
-          const unit = DEFENDERS[reward];
-          byId<HTMLElement>('reward-feature').hidden = false;
-          byId<HTMLImageElement>('reward-image').src = this.sprites.url(reward);
-          byId<HTMLImageElement>('reward-image').alt = unit.n;
-          byId<HTMLElement>('reward-name').textContent = unit.n;
-          byId<HTMLElement>('reward-description').textContent = unit.d;
+        if (reward) this.showRewardDrop(reward, index);
+        else {
+          this.sound.play('win');
+          this.showWinModal(index);
         }
       } else if (event.type === 'lose') {
         this.sound.play('lose');

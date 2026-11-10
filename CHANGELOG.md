@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.0 - Bakery menu, recipe cards and clear gameplay HUD (2026-11-10)
+
+- Completely redraw the main-menu bakery storefront: brighter pastel architecture, arched shop window, pastry glass case, copper fixtures and integrated recipe-board navigation.
+- Reposition the gameplay butter counter to the top-right and group pause/shovel beneath it; keep all pastry cards together on the left.
+- Turn both Recipe Book collections into consistent vertical portrait cards, with masked silhouettes, mystery names and hidden descriptions preserved until discovered.
+- When a first-time tutorial unlock is earned, drop a glowing collectible recipe card at the last fallen Hooman's position. Allow the player to tap it or collect it automatically after five seconds.
+- On collection, show a large recipe card in the victory screen. Replays do not incorrectly award already earned cards, and unlocked progress is saved as soon as a shift is won.
+- Retain existing butter artwork, gameplay balance, sound, settings, save migration and landscape layout; expand regression coverage.
+
+
 ## 0.6.0 - Bakery art direction, butter and field overhaul (2026-11-10)
 
 - Replace checkerboard tile fills with continuous pale stone and linen baking trays, subtle placement registration marks, copper trim and subdued inactive lanes.
