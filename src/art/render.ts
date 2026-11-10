@@ -22,7 +22,7 @@ export function drawBattlefield(canvas: HTMLCanvasElement, state: GameState, lev
   const x = canvas.getContext('2d'); if (!x) throw new Error('Cannot draw game'); x.imageSmoothingEnabled = false;
   drawBakeryWorktop(x, level.activeRows);
   // Target oven tray slots glow during teaching steps. The rule lives in the level data.
-  const guide = L.tutorial?.[state.tutorialIndex];
+  const guide = level.tutorial?.[state.tutorialIndex];
   if (state.intro <= 0 && guide?.condition.type === 'placed' && guide.focusRow !== undefined) {
     const left = (guide.minColumn ?? 0) * TILE;
     const right = ((guide.maxColumn ?? COLUMNS - 1) + 1) * TILE;
