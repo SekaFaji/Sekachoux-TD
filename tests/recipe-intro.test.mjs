@@ -37,23 +37,21 @@ test('Hooman Dex displays four slots; only encountered kinds show their names an
   assert.ok(after.filter(entry => entry.locked).every(entry => entry.stat === '???'));
 });
 
-test('camera opens on far-right Hooman approach, then zooms out to whole battlefield', () => {
-  assert.equal(APPROACH_DURATION_MS, 3900);
+test('camera starts over Hoomans on right and pans left at constant zoom', () => {
+  assert.equal(APPROACH_DURATION_MS, 3100);
   const start = approachCamera(0);
-  const held = approachCamera(.2);
-  const middle = approachCamera(.58);
+  const held = approachCamera(.12);
+  const middle = approachCamera(.57);
   const end = approachCamera(1);
   assert.deepEqual(start, held);
-  assert.ok(start.sourceX > 250);
-  assert.ok(start.sourceWidth < 288);
+  assert.equal(start.sourceX, 192);
   assert.ok(middle.sourceX < start.sourceX && middle.sourceX > 0);
-  assert.ok(middle.sourceWidth > start.sourceWidth && middle.sourceWidth < 288);
-  assert.ok(Math.abs(end.sourceX) < 1e-7);
-  assert.ok(Math.abs(end.sourceY) < 1e-7);
-  assert.ok(Math.abs(end.sourceWidth - 288) < 1e-7);
-  assert.ok(Math.abs(end.sourceHeight - 160) < 1e-7);
-  assert.deepEqual(approachCamera(-1), start);
-  assert.deepEqual(approachCamera(2), end);
+  assert.equal(end.sourceX, 0);
+  for (const frame of [start, held, middle, end, approachCamera(-1), approachCamera(2)]) {
+    assert.equal(frame.sourceY, 0);
+    assert.equal(frame.sourceWidth, 288);
+    assert.equal(frame.sourceHeight, 160);
+  }
 });
 
 

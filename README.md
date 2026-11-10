@@ -44,6 +44,13 @@ The six existing battle scenarios are retained as levels **1-5 through 1-10**. L
 
 Browser `localStorage` stores the highest available stage. The v2 save key is `sekachoux_td_unlocked_v2`. On the same browser origin, the previous `sekachoux_td_unlocked_v1` or `dc_unlocked` value is migrated. Players who completed the former long tutorial can enter at 1-5 without replaying the new teaching shifts. Progress is not shared between browser origins.
 
+## Bakery settings and credits
+
+- The bakery menu has **Settings** and **Credits** buttons. Settings let you adjust sound-effects volume, toggle sound on/off and test the generated audio. Sound preferences are saved locally, with no external audio assets or background music in this version.
+- **Reset Saved Progress** uses two confirmations. It permanently clears unlocked levels, historical/legacy save keys, encountered Hoomans and the custom baker name on this browser. Sound settings and other websites' data are not deleted.
+- Credits identify **SekaFaji Games** and the original in-project game art, code and sound effects.
+- Every level begins with upcoming Hoomans standing on the street at the right, followed by a **fixed-scale horizontal camera pan left** to the complete playfield. The intro does not zoom.
+
 ## Development
 
 Requires Node.js 22 or later.

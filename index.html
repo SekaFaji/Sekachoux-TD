@@ -18,6 +18,10 @@
           <button class="bakery-action bakery-primary" data-action="start-baking">Start Baking</button>
           <button class="bakery-action" data-action="levels">Level Select</button>
           <button class="bakery-action" data-action="recipe-book">Recipe Book</button>
+          <div class="bakery-utilities">
+            <button class="bakery-action bakery-secondary" data-action="settings">Settings</button>
+            <button class="bakery-action bakery-secondary" data-action="credits">Credits</button>
+          </div>
         </nav>
         <div id="menu-profile" aria-label="Player profile">
           <span class="profile-label">BAKED FOR</span>
@@ -40,6 +44,38 @@
         </div>
         <p id="almanac-count" class="panel-caption"></p>
         <div id="almanac-list"></div>
+        <button class="wood-button" data-action="menu">Back to Bakery</button>
+      </section>
+      <section id="settings-screen" class="screen panel-screen" aria-label="Settings">
+        <h2>Bakery Settings</h2>
+        <p class="panel-caption">Adjust the bakery sound and manage local saves.</p>
+        <div class="settings-panel">
+          <h3>Sound Effects</h3>
+          <label class="volume-label" for="sound-volume">Volume <output id="sound-volume-value" for="sound-volume">60%</output></label>
+          <input id="sound-volume" type="range" min="0" max="100" step="5" value="60" aria-label="Sound effects volume">
+          <div class="settings-sound-buttons">
+            <button class="wood-button" data-action="toggle-mute" id="sound-mute" aria-pressed="false">Sound On</button>
+            <button class="wood-button" data-action="test-sound">Test Sound</button>
+          </div>
+          <p class="settings-help">Original synthesized sound effects. No background music yet.</p>
+        </div>
+        <div class="settings-reset">
+          <span>Saved campaign, discovered Hoomans and baker name</span>
+          <button class="wood-button danger-button" data-action="reset-saves">Reset Saved Progress</button>
+        </div>
+        <button class="wood-button" data-action="menu">Back to Bakery</button>
+      </section>
+      <section id="credits-screen" class="screen panel-screen" aria-label="Game credits">
+        <h2>Credits</h2>
+        <div class="credits-board">
+          <strong>SEKACHOUX TD</strong>
+          <span>Bakery Defense</span>
+          <p>Made by <b>SekaFaji Games</b></p>
+          <p>Design, programming and original pixel art</p>
+          <p>Original synthesized sound effects</p>
+          <p>Built with TypeScript and HTML5 Canvas</p>
+          <small>Thank you for helping defend the bakery!</small>
+        </div>
         <button class="wood-button" data-action="menu">Back to Bakery</button>
       </section>
       <section id="game-screen" class="screen" aria-label="Bakery defense game">

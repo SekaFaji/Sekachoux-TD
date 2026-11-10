@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.0 - Settings, credits and camera pan (2026-11-10)
+
+- Add dedicated bakery Settings and Credits screens reachable from the main menu.
+- Implement persistent volume and mute controls for original generated sound effects, with a Test Sound action.
+- Add a two-confirmation local save reset: clear progress, legacy progress, encountered Hoomans and baker name only; keep sound preferences.
+- Replace the previous close-up zoom intro with a horizontal right-to-left camera move showing the upcoming Hoomans before the full playable bakery field.
+- Redraw the rolling-pin lane saver from a front-facing perspective while preserving its one-use lane defense behavior.
+- Add automated settings, reset safeguards, UI and camera regression tests.
+
+
 ## 0.4.0 - Recipe Book mysteries and in-world approach camera (2026-11-10)
 
 - Consolidate pastry and Hooman encyclopedia navigation under a single **Recipe Book** menu action, with two internal tabs.
