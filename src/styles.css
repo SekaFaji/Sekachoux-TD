@@ -870,3 +870,192 @@ canvas, img { image-rendering: pixelated; }
 @media (prefers-reduced-motion: reduce) {
   #menu #main-actions .retro-hit { transition: none; }
 }
+
+
+
+/* v0.9.0 - Living bakery title, following Sekampfire's in-game menu approach.
+ * The background uses gameplay sprites on an animated 320x180 canvas.
+ * Unlike v0.8 there are NO painted-in menu buttons or invisible hit areas. */
+#menu {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #2b403c;
+  color: #f9ebcb;
+}
+#menu:not(.active) { display: none; }
+#menu::after { display: none; }
+#menu #menu-art {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+#menu #title-block {
+  position: absolute;
+  left: 16%;
+  top: 7%;
+  width: 68%;
+  height: 25%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  gap: 1cqh;
+  margin: 0;
+  padding: 0;
+  color: #ffe6aa;
+  text-shadow: .3cqh .35cqh #2c2926;
+  pointer-events: none;
+}
+#menu #title-block h1 {
+  margin: 0;
+  padding: 0;
+  font: 900 7.1cqh/1.15 ui-monospace, 'Trebuchet MS', monospace;
+  color: #ffe1a0;
+  letter-spacing: .08cqw;
+  white-space: nowrap;
+  text-shadow: .3cqh .3cqh #3d281d, 0 0 2cqh #e7aa5d50;
+}
+#menu #title-block h1 span { color: #f5af73; }
+#menu #title-block p {
+  margin: 0;
+  padding: 0;
+  color: #e9dac1;
+  font: 800 2.45cqh/1.3 ui-monospace, 'Trebuchet MS', monospace;
+  letter-spacing: .14cqw;
+  text-shadow: .2cqh .25cqh #273a35;
+}
+#menu #main-actions {
+  position: absolute;
+  left: 32%;
+  right: auto;
+  top: 34%;
+  bottom: auto;
+  z-index: 3;
+  width: 36%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.05cqh;
+  margin: 0;
+  padding: 2.05cqh 1.05cqw;
+  border: .5cqh solid #b9996a;
+  border-radius: .6cqh;
+  background: rgba(17, 31, 34, .78);
+  box-shadow: inset 0 .35cqh #ddc59a55, 0 .7cqh 2.7cqh #121c1aba;
+  pointer-events: auto;
+}
+#menu #main-actions .title-action {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 8.3cqh;
+  flex: none;
+  margin: 0;
+  padding: .35cqh .25cqw;
+  border: .4cqh solid #668b7b;
+  border-radius: .3cqh;
+  background: rgba(48, 73, 70, .86);
+  color: #f5eada;
+  box-shadow: inset 0 .3cqh #9dc1a54f;
+  font: 850 2.7cqh/1 ui-monospace, 'Trebuchet MS', monospace;
+  text-align: center;
+  text-shadow: .2cqh .2cqh #223a31;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease, transform .12s ease;
+}
+#menu #main-actions .title-primary {
+  border-color: #edc481;
+  background: linear-gradient(#9e7548,#725037);
+  color: #fff1ca;
+  box-shadow: inset 0 .35cqh #f6d89c85, 0 0 1.2cqh #dda95c36;
+  font-size: 3.05cqh;
+}
+#menu #main-actions .title-action:hover,
+#menu #main-actions .title-action:focus-visible {
+  border-color: #ffe9a8;
+  background: #7b674a;
+  color: #fff6d7;
+  outline: .35cqh solid #f8dea4;
+  outline-offset: -.35cqh;
+}
+#menu #main-actions .title-action:active {
+  transform: translateY(.3cqh);
+  background: #92754e;
+}
+#menu #menu-profile {
+  position: absolute;
+  left: 2.6%;
+  top: auto;
+  right: auto;
+  bottom: 2.4%;
+  z-index: 4;
+  width: 31%;
+  height: 9.2cqh;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .4cqw;
+  margin: 0;
+  padding: .6cqh .5cqw;
+  border: .3cqh solid #d1b17e;
+  border-radius: .4cqh;
+  background: rgba(19, 33, 33, .85);
+  color: #f6e7c7;
+  box-shadow: inset 0 .25cqh #d3b57a55;
+  overflow: hidden;
+}
+#menu #menu-profile .profile-label {
+  display: inline;
+  flex: none;
+  color: #debf8c;
+  font-size: 1.75cqh;
+  letter-spacing: .05cqw;
+  line-height: 1.2;
+}
+#menu #menu-profile #profile-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: #ffecba;
+  font-size: 2cqh;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+  text-shadow: none;
+}
+#menu #menu-profile #edit-name {
+  display: block;
+  position: static;
+  flex: none;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: .55cqh .5cqw;
+  opacity: 1;
+  border: .3cqh solid #a6bb9d;
+  border-radius: .25cqh;
+  background: #405a50;
+  color: #fff0ca;
+  font: 900 1.75cqh/1 ui-monospace,monospace;
+  cursor: pointer;
+}
+#menu #menu-profile #edit-name:focus-visible {
+  outline: .4cqh solid #fce3a1;
+}
+@media (prefers-reduced-motion: reduce) {
+  #menu #main-actions .title-action { transition: none; }
+}

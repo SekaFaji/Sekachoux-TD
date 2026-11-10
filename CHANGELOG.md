@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.9.0 - Living bakery title menu (2026-11-10)
+
+- Replace the static retro-arcade image menu with a small in-game canvas scene, inspired by the proven Sekampfire title-screen approach.
+- Show a gently animated bakery with an oven glow, flour motes, a street-facing window and hungry Hoomans drawn with the actual gameplay sprites.
+- Reuse the existing Croissant, Butter Block, Baguette and rolling pin sprites for calm idle animations; preserve the Butter Block artwork and gameplay visuals.
+- Add a compact, readable translucent center menu with five visible native buttons: Start Baking, Level Select, Recipe Book, Settings and Credits.
+- Keep baker-name editing in a small lower-left strip. No prominent studio branding; SekaFaji Games remains in Credits. Fullscreen remains inside Settings.
+- Pause animation outside the title, while hidden, and on reduced-motion devices. Render at about 30 FPS on standard devices.
+- Remove the obsolete promotional WebP, painted-button hitbox mapping and asset copy step, reducing the Pages artifact size.
+- Preserve progression, currency, level previews, sound settings, two-step reset, unlock cards and the Recipe Book.
+- Add regression coverage for title scene sprites, animation lifecycle, visible controls and removed static menu assets.
+
+
 ## 0.8.0 - Retro arcade bakery-versus-Hoomans menu (2026-11-10)
 
 - Replace the previous programmatic bakery-interior artwork with the approved original illustrated retro arcade main menu, showing Croissant, Butter Block and pastry allies defending against hungry Hoomans gathered outside the bakery window.

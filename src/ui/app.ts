@@ -13,8 +13,7 @@ import { COLUMNS, ROWS, TILE } from '../game/types.js';
 import { fitLandscape, pointerToGrid } from './viewport.js';
 import { BakerySound } from '../audio/sound.js';
 import { clearGameSave } from '../settings/saveReset.js';
-import { positionBakeryMenu } from '../art/menuLayout.js';
-import { MENU_IMAGE_PATH } from '../art/bakeryScene.js';
+import { drawBakeryTitleScene } from '../art/bakeryScene.js';
 
 const byId = <T extends HTMLElement>(id: string): T => {
   const element = document.getElementById(id);
@@ -45,6 +44,9 @@ export class GameApp {
   private bannerTimer = 0;
   private previousFrame = 0;
   private frameCount = 0;
+  private menuAnimation = 0;
+  private menuStartedAt = 0;
+  private menuLastDraw = 0;
   private pendingReward: { kind: string; levelIndex: number } | null = null;
   private rewardTimer = 0;
 
@@ -54,8 +56,7 @@ export class GameApp {
     this.canvas.height = ROWS * TILE;
     byId<HTMLImageElement>('butter-icon').src = this.sprites.url('butter-drop');
     byId<HTMLImageElement>('shovel-icon').src = this.sprites.url('shovel');
-    byId<HTMLImageElement>('menu-art').src = MENU_IMAGE_PATH;
-    positionBakeryMenu(byId<HTMLElement>('menu'));
+    drawBakeryTitleScene(byId<HTMLCanvasElement>('menu-art'), this.sprites, 0);
     this.updateProfile();
     this.updateFullscreenControl();
     document.addEventListener('fullscreenchange', () => this.updateFullscreenControl());
@@ -70,7 +71,12 @@ export class GameApp {
     this.frame.addEventListener('click', e => this.onButtonClick(e));
     this.frame.addEventListener('keydown', e => { if (e.key === 'Escape') this.closeNameEditor(); });
     this.canvas.addEventListener('pointerdown', e => this.onBoardPointer(e));
-    document.addEventListener('visibilitychange', () => { if (document.hidden && this.playing) this.pause(); });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (this.playing) this.pause();
+        this.stopMenuAnimation();
+      } else if (byId<HTMLElement>('menu').classList.contains('active')) this.startMenuAnimation();
+    });
     window.addEventListener('blur', () => { if (this.playing) this.pause(); });
     const measure = () => this.resize();
     const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
@@ -99,6 +105,35 @@ export class GameApp {
     });
     byId<HTMLElement>('modal').classList.remove('active');
     this.resetStep = 0;
+    if (name === 'menu') this.startMenuAnimation();
+    else this.stopMenuAnimation();
+  }
+
+  /** Draw the world behind the title at a gentle ~30fps, only while visible. */
+  private startMenuAnimation(): void {
+    if (this.menuAnimation || document.hidden) return;
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    this.menuStartedAt = performance.now();
+    this.menuLastDraw = -Infinity;
+    const canvas = byId<HTMLCanvasElement>('menu-art');
+    const render = (now: number): void => {
+      if (document.hidden || !byId<HTMLElement>('menu').classList.contains('active')) {
+        this.menuAnimation = 0;
+        return;
+      }
+      if (now - this.menuLastDraw >= 32) {
+        drawBakeryTitleScene(canvas, this.sprites,
+          reduced ? 0 : (now - this.menuStartedAt) / 1000);
+        this.menuLastDraw = now;
+      }
+      this.menuAnimation = reduced ? 0 : requestAnimationFrame(render);
+    };
+    this.menuAnimation = requestAnimationFrame(render);
+  }
+
+  private stopMenuAnimation(): void {
+    if (this.menuAnimation) cancelAnimationFrame(this.menuAnimation);
+    this.menuAnimation = 0;
   }
 
   /** The browser may not expose Fullscreen on every mobile platform. */
