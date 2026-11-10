@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.0 - Recipe Book mysteries and in-world approach camera (2026-11-10)
+
+- Consolidate pastry and Hooman encyclopedia navigation under a single **Recipe Book** menu action, with two internal tabs.
+- Display every entry as a collection slot from the start; undiscovered entries use black silhouettes, `??????` names, hidden stat values and `???? ?? ???? ??????` descriptions.
+- Replace the disconnected pre-level Hooman card dialog with a cinematic view of the real upcoming Hoomans on the right-side street.
+- Smoothly pan and zoom back to the full battlefield, then reveal the lanes and start gameplay. Allow the introduction to be skipped.
+- Keep Hooman discoveries earned only when enemies enter gameplay, never when shown in the camera preview.
+- Add unit tests for all masked entries, sequential pastry unlocks and cinematic camera coordinates.
+
+
 ## 0.3.0 - Bakery menu, baker identity and Hooman Dex (2026-11-10)
 
 - Replace the generic menu backdrop with a detailed original pixel-art bakery interior.
