@@ -26,7 +26,8 @@ export class GameEngine {
 
   allowed(kind: string): boolean {
     const tutorial = this.level.tutorial;
-    return !tutorial || Boolean(tutorial[this.state.tutorialIndex]?.allowed.includes(kind));
+    return this.level.available.includes(kind as typeof this.level.available[number]) &&
+      (!tutorial || Boolean(tutorial[this.state.tutorialIndex]?.allowed.includes(kind as typeof this.level.available[number])));
   }
 
   collectAt(x: number, y: number): boolean {
@@ -48,6 +49,10 @@ export class GameEngine {
       s.defenders = s.defenders.filter(p => p.column !== column || p.row !== row);
       return s.defenders.length !== before;
     }
+    const step = this.level.tutorial?.[s.tutorialIndex];
+    if (step?.focusRow !== undefined && row !== step.focusRow) return false;
+    if (step?.minColumn !== undefined && column < step.minColumn) return false;
+    if (step?.maxColumn !== undefined && column > step.maxColumn) return false;
     const unit = DEFENDERS[kind];
     if (!unit || !this.allowed(kind) || s.defenders.some(p => p.column === column && p.row === row) || s.butter < unit.c || (s.cooldowns[kind] || 0) > s.elapsed) return false;
     s.butter -= unit.c;
@@ -94,7 +99,7 @@ export class GameEngine {
     const s = this.state, level = this.level;
     if (s.intro > 0) {
       s.intro -= dt;
-      const message = s.intro > 1.7 ? 'READY...' : s.intro > .9 ? 'SET...' : 'BAKE!';
+      const message = s.intro > 1.7 ? 'OVENS READY...' : s.intro > .9 ? 'ON YOUR MARKS...' : 'BAKE!';
       if (message !== s.introLabel) { s.introLabel = message; this.events.push({ type: 'banner', message, duration: 900 }); }
       if (s.intro <= 0 && level.tutorial) this.beginStep(level.tutorial[0]);
       return;

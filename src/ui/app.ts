@@ -1,5 +1,6 @@
 import { createSpriteAtlas, drawBattlefield, drawMenuBackground, type SpriteAtlas } from '../art/render.js';
 import { DEFENDERS, ENEMIES } from '../game/catalog.js';
+import { campaignLevelLabel, nextPlayableLevel, stageCompleteMessage } from '../game/campaign.js';
 import { GameEngine } from '../game/engine.js';
 import { LEVELS } from '../game/levels.js';
 import { loadUnlocked, saveUnlocked } from '../game/progress.js';
@@ -12,6 +13,9 @@ const byId = <T extends HTMLElement>(id: string): T => {
   return element as T;
 };
 
+type MainScreen = 'menu' | 'level-screen' | 'almanac-screen' | 'game-screen';
+
+/** DOM layer only: the campaign, simulation and renderer do not depend on this class. */
 export class GameApp {
   private readonly frame = byId<HTMLElement>('stage');
   private readonly root = byId<HTMLElement>('app');
@@ -22,7 +26,9 @@ export class GameApp {
   private unlocked = loadUnlocked();
   private playing = false;
   private animation = 0;
-  private bannerTimeout = 0;
+  private previewTimer = 0;
+  private revealTimer = 0;
+  private bannerTimer = 0;
   private previousFrame = 0;
   private frameCount = 0;
 
@@ -58,8 +64,11 @@ export class GameApp {
     this.frame.style.height = `${height}px`;
   }
 
-  private show(name: 'menu' | 'level-screen' | 'almanac-screen' | 'game-screen'): void {
-    this.frame.querySelectorAll<HTMLElement>('.screen:not(.overlay)').forEach(section => section.classList.toggle('active', section.id === name));
+  private show(name: MainScreen): void {
+    this.frame.querySelectorAll<HTMLElement>('.screen:not(.overlay):not(.interstitial)').forEach(section => {
+      section.classList.toggle('active', section.id === name);
+    });
+    byId<HTMLElement>('level-preview').classList.remove('active');
     byId<HTMLElement>('modal').classList.remove('active');
   }
 
@@ -68,15 +77,22 @@ export class GameApp {
     list.replaceChildren();
     LEVELS.forEach((level, index) => {
       const button = document.createElement('button');
-      const number = document.createElement('strong');
-      const description = document.createElement('span');
       button.className = 'wood-button';
+      if (index === this.unlocked - 1) button.classList.add('next-stage');
       button.dataset.action = 'level';
       button.dataset.level = String(index);
       button.disabled = index >= this.unlocked;
-      number.textContent = `1-${index + 1}`;
-      description.textContent = index >= this.unlocked ? 'Locked' : level.name;
-      button.append(number, description);
+      const number = document.createElement('strong');
+      number.textContent = campaignLevelLabel(index);
+      const name = document.createElement('span');
+      name.className = 'level-name';
+      name.textContent = level.name;
+      const detail = document.createElement('span');
+      detail.className = index >= this.unlocked ? 'level-locked' : 'level-reward';
+      detail.textContent = index >= this.unlocked ? (level.reward ? `EARNS: ${DEFENDERS[level.reward].n}` : 'LOCKED') :
+        index < this.unlocked - 1 ? 'CLEARED' :
+        level.reward ? `WIN: ${DEFENDERS[level.reward].n}` : index === LEVELS.length - 1 ? 'FINAL SHIFT' : 'DEFEND';
+      button.append(number, name, detail);
       list.append(button);
     });
     this.show('level-screen');
@@ -102,59 +118,121 @@ export class GameApp {
     this.show('almanac-screen');
   }
 
-  private startLevel(index: number): void {
-    if (index < 0 || index >= LEVELS.length || index >= this.unlocked) return;
-    this.stopAnimation();
-    this.engine = new GameEngine(index);
-    this.selected = null;
+  private buildCards(): void {
+    if (!this.engine) return;
     const cards = byId<HTMLElement>('defender-cards');
     cards.replaceChildren();
-    for (const [kind, definition] of Object.entries(DEFENDERS)) {
+    // Only the pastries earned so far are shown. Future unlocks never crowd the bar.
+    for (const kind of this.engine.level.available) {
+      const definition = DEFENDERS[kind];
       const button = document.createElement('button');
       const icon = new Image();
-      const cost = document.createElement('small');
+      const name = document.createElement('span');
+      const cost = document.createElement('span');
       button.className = 'defender-card';
       button.dataset.action = 'card';
       button.dataset.kind = kind;
       button.id = `card-${kind}`;
-      button.setAttribute('aria-label', `${definition.n}, ${definition.c} butter`);
+      button.setAttribute('aria-label', `${definition.n}, ${definition.c} butter. ${definition.d}`);
+      button.setAttribute('title', definition.d);
       icon.src = this.sprites.url(kind);
       icon.alt = '';
+      name.className = 'card-name';
+      name.textContent = definition.n;
+      cost.className = 'card-cost';
       cost.textContent = String(definition.c);
-      button.append(icon, cost);
+      button.append(icon, name, cost);
       cards.append(button);
     }
-    byId<HTMLElement>('level-label').textContent = `Level 1-${index + 1}: ${LEVELS[index].name}`;
-    this.setTip('');
+  }
+
+  private startLevel(index: number): void {
+    if (!Number.isInteger(index) || index < 0 || index >= LEVELS.length || index >= this.unlocked) return;
+    this.stopAnimation();
+    this.engine = new GameEngine(index);
+    this.selected = null;
+    this.frameCount = 0;
+    this.buildCards();
+    byId<HTMLElement>('level-label').textContent = `${campaignLevelLabel(index)}  ${LEVELS[index].name}`;
     byId<HTMLElement>('level-progress').style.display = this.engine.level.tutorial ? 'none' : '';
+    byId<HTMLElement>('shovel').hidden = Boolean(this.engine.level.tutorial);
     byId<HTMLElement>('banner').classList.remove('active');
+    this.setTip('');
     this.show('game-screen');
     this.updateInterface();
     drawBattlefield(this.canvas, this.engine.state, this.engine.level, this.sprites);
+    this.showPreview();
+  }
+
+  /** The pre-shift crowd roll-call is a real transition, not an unpausable video. */
+  private showPreview(): void {
+    if (!this.engine) return;
+    const level = this.engine.level;
+    byId<HTMLElement>('preview-level').textContent = `BAKERY SHIFT ${campaignLevelLabel(this.engine.state.levelIndex)}`;
+    byId<HTMLElement>('preview-lesson').textContent = level.lesson;
+    const lineup = byId<HTMLElement>('preview-enemies');
+    lineup.replaceChildren();
+    for (const kind of level.previewEnemies) {
+      const definition = ENEMIES[kind];
+      const card = document.createElement('div');
+      card.className = 'preview-enemy';
+      const image = new Image();
+      image.src = this.sprites.url(`${kind}0`);
+      image.alt = '';
+      const label = document.createElement('strong');
+      label.textContent = definition.n;
+      const description = document.createElement('span');
+      description.textContent = definition.d;
+      card.append(image, label, description);
+      lineup.append(card);
+    }
+    byId<HTMLElement>('level-preview').classList.add('active');
+    this.previewTimer = window.setTimeout(() => this.beginBattle(), 3200);
+  }
+
+  private beginBattle(): void {
+    if (!this.engine || !byId<HTMLElement>('level-preview').classList.contains('active')) return;
+    clearTimeout(this.previewTimer);
+    this.previewTimer = 0;
+    byId<HTMLElement>('level-preview').classList.remove('active');
     this.resume();
+    const curtain = byId<HTMLElement>('lane-reveal');
+    curtain.replaceChildren();
+    for (let row = 0; row < ROWS; row++) {
+      const strip = document.createElement('div');
+      strip.className = 'lane-cover';
+      strip.style.setProperty('--row', String(row));
+      curtain.append(strip);
+    }
+    // Restart the CSS animation for every level, including Retry.
+    curtain.classList.remove('revealing');
+    void curtain.offsetWidth;
+    curtain.classList.add('revealing');
+    this.revealTimer = window.setTimeout(() => curtain.classList.remove('revealing'), 2700);
   }
 
   private setTip(message: string): void {
-    const element = byId<HTMLElement>('tutorial-tip');
-    element.textContent = message;
-    element.style.display = message ? 'block' : 'none';
+    const tip = byId<HTMLElement>('tutorial-tip');
+    tip.textContent = message;
+    tip.style.display = message ? 'block' : 'none';
   }
 
   private showBanner(message: string, milliseconds: number): void {
-    const element = byId<HTMLElement>('banner');
-    element.textContent = message;
-    element.classList.add('active');
-    clearTimeout(this.bannerTimeout);
-    this.bannerTimeout = window.setTimeout(() => element.classList.remove('active'), milliseconds);
+    const banner = byId<HTMLElement>('banner');
+    banner.textContent = message;
+    banner.classList.add('active');
+    clearTimeout(this.bannerTimer);
+    this.bannerTimer = window.setTimeout(() => banner.classList.remove('active'), milliseconds);
   }
 
   private updateInterface(): void {
+    if (!this.engine) return;
     const engine = this.engine;
-    if (!engine) return;
     const state = engine.state;
     byId<HTMLElement>('butter-value').textContent = String(state.butter);
     byId<HTMLElement>('progress-fill').style.width = `${engine.level.duration ? Math.min(100, state.elapsed / engine.level.duration * 100) : 0}%`;
-    for (const [kind, unit] of Object.entries(DEFENDERS)) {
+    for (const kind of engine.level.available) {
+      const unit = DEFENDERS[kind];
       const button = byId<HTMLButtonElement>(`card-${kind}`);
       const cooldown = Math.max(0, (state.cooldowns[kind] || 0) - state.elapsed);
       button.classList.toggle('selected', this.selected === kind);
@@ -165,6 +243,13 @@ export class GameApp {
     const shovel = byId<HTMLElement>('shovel');
     shovel.classList.toggle('selected', this.selected === 'shovel');
     shovel.setAttribute('aria-pressed', String(this.selected === 'shovel'));
+    const info = byId<HTMLElement>('selected-info');
+    const unit = this.selected && DEFENDERS[this.selected];
+    if (unit) {
+      byId<HTMLElement>('selected-name').textContent = `${unit.n} - ${unit.c} butter`;
+      byId<HTMLElement>('selected-description').textContent = unit.d;
+      info.style.display = 'block';
+    } else info.style.display = 'none';
   }
 
   private onBoardPointer(event: PointerEvent): void {
@@ -190,6 +275,7 @@ export class GameApp {
       else void document.exitFullscreen?.();
       return;
     }
+    if (action === 'start-bake') { this.beginBattle(); return; }
     if (action === 'card' && this.engine && this.playing) {
       const kind = button.dataset.kind ?? '';
       if (this.engine.allowed(kind)) this.selected = this.selected === kind ? null : kind;
@@ -197,7 +283,7 @@ export class GameApp {
     } else if (action === 'shovel' && this.engine && this.playing && !this.engine.level.tutorial) {
       this.selected = this.selected === 'shovel' ? null : 'shovel';
       this.updateInterface();
-    } else if (action === 'adventure') this.startLevel(Math.min(this.unlocked, LEVELS.length) - 1);
+    } else if (action === 'adventure') this.startLevel(nextPlayableLevel(this.unlocked));
     else if (action === 'levels') { this.stopAnimation(); this.buildLevels(); }
     else if (action === 'almanac') { this.stopAnimation(); this.buildAlmanac(); }
     else if (action === 'menu') { this.stopAnimation(); this.show('menu'); }
@@ -212,7 +298,13 @@ export class GameApp {
     this.playing = false;
     cancelAnimationFrame(this.animation);
     this.animation = 0;
-    clearTimeout(this.bannerTimeout);
+    clearTimeout(this.previewTimer);
+    clearTimeout(this.revealTimer);
+    clearTimeout(this.bannerTimer);
+    this.previewTimer = 0;
+    this.revealTimer = 0;
+    this.bannerTimer = 0;
+    byId<HTMLElement>('lane-reveal').classList.remove('revealing');
   }
 
   private resume(): void {
@@ -220,15 +312,16 @@ export class GameApp {
     this.stopAnimation();
     this.playing = true;
     this.previousFrame = performance.now();
-    this.animation = requestAnimationFrame(t => this.tick(t));
+    this.animation = requestAnimationFrame(time => this.tick(time));
   }
 
   private pause(): void {
     this.stopAnimation();
-    this.modal('Paused', 'The dough can wait.', ['Resume', 'resume'], ['Quit to menu', 'menu']);
+    this.modal('Bakery Break', 'The dough can wait. Your shift is paused.', ['Resume', 'resume'], ['Quit to Menu', 'menu']);
   }
 
   private modal(title: string, message: string, first: [string, string], second: [string, string]): void {
+    byId<HTMLElement>('reward-feature').hidden = true;
     byId<HTMLElement>('modal-title').textContent = title;
     byId<HTMLElement>('modal-message').textContent = message;
     for (const [id, value] of [['modal-primary', first], ['modal-secondary', second]] as const) {
@@ -246,13 +339,23 @@ export class GameApp {
       else if (event.type === 'tip') this.setTip(event.message);
       else if (event.type === 'win') {
         const index = this.engine.state.levelIndex;
+        const reward = this.unlocked <= index + 1 ? this.engine.level.reward : undefined;
         this.unlocked = saveUnlocked(Math.max(this.unlocked, index + 2));
         this.stopAnimation();
         const last = index === LEVELS.length - 1;
-        this.modal(last ? 'Bakery saved!' : 'Level cleared!', index === 0 ? 'You know the units now. Defend the bakery!' : last ? 'Every customer was turned away. Master baker!' : 'The customers have retreated. For now.', last ? ['Main menu', 'menu'] : ['Next level', 'next'], ['Level select', 'levels']);
+        this.modal(last ? 'BAKERY SAVED!' : 'SHIFT COMPLETE!', stageCompleteMessage(index),
+          last ? ['Main Menu', 'menu'] : ['Next Shift', 'next'], ['Level Select', 'levels']);
+        if (reward) {
+          const unit = DEFENDERS[reward];
+          byId<HTMLElement>('reward-feature').hidden = false;
+          byId<HTMLImageElement>('reward-image').src = this.sprites.url(reward);
+          byId<HTMLImageElement>('reward-image').alt = unit.n;
+          byId<HTMLElement>('reward-name').textContent = unit.n;
+          byId<HTMLElement>('reward-description').textContent = unit.d;
+        }
       } else if (event.type === 'lose') {
         this.stopAnimation();
-        this.modal('Bakery overrun!', 'The humans ate everything. Even the croissants.', ['Retry', 'retry'], ['Level select', 'levels']);
+        this.modal('BAKERY OVERRUN!', 'The customers got past your defenses. Try a different pastry lineup!', ['Retry Shift', 'retry'], ['Level Select', 'levels']);
       }
     }
   }
@@ -265,6 +368,6 @@ export class GameApp {
     this.handleEvents();
     drawBattlefield(this.canvas, this.engine.state, this.engine.level, this.sprites);
     if (this.frameCount++ % 6 === 0) this.updateInterface();
-    if (this.playing) this.animation = requestAnimationFrame(t => this.tick(t));
+    if (this.playing) this.animation = requestAnimationFrame(next => this.tick(next));
   }
 }

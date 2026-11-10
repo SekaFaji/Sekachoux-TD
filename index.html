@@ -23,30 +23,41 @@
         <button class="small-button menu-fullscreen" data-action="fullscreen">Fullscreen</button>
       </section>
       <section id="level-screen" class="screen panel-screen" aria-label="Level select">
-        <h2>Adventure</h2><div id="level-list"></div>
-        <button class="wood-button" data-action="menu">Back</button>
+        <h2>Bakery Adventure</h2><p class="panel-caption">Complete a shift to unlock the next pastry and level.</p>
+        <div id="level-list"></div>
+        <button class="wood-button" data-action="menu">Back to Bakery</button>
       </section>
       <section id="almanac-screen" class="screen panel-screen" aria-label="Bakery almanac">
         <h2>Bakery Almanac</h2><div id="almanac-list"></div>
-        <button class="wood-button" data-action="menu">Back</button>
+        <button class="wood-button" data-action="menu">Back to Bakery</button>
       </section>
       <section id="game-screen" class="screen" aria-label="Bakery defense game">
         <header id="toolbar">
-          <div id="butter-counter"><img id="butter-icon" alt="" width="32" height="32"><span id="butter-value">0</span></div>
+          <div id="butter-counter" aria-label="Butter resource"><img id="butter-icon" alt="" width="32" height="32"><span id="butter-value">0</span><small>BUTTER</small></div>
           <div id="defender-cards" aria-label="Choose a pastry"></div>
-          <button class="tool-card" id="shovel" data-action="shovel" aria-label="Remove pastry"><img id="shovel-icon" alt="" width="32" height="32"></button>
-          <button class="small-button" data-action="pause">Pause</button>
+          <div id="toolbar-controls">
+            <button class="tool-card" id="shovel" data-action="shovel" aria-label="Remove pastry" title="Remove pastry"><img id="shovel-icon" alt="" width="32" height="32"></button>
+            <button class="small-button" data-action="pause">Pause</button>
+          </div>
         </header>
         <div id="battle-area">
           <canvas id="battlefield" width="288" height="160" aria-label="Tap a tile to place a pastry"></canvas>
           <div id="level-label"></div>
           <div id="banner" role="status" aria-live="polite"></div>
           <div id="tutorial-tip" role="status" aria-live="polite"></div>
+          <div id="selected-info" aria-live="polite"><strong id="selected-name"></strong><span id="selected-description"></span></div>
           <div id="level-progress"><i id="progress-fill"></i></div>
+          <div id="lane-reveal" aria-hidden="true"></div>
         </div>
+      </section>
+      <section id="level-preview" class="screen interstitial" role="dialog" aria-modal="true" aria-label="Today's customers">
+        <div class="preview-heading"><small id="preview-level"></small><h2>TODAY'S CUSTOMERS</h2><p id="preview-lesson"></p></div>
+        <div id="preview-enemies" class="preview-lineup"></div>
+        <div class="preview-foot"><span>THE BAKERY OPENS SOON</span><button class="wood-button" data-action="start-bake">OPEN THE BAKERY</button></div>
       </section>
       <section id="modal" class="screen overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-card"><h2 id="modal-title"></h2><p id="modal-message"></p>
+          <div id="reward-feature" hidden><span class="reward-ribbon">NEW PASTRY UNLOCKED</span><img id="reward-image" width="64" height="64" alt=""><div><strong id="reward-name"></strong><p id="reward-description"></p></div></div>
           <button id="modal-primary" class="wood-button"></button>
           <button id="modal-secondary" class="wood-button"></button>
         </div>

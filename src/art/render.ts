@@ -35,6 +35,17 @@ export function drawBattlefield(canvas: HTMLCanvasElement, state: GameState, lev
     }
     if (!L.activeRows.includes(r)) { x.fillStyle = 'rgba(20,10,5,.5)'; x.fillRect(0, r * TILE, COLUMNS * TILE, TILE); }
   }
+  // Target oven tray slots glow during teaching steps. The rule lives in the level data.
+  const guide = L.tutorial?.[state.tutorialIndex];
+  if (state.intro <= 0 && guide?.condition.type === 'placed' && guide.focusRow !== undefined) {
+    const left = (guide.minColumn ?? 0) * TILE;
+    const right = ((guide.maxColumn ?? COLUMNS - 1) + 1) * TILE;
+    const top = guide.focusRow * TILE;
+    x.fillStyle = 'rgba(255,233,135,.14)';
+    x.fillRect(left, top, right - left, TILE);
+    x.strokeStyle = '#ffef95'; x.lineWidth = 2;
+    x.strokeRect(left + 2, top + 2, right - left - 4, TILE - 4);
+  }
   for (const m of state.pins) if (!m.used) x.drawImage(sprites.images.pin, Math.round(m.x * TILE - 16), m.row * TILE + 2);
   for (const p of state.defenders) {
     x.globalAlpha = (p.kind === 'pie' && p.timer > 0 ? .6 : 1) * (.5 + .5 * Math.min(1, p.health / DEFENDERS[p.kind].hp));
