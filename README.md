@@ -59,6 +59,14 @@ The Butter Block tower now looks like a wrapped golden pat with its own characte
 
 This is **visual overhaul phase 1**. A future update will redesign the remaining pastries, Hoomans, animations and effects without borrowing third-party game assets.
 
+## Collectible recipe cards and bakery presentation (v0.7.0)
+
+The main screen is a newly painted, original pixel-art bakery storefront. Start Baking, Level Select, Recipe Book, Settings and Credits are integrated into its recipe-board signage. The pastry deck sits on the **left** of the in-game HUD, while the **butter currency is in the top-right** above pause and shovel.
+
+Each pastry and Hooman is represented by a portrait-style Recipe Book card. Locked entries remain black silhouettes labeled `??????`, with masked details and stats until earned or encountered.
+
+When a new pastry is awarded for the first completion of a teaching shift, a glowing **recipe card falls where the last Hooman was defeated**. Tap the card to collect it, or let it auto-collect after **five seconds**. The victory dialog then displays the full card and lets you continue. Progress is saved when you win, so exiting during the pickup cannot lose your unlock. Replays do not show duplicate card drops.
+
 ## Development
 
 Requires Node.js 22 or later.

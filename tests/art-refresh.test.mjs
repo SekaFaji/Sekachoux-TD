@@ -22,7 +22,7 @@ test('board uses a continuous custom worktop, and butter pickups use a dedicated
 
 test('visual refresh does not modify the level data or engine gameplay', () => {
   const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
-  assert.equal(pkg.version, '0.6.0');
+  assert.match(pkg.version, /^0\.[6-9]\.\d+$/);
   const html = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
   assert.ok(html.includes('data-action="start-baking"'));
   assert.ok(html.includes('data-action="settings"'));

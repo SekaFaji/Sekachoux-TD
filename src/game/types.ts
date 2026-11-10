@@ -27,6 +27,7 @@ export interface GameState {
   collected: number;
   placed: Record<string, number>;
   kills: number;
+  lastDefeated: { x: number; row: number } | null;
   tutorialIndex: number;
   intro: number;
   introLabel: string;

@@ -13,8 +13,9 @@
     <div id="stage" aria-label="Sekachoux TD landscape game">
       <section id="menu" class="screen active" aria-label="Main menu">
         <canvas id="menu-art" aria-hidden="true" width="160" height="90"></canvas>
-        <div id="title-block"><h1>SEKACHOUX <span>TD</span></h1><p>BAKERY DEFENSE</p></div>
+        <div id="title-block"><span class="menu-kicker">WELCOME TO</span><h1>SEKACHOUX <span>TD</span></h1><p>THE PASTRY DEFENSE BAKERY</p></div>
         <nav id="main-actions" aria-label="Bakery menu">
+          <span id="menu-board-heading">THE BAKEHOUSE</span>
           <button class="bakery-action bakery-primary" data-action="start-baking">Start Baking</button>
           <button class="bakery-action" data-action="levels">Level Select</button>
           <button class="bakery-action" data-action="recipe-book">Recipe Book</button>
@@ -28,7 +29,7 @@
           <strong id="profile-name">#guest#000001</strong>
           <button id="edit-name" data-action="edit-name" aria-label="Edit your baker name">Edit Name</button>
         </div>
-        <p id="studio-credit">A <strong>SekaFaji Games</strong> creation</p>
+        <p id="studio-credit">CRAFTED BY <strong>SekaFaji Games</strong></p>
         <button class="small-button menu-fullscreen" data-action="fullscreen">Fullscreen</button>
       </section>
       <section id="level-screen" class="screen panel-screen" aria-label="Level select">
@@ -80,11 +81,16 @@
       </section>
       <section id="game-screen" class="screen" aria-label="Bakery defense game">
         <header id="toolbar">
-          <div id="butter-counter" aria-label="Butter resource"><img id="butter-icon" alt="" width="32" height="32"><span id="butter-value">0</span><small>BUTTER</small></div>
-          <div id="defender-cards" aria-label="Choose a pastry"></div>
-          <div id="toolbar-controls">
-            <button class="tool-card" id="shovel" data-action="shovel" aria-label="Remove pastry" title="Remove pastry"><img id="shovel-icon" alt="" width="32" height="32"></button>
-            <button class="small-button" data-action="pause">Pause</button>
+          <div id="hud-deck">
+            <span class="hud-deck-label">YOUR PASTRIES <span>CHOOSE A RECIPE</span></span>
+            <div id="defender-cards" aria-label="Choose a pastry"></div>
+          </div>
+          <div id="hud-right">
+            <div id="butter-counter" aria-label="Butter resource"><img id="butter-icon" alt="" width="32" height="32"><span id="butter-value">0</span><small>BUTTER</small></div>
+            <div id="toolbar-controls">
+              <button class="tool-card" id="shovel" data-action="shovel" aria-label="Remove pastry" title="Remove pastry"><img id="shovel-icon" alt="" width="32" height="32"></button>
+              <button class="small-button" data-action="pause">Pause</button>
+            </div>
           </div>
         </header>
         <div id="battle-area">
@@ -95,6 +101,16 @@
           <div id="selected-info" aria-live="polite"><strong id="selected-name"></strong><span id="selected-description"></span></div>
           <div id="level-progress"><i id="progress-fill"></i></div>
           <div id="lane-reveal" aria-hidden="true"></div>
+          <div id="reward-drop-layer" hidden>
+            <span class="reward-drop-prompt">NEW RECIPE! TAP TO COLLECT</span>
+            <button id="reward-drop-card" class="recipe-card reward-drop-card" data-action="collect-reward" aria-label="Collect new recipe card">
+              <span class="recipe-card-label">NEW RECIPE</span>
+              <img id="reward-drop-image" alt="" width="56" height="56">
+              <strong id="reward-drop-name"></strong>
+              <span class="card-sparkle" aria-hidden="true">✦</span>
+            </button>
+            <span id="reward-auto-label">Automatically collected in 5 seconds</span>
+          </div>
           <div id="approach-intro" hidden aria-label="Camera preview of incoming Hoomans">
             <canvas id="approach-canvas" width="288" height="160" aria-hidden="true"></canvas>
             <span id="approach-label">HOOMANS APPROACHING!</span>
@@ -114,7 +130,14 @@
       </section>
       <section id="modal" class="screen overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-card"><h2 id="modal-title"></h2><p id="modal-message"></p>
-          <div id="reward-feature" hidden><span class="reward-ribbon">NEW PASTRY UNLOCKED</span><img id="reward-image" width="64" height="64" alt=""><div><strong id="reward-name"></strong><p id="reward-description"></p></div></div>
+          <div id="reward-feature" hidden>
+            <div class="recipe-card reward-collectible">
+              <span class="reward-ribbon">NEW RECIPE UNLOCKED</span>
+              <img id="reward-image" width="64" height="64" alt="">
+              <strong id="reward-name"></strong>
+              <p id="reward-description"></p>
+            </div>
+          </div>
           <button id="modal-primary" class="wood-button"></button>
           <button id="modal-secondary" class="wood-button"></button>
         </div>
