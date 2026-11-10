@@ -46,7 +46,21 @@ export function drawBattlefield(canvas: HTMLCanvasElement, state: GameState, lev
     x.strokeStyle = '#ffef95'; x.lineWidth = 2;
     x.strokeRect(left + 2, top + 2, right - left - 4, TILE - 4);
   }
-  for (const m of state.pins) if (!m.used) x.drawImage(sprites.images.pin, Math.round(m.x * TILE - 16), m.row * TILE + 2);
+  for (const m of state.pins) if (!m.used) {
+    const pxPos = Math.round(m.x * TILE - 16), pyPos = m.row * TILE + 2;
+    if (!m.active) {
+      x.fillStyle = 'rgba(60,35,18,.18)';
+      x.fillRect(pxPos + 3, pyPos + 23, 24, 4);
+    } else {
+      x.fillStyle = 'rgba(255,241,207,.7)';
+      x.fillRect(pxPos - 10, pyPos + 9, 8, 2);
+      x.fillRect(pxPos - 15, pyPos + 13, 12, 2);
+      x.fillStyle = 'rgba(222,183,122,.6)';
+      x.fillRect(pxPos - 7, pyPos + 20, 7, 3);
+      x.fillRect(pxPos - 14, pyPos + 22, 8, 2);
+    }
+    x.drawImage(sprites.images.pin, pxPos, pyPos);
+  }
   for (const p of state.defenders) {
     x.globalAlpha = (p.kind === 'pie' && p.timer > 0 ? .6 : 1) * (.5 + .5 * Math.min(1, p.health / DEFENDERS[p.kind].hp));
     x.drawImage(sprites.images[p.kind], p.column * TILE, p.row * TILE + Math.round(Math.sin(state.elapsed * 3 + p.column + p.row))); x.globalAlpha = 1;

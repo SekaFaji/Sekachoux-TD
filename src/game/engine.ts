@@ -13,7 +13,7 @@ export class GameEngine {
     if (!level) throw new RangeError(`Unknown level: ${levelIndex}`);
     this.state = {
       levelIndex, butter: level.startingButter, defenders: [], enemies: [], projectiles: [],
-      drops: [], effects: [], pins: level.activeRows.map(row => ({ row, x: .4, active: false, used: false })),
+      drops: [], effects: [], pins: level.activeRows.map(row => ({ row, x: .5, active: false, used: false })),
       elapsed: 0, spawnTimer: 10, dropTimer: 4, cooldowns: {}, firstWave: false, finalWave: false,
       collected: 0, placed: {}, kills: 0, tutorialIndex: 0, intro: 2.6, introLabel: '',
     };
@@ -159,9 +159,9 @@ export class GameEngine {
       if (z.x < .1 && (!pin || pin.used)) { this.finish('lose'); return; }
     }
     for (const pin of s.pins) if (pin.active) {
-      pin.x += 4 * dt;
-      for (const z of s.enemies) if (z.row === pin.row && z.x < pin.x + .4) z.health = 0;
-      if (pin.x > COLUMNS + .5) { pin.active = false; pin.used = true; }
+      pin.x += 4.8 * dt;
+      for (const z of s.enemies) if (z.row === pin.row && z.x < pin.x + .55) z.health = 0;
+      if (pin.x > COLUMNS + .8) { pin.active = false; pin.used = true; }
     }
     for (const shot of s.projectiles) {
       shot.x += 3.2 * dt;
