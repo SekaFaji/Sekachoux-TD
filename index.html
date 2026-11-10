@@ -17,8 +17,7 @@
         <nav id="main-actions" aria-label="Bakery menu">
           <button class="bakery-action bakery-primary" data-action="start-baking">Start Baking</button>
           <button class="bakery-action" data-action="levels">Level Select</button>
-          <button class="bakery-action" data-action="pastry-book">Pastry Book</button>
-          <button class="bakery-action" data-action="hooman-dex">Hooman Dex</button>
+          <button class="bakery-action" data-action="recipe-book">Recipe Book</button>
         </nav>
         <div id="menu-profile" aria-label="Player profile">
           <span class="profile-label">BAKED FOR</span>
@@ -33,15 +32,14 @@
         <div id="level-list"></div>
         <button class="wood-button" data-action="menu">Back to Bakery</button>
       </section>
-      <section id="almanac-screen" class="screen panel-screen" aria-label="Bakery encyclopedia">
-        <h2 id="almanac-title">Pastry Book</h2>
+      <section id="almanac-screen" class="screen panel-screen" aria-label="Recipe Book">
+        <h2 id="almanac-title">Recipe Book</h2>
         <div class="codex-tabs" role="group" aria-label="Encyclopedia sections">
-          <button class="wood-button" id="tab-pastries" data-action="pastry-book">Pastry Book</button>
-          <button class="wood-button" id="tab-hoomans" data-action="hooman-dex">Hooman Dex</button>
+          <button class="wood-button" id="tab-pastries" data-action="tab-pastries">Pastries</button>
+          <button class="wood-button" id="tab-hoomans" data-action="tab-hoomans">Hoomans</button>
         </div>
         <p id="almanac-count" class="panel-caption"></p>
         <div id="almanac-list"></div>
-        <p id="almanac-empty" class="codex-empty" hidden>Meet Hoomans during bakery shifts to discover them here.</p>
         <button class="wood-button" data-action="menu">Back to Bakery</button>
       </section>
       <section id="game-screen" class="screen" aria-label="Bakery defense game">
@@ -61,12 +59,12 @@
           <div id="selected-info" aria-live="polite"><strong id="selected-name"></strong><span id="selected-description"></span></div>
           <div id="level-progress"><i id="progress-fill"></i></div>
           <div id="lane-reveal" aria-hidden="true"></div>
+          <div id="approach-intro" hidden aria-label="Camera preview of incoming Hoomans">
+            <canvas id="approach-canvas" width="288" height="160" aria-hidden="true"></canvas>
+            <span id="approach-label">HOOMANS APPROACHING!</span>
+            <button id="skip-approach" class="small-button" data-action="skip-intro">SKIP INTRO</button>
+          </div>
         </div>
-      </section>
-      <section id="level-preview" class="screen interstitial" role="dialog" aria-modal="true" aria-label="Today's Hoomans">
-        <div class="preview-heading"><small id="preview-level"></small><h2>TODAY'S HOOMANS</h2><p id="preview-lesson"></p></div>
-        <div id="preview-enemies" class="preview-lineup"></div>
-        <div class="preview-foot"><span>THE BAKERY OPENS SOON</span><button class="wood-button" data-action="start-bake">OPEN THE BAKERY</button></div>
       </section>
       <section id="identity-dialog" class="screen overlay" role="dialog" aria-modal="true" aria-labelledby="identity-title">
         <form id="name-form" class="modal-card name-card">

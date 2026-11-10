@@ -1,10 +1,12 @@
 import { createSpriteAtlas, drawBattlefield, drawMenuBackground, type SpriteAtlas } from '../art/render.js';
-import { DEFENDERS, ENEMIES } from '../game/catalog.js';
+import { APPROACH_DURATION_MS, drawApproachFrame, drawApproachWorld } from '../art/approach.js';
+import { DEFENDERS } from '../game/catalog.js';
 import { campaignLevelLabel, nextPlayableLevel, stageCompleteMessage } from '../game/campaign.js';
 import { GameEngine } from '../game/engine.js';
 import { loadDiscoveredHoomans, recordDiscoveredHooman } from '../game/discovery.js';
 import { GUEST_NAME, loadPlayerName, savePlayerName } from '../profile/identity.js';
 import type { EnemyKind } from '../game/levels.js';
+import { recipeBookEntries, type RecipeBookTab } from '../game/recipeBook.js';
 import { LEVELS } from '../game/levels.js';
 import { loadUnlocked, saveUnlocked } from '../game/progress.js';
 import { COLUMNS, ROWS, TILE } from '../game/types.js';
@@ -31,7 +33,8 @@ export class GameApp {
   private playerName = loadPlayerName();
   private playing = false;
   private animation = 0;
-  private previewTimer = 0;
+  private introAnimation = 0;
+  private introStartedAt: number | null = null;
   private revealTimer = 0;
   private bannerTimer = 0;
   private previousFrame = 0;
@@ -76,7 +79,6 @@ export class GameApp {
     this.frame.querySelectorAll<HTMLElement>('.screen:not(.overlay):not(.interstitial)').forEach(section => {
       section.classList.toggle('active', section.id === name);
     });
-    byId<HTMLElement>('level-preview').classList.remove('active');
     byId<HTMLElement>('modal').classList.remove('active');
   }
 
@@ -106,26 +108,26 @@ export class GameApp {
     this.show('level-screen');
   }
 
-  private buildAlmanac(tab: 'pastries' | 'hoomans'): void {
+  private buildAlmanac(tab: RecipeBookTab): void {
     const list = byId<HTMLElement>('almanac-list');
     list.replaceChildren();
     const pastries = tab === 'pastries';
-    byId<HTMLElement>('almanac-title').textContent = pastries ? 'Pastry Book' : 'Hooman Dex';
+    byId<HTMLElement>('almanac-title').textContent = 'Recipe Book';
     byId<HTMLElement>('tab-pastries').classList.toggle('active-tab', pastries);
     byId<HTMLElement>('tab-hoomans').classList.toggle('active-tab', !pastries);
-    const entries = pastries
-      ? (LEVELS[Math.max(0, this.unlocked - 1)]?.available ?? []).map(kind => ({ key: kind, name: DEFENDERS[kind].n, description: DEFENDERS[kind].d, stat: `${DEFENDERS[kind].c} butter` }))
-      : this.knownHoomans.map(kind => ({ key: `${kind}0`, name: ENEMIES[kind].n, description: ENEMIES[kind].d, stat: `Health ${ENEMIES[kind].hp}` }));
-    byId<HTMLElement>('almanac-count').textContent = pastries
-      ? `${entries.length} of ${Object.keys(DEFENDERS).length} pastries earned`
-      : `${entries.length} of ${Object.keys(ENEMIES).length} Hoomans discovered`;
-    const empty = byId<HTMLElement>('almanac-empty');
-    empty.hidden = entries.length !== 0;
+    const earned = LEVELS[Math.max(0, this.unlocked - 1)]?.available ?? [];
+    const entries = recipeBookEntries(tab, earned, this.knownHoomans);
+    byId<HTMLElement>('almanac-count').textContent = `${entries.filter(entry => !entry.locked).length} of ${entries.length} ${pastries ? 'pastries earned' : 'Hoomans discovered'}`;
     for (const entry of entries) {
       const article = document.createElement('article');
+      article.className = entry.locked ? 'codex-card-locked' : 'codex-card-known';
+      article.setAttribute('aria-label', entry.locked ? (pastries ? 'Undiscovered pastry' : 'Undiscovered Hooman') : entry.name);
+      const portrait = document.createElement('div');
+      portrait.className = 'codex-portrait';
       const image = new Image();
       image.alt = '';
-      image.src = this.sprites.url(entry.key);
+      image.src = this.sprites.url(entry.imageKey);
+      portrait.append(image);
       const info = document.createElement('div');
       const heading = document.createElement('b');
       heading.textContent = entry.name;
@@ -133,7 +135,7 @@ export class GameApp {
       role.className = 'codex-detail';
       role.textContent = `${entry.stat} - ${entry.description}`;
       info.append(heading, role);
-      article.append(image, info);
+      article.append(portrait, info);
       list.append(article);
     }
     this.show('almanac-screen');
@@ -210,40 +212,37 @@ export class GameApp {
     this.show('game-screen');
     this.updateInterface();
     drawBattlefield(this.canvas, this.engine.state, this.engine.level, this.sprites);
-    this.showPreview();
+    this.showApproach();
   }
 
-  /** The pre-shift crowd roll-call is a real transition, not an unpausable video. */
-  private showPreview(): void {
+  /** In-world preview: start on the far-right pavement, then pan and zoom back to the bakery. */
+  private showApproach(): void {
     if (!this.engine) return;
-    const level = this.engine.level;
-    byId<HTMLElement>('preview-level').textContent = `BAKERY SHIFT ${campaignLevelLabel(this.engine.state.levelIndex)}`;
-    byId<HTMLElement>('preview-lesson').textContent = level.lesson;
-    const lineup = byId<HTMLElement>('preview-enemies');
-    lineup.replaceChildren();
-    for (const kind of level.previewEnemies) {
-      const definition = ENEMIES[kind];
-      const card = document.createElement('div');
-      card.className = 'preview-enemy';
-      const image = new Image();
-      image.src = this.sprites.url(`${kind}0`);
-      image.alt = '';
-      const label = document.createElement('strong');
-      label.textContent = definition.n;
-      const description = document.createElement('span');
-      description.textContent = definition.d;
-      card.append(image, label, description);
-      lineup.append(card);
-    }
-    byId<HTMLElement>('level-preview').classList.add('active');
-    this.previewTimer = window.setTimeout(() => this.beginBattle(), 3200);
+    const intro = byId<HTMLElement>('approach-intro');
+    const previewCanvas = byId<HTMLCanvasElement>('approach-canvas');
+    const world = drawApproachWorld(this.engine.level, this.engine.state, this.sprites);
+    byId<HTMLElement>('game-screen').classList.add('cinematic');
+    intro.hidden = false;
+    this.introStartedAt = null;
+    drawApproachFrame(previewCanvas, world, 0);
+    const animate = (time: number): void => {
+      if (!this.engine || intro.hidden) return;
+      if (this.introStartedAt === null) this.introStartedAt = time;
+      const progress = Math.min(1, (time - this.introStartedAt) / APPROACH_DURATION_MS);
+      drawApproachFrame(previewCanvas, world, progress);
+      if (progress >= 1) this.beginBattle();
+      else this.introAnimation = requestAnimationFrame(animate);
+    };
+    this.introAnimation = requestAnimationFrame(animate);
   }
 
   private beginBattle(): void {
-    if (!this.engine || !byId<HTMLElement>('level-preview').classList.contains('active')) return;
-    clearTimeout(this.previewTimer);
-    this.previewTimer = 0;
-    byId<HTMLElement>('level-preview').classList.remove('active');
+    if (!this.engine || byId<HTMLElement>('approach-intro').hidden) return;
+    cancelAnimationFrame(this.introAnimation);
+    this.introAnimation = 0;
+    this.introStartedAt = null;
+    byId<HTMLElement>('approach-intro').hidden = true;
+    byId<HTMLElement>('game-screen').classList.remove('cinematic');
     this.resume();
     const curtain = byId<HTMLElement>('lane-reveal');
     curtain.replaceChildren();
@@ -253,7 +252,6 @@ export class GameApp {
       strip.style.setProperty('--row', String(row));
       curtain.append(strip);
     }
-    // Restart the CSS animation for every level, including Retry.
     curtain.classList.remove('revealing');
     void curtain.offsetWidth;
     curtain.classList.add('revealing');
@@ -324,7 +322,7 @@ export class GameApp {
       else void document.exitFullscreen?.();
       return;
     }
-    if (action === 'start-bake') { this.beginBattle(); return; }
+    if (action === 'skip-intro') { this.beginBattle(); return; }
     if (action === 'card' && this.engine && this.playing) {
       const kind = button.dataset.kind ?? '';
       if (this.engine.allowed(kind)) this.selected = this.selected === kind ? null : kind;
@@ -334,8 +332,8 @@ export class GameApp {
       this.updateInterface();
     } else if (action === 'start-baking') this.startLevel(nextPlayableLevel(this.unlocked));
     else if (action === 'levels') { this.stopAnimation(); this.buildLevels(); }
-    else if (action === 'pastry-book') { this.stopAnimation(); this.buildAlmanac('pastries'); }
-    else if (action === 'hooman-dex') { this.stopAnimation(); this.buildAlmanac('hoomans'); }
+    else if (action === 'recipe-book' || action === 'tab-pastries') { this.stopAnimation(); this.buildAlmanac('pastries'); }
+    else if (action === 'tab-hoomans') { this.stopAnimation(); this.buildAlmanac('hoomans'); }
     else if (action === 'edit-name') this.openNameEditor();
     else if (action === 'cancel-name') this.closeNameEditor();
     else if (action === 'menu') { this.stopAnimation(); this.show('menu'); }
@@ -350,10 +348,13 @@ export class GameApp {
     this.playing = false;
     cancelAnimationFrame(this.animation);
     this.animation = 0;
-    clearTimeout(this.previewTimer);
+    cancelAnimationFrame(this.introAnimation);
     clearTimeout(this.revealTimer);
     clearTimeout(this.bannerTimer);
-    this.previewTimer = 0;
+    this.introAnimation = 0;
+    this.introStartedAt = null;
+    byId<HTMLElement>('approach-intro').hidden = true;
+    byId<HTMLElement>('game-screen').classList.remove('cinematic');
     this.revealTimer = 0;
     this.bannerTimer = 0;
     byId<HTMLElement>('lane-reveal').classList.remove('revealing');

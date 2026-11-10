@@ -10,19 +10,19 @@
 [**Play Sekachoux TD**](https://sekafaji.github.io/Sekachoux-TD/)
 
 - The game always uses a **16:9 landscape layout**. On portrait phones it scales to fit without blocking play, though rotating the device is more comfortable.
-- Preview today's customer types before each shift. Tap **Open the Bakery** to skip the preview or let it advance automatically.
-- A bakery table runner pulls back from the lanes as the shift begins.
+- The level camera begins on the far-right street showing today's incoming Hoomans, then pans and zooms back to the full bakery field. Tap **Skip Intro** to start immediately.
+- The bakery table runners pull back after the approach camera finishes, opening each lane before the shift begins.
 - Select a pastry in the top bar, then place it on an active tile. Every card shows the **tower's name, image and butter cost**. Selecting a tower shows its description.
 - Collect golden butter. Some pastries attack, others generate butter, slow customers, block lanes or explode.
 - Defeat every customer while defending the left edge of the bakery.
 
 ## Bakery menu and identity
 
-The main menu is a hand-drawn bakery interior. Play via **Start Baking**, browse shifts with **Level Select**, inspect earned defenders in **Pastry Book** and discover enemy characters in the **Hooman Dex**.
+The main menu is a hand-drawn bakery interior. Play via **Start Baking**, browse shifts with **Level Select**, or open a single **Recipe Book** to switch between pastries and Hoomans.
 
 - A cosmetic baker name appears on the shop's nameplate. The default is `#guest#000001`. Use **Edit Name** to choose a local name (up to 18 letters, numbers, spaces, `_` or `-`), or clear the input to return to the guest label.
 - Names and discovered Hoomans are stored locally in the browser. They are not online accounts, globally unique names or cross-device identities.
-- The Hooman Dex initially contains no entries. Hooman types appear after the player meets them during actual gameplay; simply previewing future enemy types does not unlock their Dex entries.
+- The Recipe Book displays **all collection slots** from the start. Unearned pastries and undiscovered Hoomans appear as dark silhouettes with `??????` names, hidden stats and `???? ?? ???? ??????` descriptions. Their real details are revealed only after unlock/discovery. Camera previews do not unlock Hoomans.
 - Existing players get a one-time migration of Hoomans from previously **cleared** levels, without revealing types from locked or uncompleted levels.
 
 ## Campaign and unlocks
@@ -69,8 +69,10 @@ npm test
 | `src/art/bakeryScene.ts` | Layered, original pixel-art bakery menu environment |
 | `src/profile/identity.ts` | Local baker identity, validated editing and guest fallback |
 | `src/game/discovery.ts` | Persistent Hooman encounter history and old-save migration |
+| `src/game/recipeBook.ts` | Pure collection catalog with masked/unlocked slots for both tabs |
+| `src/art/approach.ts` | Original right-side street diorama and smooth pre-level camera |
 | `src/art/render.ts` | Canvas rendering and tutorial placement indicators |
-| `src/ui/app.ts` | HUD, enemy preview, lane opening, rewards and animation lifecycle |
+| `src/ui/app.ts` | HUD, in-world approach sequence, Recipe Book, rewards and animation lifecycle |
 | `src/ui/viewport.ts` | Responsive landscape and pointer coordinate mapping |
 | `tests/` | Pure engine, unlock, migration and viewport regression tests |
 | `.github/workflows/pages.yml` | Typecheck, test and GitHub Pages deployment on every main push |
@@ -81,4 +83,4 @@ The GitHub Pages workflow builds and tests on each push to `main` and deploys `d
 
 ## Status and next art milestone
 
-**v0.3.0** adds the original bakery interior menu, guest identity/name editing, accessible shop navigation, Pastry Book and a genuinely discovery-gated Hooman Dex. Broader character/battlefield sprite upgrades remain a separate art milestone. All art and code are original to this project, without third-party game assets.
+**v0.4.0** combines the two collections into a Recipe Book with masked, silhouetted locked entries, and replaces the separate Hooman roll-call popup with an in-world street preview that pans and zooms to the battlefield. Broader pastry, Hooman and battlefield art upgrades remain a separate visual milestone. All art and code are original to this project, without third-party game assets.
