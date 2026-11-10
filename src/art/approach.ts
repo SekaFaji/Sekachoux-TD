@@ -2,7 +2,7 @@ import { drawBattlefield, type SpriteAtlas } from './render.js';
 import { COLUMNS, ROWS, TILE, type GameState } from '../game/types.js';
 import type { Level } from '../game/levels.js';
 
-export const APPROACH_DURATION_MS = 3900;
+export const APPROACH_DURATION_MS = 3100;
 const VIEW_WIDTH = COLUMNS * TILE;
 const VIEW_HEIGHT = ROWS * TILE;
 const WORLD_WIDTH = 480;
@@ -14,19 +14,17 @@ export interface ApproachCamera {
   sourceHeight: number;
 }
 
-/** Hold on the approaching Hoomans, then track and zoom smoothly back to the entire bakery. */
+/** Fixed-scale horizontal pan: view Hoomans on the right, then move left to the playing field. */
 export function approachCamera(progress: number): ApproachCamera {
   const p = Math.max(0, Math.min(1, Number.isFinite(progress) ? progress : 0));
-  const t = Math.max(0, Math.min(1, (p - .24) / .72));
+  // Briefly show the whole upcoming crowd before sliding left, with no zoom or crop changes.
+  const t = Math.max(0, Math.min(1, (p - .14) / .78));
   const eased = t * t * (3 - 2 * t);
-  const zoom = 1.43 - .43 * eased;
-  const sourceWidth = VIEW_WIDTH / zoom;
-  const sourceHeight = VIEW_HEIGHT / zoom;
-  const center = 355 + (VIEW_WIDTH / 2 - 355) * eased;
   return {
-    sourceX: Math.max(0, Math.min(WORLD_WIDTH - sourceWidth, center - sourceWidth / 2)),
-    sourceY: (VIEW_HEIGHT - sourceHeight) / 2,
-    sourceWidth, sourceHeight,
+    sourceX: (WORLD_WIDTH - VIEW_WIDTH) * (1 - eased),
+    sourceY: 0,
+    sourceWidth: VIEW_WIDTH,
+    sourceHeight: VIEW_HEIGHT,
   };
 }
 

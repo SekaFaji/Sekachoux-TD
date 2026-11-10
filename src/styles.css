@@ -260,3 +260,40 @@ canvas, img { image-rendering: pixelated; }
 #approach-label { position: absolute; left: 50%; top: 5%; transform: translateX(-50%); pointer-events: none; white-space: nowrap; font-size: 3.1cqh; color: #ffedc0; background: #442817d9; border: .3cqh solid #f2c884a6; border-radius: .4cqh; padding: .7cqh 1cqw; text-shadow: 0 .3cqh #21130c; }
 #skip-approach { position: absolute; bottom: 3%; right: 2.5%; z-index: 1; font-size: 2.2cqh; background: #6c3f27eb; }
 @media (prefers-reduced-motion: reduce) { #approach-intro { transition: none; } }
+
+
+/* v0.5 - compact bakery menu utilities, accessible settings and studio credits. */
+#main-actions { top: 29%; gap: 1.35cqh; }
+#main-actions > .bakery-action { min-height: 9.4cqh; padding: 1cqh .2cqw; font-size: 3.2cqh; }
+#main-actions > .bakery-action:first-child { font-size: 3.4cqh; }
+.bakery-utilities { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .8cqw; width: 100%; }
+#main-actions .bakery-secondary {
+  min-width: 0; min-height: 6.8cqh; font-size: 2.35cqh; padding: .65cqh .15cqw;
+  border-color: #b98b51; background: linear-gradient(#a98155,#6e462a);
+}
+#settings-screen, #credits-screen { justify-content: center; gap: 1.5cqh; }
+#settings-screen h2, #credits-screen h2 { font-size: 5.3cqh; }
+.settings-panel, .settings-reset, .credits-board {
+  width: 65%; border: .7cqh solid #4b2916; border-radius: 1.1cqh;
+  background: linear-gradient(#d19a61,#a96e3b); box-shadow: inset 0 .65cqh #f3c993, 0 .7cqh #2e190d;
+  padding: 1.5cqh 2cqw; color: #fff5df;
+}
+.settings-panel { display: flex; flex-direction: column; gap: 1cqh; }
+.settings-panel h3 { margin: 0; font-size: 3.2cqh; }
+.volume-label { display: flex; align-items: center; justify-content: space-between; font-size: 2.65cqh; }
+#sound-volume { width: 100%; min-height: 3cqh; accent-color: #ffd477; cursor: pointer; }
+#sound-volume-value { color: #fff0b9; font-size: 3cqh; }
+.settings-sound-buttons { display: flex; justify-content: center; gap: 1.2cqw; }
+.settings-sound-buttons .wood-button { font-size: 2.3cqh; padding: .8cqh 1.5cqw; flex: 1; }
+.settings-help { font-size: 1.85cqh; margin: 0; color: #fff1c7; }
+.settings-reset { display: flex; align-items: center; justify-content: space-between; gap: 1.8cqw; }
+.settings-reset span { font-size: 2.2cqh; flex: 1; }
+.settings-reset .wood-button { flex: none; font-size: 2.2cqh; padding: 1.1cqh 1cqw; }
+.danger-button { color: #fff2e6; background: linear-gradient(#be5a42,#79291f); border-color: #52201a; box-shadow: inset 0 .45cqh #eb9780, 0 .6cqh #2b1611; }
+.credits-board { display: flex; flex-direction: column; align-items: center; gap: 1.2cqh; text-align: center; }
+.credits-board > strong { font-size: 5.5cqh; color: #fff0b6; }
+.credits-board > span { font-size: 3.5cqh; color: #ffd28b; }
+.credits-board p { font-size: 2.5cqh; margin: .35cqh 0; }
+.credits-board b { color: #fff0a8; }
+.credits-board small { font-size: 2.2cqh; color: #fff4d8; }
+#settings-screen > .wood-button, #credits-screen > .wood-button { font-size: 2.55cqh; padding: .9cqh 2cqw; }

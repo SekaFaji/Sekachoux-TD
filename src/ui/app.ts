@@ -11,6 +11,8 @@ import { LEVELS } from '../game/levels.js';
 import { loadUnlocked, saveUnlocked } from '../game/progress.js';
 import { COLUMNS, ROWS, TILE } from '../game/types.js';
 import { fitLandscape, pointerToGrid } from './viewport.js';
+import { BakerySound } from '../audio/sound.js';
+import { clearGameSave } from '../settings/saveReset.js';
 
 const byId = <T extends HTMLElement>(id: string): T => {
   const element = document.getElementById(id);
@@ -18,7 +20,7 @@ const byId = <T extends HTMLElement>(id: string): T => {
   return element as T;
 };
 
-type MainScreen = 'menu' | 'level-screen' | 'almanac-screen' | 'game-screen';
+type MainScreen = 'menu' | 'level-screen' | 'almanac-screen' | 'settings-screen' | 'credits-screen' | 'game-screen';
 
 /** DOM layer only: the campaign, simulation and renderer do not depend on this class. */
 export class GameApp {
@@ -31,6 +33,8 @@ export class GameApp {
   private unlocked = loadUnlocked();
   private knownHoomans: EnemyKind[] = loadDiscoveredHoomans(this.unlocked);
   private playerName = loadPlayerName();
+  private readonly sound = new BakerySound();
+  private resetStep: 0 | 1 | 2 = 0;
   private playing = false;
   private animation = 0;
   private introAnimation = 0;
@@ -49,6 +53,13 @@ export class GameApp {
     drawMenuBackground(byId<HTMLCanvasElement>('menu-art'), this.sprites);
     this.updateProfile();
     byId<HTMLFormElement>('name-form').addEventListener('submit', e => { e.preventDefault(); this.submitName(); });
+    const volume = byId<HTMLInputElement>('sound-volume');
+    volume.addEventListener('input', () => {
+      this.sound.setVolume(Number(volume.value) / 100);
+      this.updateSoundControls();
+    });
+    volume.addEventListener('change', () => this.sound.play('butter'));
+    this.updateSoundControls();
     this.frame.addEventListener('click', e => this.onButtonClick(e));
     this.frame.addEventListener('keydown', e => { if (e.key === 'Escape') this.closeNameEditor(); });
     this.canvas.addEventListener('pointerdown', e => this.onBoardPointer(e));
@@ -80,6 +91,54 @@ export class GameApp {
       section.classList.toggle('active', section.id === name);
     });
     byId<HTMLElement>('modal').classList.remove('active');
+    this.resetStep = 0;
+  }
+
+  private updateSoundControls(): void {
+    const { volume, muted } = this.sound.settings;
+    const input = byId<HTMLInputElement>('sound-volume');
+    input.value = String(Math.round(volume * 100));
+    byId<HTMLElement>('sound-volume-value').textContent = String(Math.round(volume * 100)) + '%';
+    const button = byId<HTMLButtonElement>('sound-mute');
+    button.textContent = muted ? 'Sound Off' : 'Sound On';
+    button.setAttribute('aria-pressed', String(muted));
+  }
+
+  private askToReset(): void {
+    this.resetStep = 1;
+    this.modal(
+      'RESET YOUR BAKERY?',
+      'Step 1 of 2. This deletes local level unlocks, Hooman discoveries and your baker name. Sound preferences stay saved.',
+      ['Continue', 'reset-confirm-1'], ['Keep Save', 'reset-cancel']
+    );
+  }
+
+  private confirmReset(): void {
+    if (this.resetStep !== 1) return;
+    this.resetStep = 2;
+    this.modal(
+      'FINAL CONFIRMATION',
+      'Step 2 of 2. This cannot be undone. Choose Delete Save to erase your progress from this browser.',
+      ['DELETE SAVE', 'reset-confirm-2'], ['Cancel', 'reset-cancel']
+    );
+  }
+
+  private resetSavedGame(): void {
+    if (this.resetStep !== 2) return;
+    if (!clearGameSave(localStorage)) {
+      this.resetStep = 0;
+      this.modal('SAVE RESET FAILED', 'Your browser blocked storage changes. Your bakery progress may still exist.',
+        ['Back to Settings', 'reset-cancel'], ['Main Menu', 'menu']);
+      return;
+    }
+    this.stopAnimation();
+    this.engine = null;
+    this.unlocked = 1;
+    this.knownHoomans = [];
+    this.playerName = GUEST_NAME;
+    this.updateProfile();
+    this.resetStep = 0;
+    this.show('menu');
   }
 
   private buildLevels(): void {
@@ -304,8 +363,13 @@ export class GameApp {
     const cell = pointerToGrid(event.clientX, event.clientY, this.canvas.getBoundingClientRect());
     if (!cell) return;
     event.preventDefault();
-    if (this.engine.collectAt(cell.x, cell.y)) { this.updateInterface(); return; }
+    if (this.engine.collectAt(cell.x, cell.y)) {
+      this.sound.play('butter');
+      this.updateInterface();
+      return;
+    }
     if (this.selected && this.engine.place(this.selected, cell.column, cell.row)) {
+      this.sound.play('place');
       this.selected = null;
       this.updateInterface();
     }
@@ -317,6 +381,7 @@ export class GameApp {
     const button = target.closest<HTMLButtonElement>('button[data-action]');
     if (!button || button.disabled) return;
     const action = button.dataset.action;
+    if (action !== 'reset-confirm-2') this.sound.play('tap');
     if (action === 'fullscreen') {
       if (!document.fullscreenElement) void document.documentElement.requestFullscreen?.().catch(() => {});
       else void document.exitFullscreen?.();
@@ -336,6 +401,18 @@ export class GameApp {
     else if (action === 'tab-hoomans') { this.stopAnimation(); this.buildAlmanac('hoomans'); }
     else if (action === 'edit-name') this.openNameEditor();
     else if (action === 'cancel-name') this.closeNameEditor();
+    else if (action === 'settings') { this.stopAnimation(); this.updateSoundControls(); this.show('settings-screen'); }
+    else if (action === 'credits') { this.stopAnimation(); this.show('credits-screen'); }
+    else if (action === 'toggle-mute') {
+      this.sound.setMuted(!this.sound.settings.muted);
+      this.updateSoundControls();
+      this.sound.play('butter');
+    }
+    else if (action === 'test-sound') this.sound.play('win');
+    else if (action === 'reset-saves') this.askToReset();
+    else if (action === 'reset-confirm-1') this.confirmReset();
+    else if (action === 'reset-confirm-2') this.resetSavedGame();
+    else if (action === 'reset-cancel') { this.resetStep = 0; byId<HTMLElement>('modal').classList.remove('active'); }
     else if (action === 'menu') { this.stopAnimation(); this.show('menu'); }
     else if (action === 'level') this.startLevel(Number(button.dataset.level));
     else if (action === 'retry' && this.engine) this.startLevel(this.engine.state.levelIndex);
@@ -392,6 +469,7 @@ export class GameApp {
       else if (event.type === 'tip') this.setTip(event.message);
       else if (event.type === 'hooman') this.knownHoomans = recordDiscoveredHooman(this.knownHoomans, event.kind);
       else if (event.type === 'win') {
+        this.sound.play('win');
         const index = this.engine.state.levelIndex;
         const reward = this.unlocked <= index + 1 ? this.engine.level.reward : undefined;
         this.unlocked = saveUnlocked(Math.max(this.unlocked, index + 2));
@@ -408,6 +486,7 @@ export class GameApp {
           byId<HTMLElement>('reward-description').textContent = unit.d;
         }
       } else if (event.type === 'lose') {
+        this.sound.play('lose');
         this.stopAnimation();
         this.modal('BAKERY OVERRUN!', 'The customers got past your defenses. Try a different pastry lineup!', ['Retry Shift', 'retry'], ['Level Select', 'levels']);
       }
