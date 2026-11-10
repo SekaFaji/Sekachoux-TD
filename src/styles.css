@@ -678,3 +678,116 @@ canvas, img { image-rendering: pixelated; }
 @media (prefers-reduced-motion: reduce) {
   .reward-drop-card { animation: none; }
 }
+
+
+/* v0.7.1 - coherent bakery interior. Artwork and controls share MENU_SLOTS.
+   Inline percentages are calculated from the painting's actual 480x270 grid. */
+#menu { overflow: hidden; background: #e9dfc9; }
+#menu #menu-art { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+#menu::after { display: none; }
+#menu #main-actions {
+  position: absolute; inset: 0; width: 100%; height: 100%; bottom: auto;
+  display: block; z-index: 3; padding: 0; margin: 0;
+  pointer-events: none;
+}
+#menu .bakery-utilities { display: contents; }
+#menu [data-menu-slot] { position: absolute; margin: 0; }
+#menu #title-block {
+  z-index: 2; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: .5cqh; padding: .1cqh .8cqw; text-align: center;
+  color: #3b5a4b; text-shadow: none;
+}
+#menu #title-block .menu-kicker {
+  color: #a16e49; font-size: 2cqh; font-weight: 900; line-height: 1.2;
+  letter-spacing: .2cqw; white-space: nowrap;
+}
+#menu #title-block h1 {
+  font-size: 6.5cqh; line-height: 1; letter-spacing: -.03cqw;
+  color: #315244; text-shadow: 0 .2cqh #ffffffa0;
+  white-space: nowrap; margin: 0; padding: 0;
+}
+#menu #title-block h1 span { color: #ba774c; }
+#menu #title-block p {
+  font-size: 2.15cqh; letter-spacing: .25cqw; color: #8d6950;
+  margin: 0; line-height: 1.2;
+}
+#menu #main-actions #menu-board-heading {
+  z-index: 2; display: flex; align-items: center; justify-content: center;
+  font-size: 2.45cqh; color: #f4e8c8; letter-spacing: .14cqw;
+  text-shadow: 0 .2cqh #364b3e; white-space: nowrap; pointer-events: none;
+}
+#menu #main-actions .scene-button {
+  position: absolute; z-index: 5; pointer-events: auto;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: .6cqh; min-width: 0; min-height: 0; margin: 0; padding: .25cqh .25cqw;
+  font: 900 3.45cqh/1.05 ui-monospace,'Trebuchet MS',monospace;
+  text-align: center; white-space: nowrap; letter-spacing: 0;
+  border: .3cqh solid transparent; border-radius: .75cqh;
+  box-shadow: none; background: transparent; cursor: pointer;
+  transition: filter .12s ease, box-shadow .12s ease, transform .12s ease;
+}
+#menu #main-actions .scene-button strong { font-size: inherit; color: inherit; font-weight: 900; }
+#menu #main-actions .scene-kicker {
+  font-size: 1.85cqh; letter-spacing: .14cqw;
+  font-weight: 900; line-height: 1.1; opacity: .93;
+}
+#menu #main-actions .scene-oven {
+  color: #ffe6af; text-shadow: 0 .3cqh #201b18;
+  background: linear-gradient(#30201900 0%,#231c16b0 100%);
+  border-color: #e9ab6159; box-shadow: inset 0 0 1.2cqh #efa55830;
+}
+#menu #main-actions .scene-oven strong { font-size: 4.2cqh; }
+#menu #main-actions .scene-oven .scene-kicker { color: #ffc779; }
+#menu #main-actions .scene-orders {
+  color: #5d4b3d; text-shadow: 0 .18cqh #fffdf4;
+  background: #fff4dd14;
+}
+#menu #main-actions .scene-orders .scene-kicker { color: #977451; }
+#menu #main-actions .scene-book {
+  color: #79533d; text-shadow: 0 .15cqh #ffefcf;
+  background: #fff2d112;
+}
+#menu #main-actions .scene-book .scene-kicker { color: #9c7254; }
+#menu #main-actions .scene-small {
+  font-size: 2.4cqh; color: #fff1cb; text-shadow: 0 .2cqh #395440;
+  background: transparent; border-color: transparent; border-radius: .35cqh;
+}
+#menu #main-actions .scene-button:hover:not(:disabled),
+#menu #main-actions .scene-button:focus-visible {
+  filter: brightness(1.12); box-shadow: inset 0 0 2cqh #ffdb7948,0 0 0 .45cqh #ffe3a6b0;
+}
+#menu #main-actions .scene-button:active:not(:disabled) { transform: translateY(.25cqh); filter: brightness(1.2); }
+#menu #main-actions .scene-button:focus-visible { outline: .5cqh solid #fff0af; outline-offset: 0; }
+#menu #menu-profile {
+  z-index: 3; display: flex; align-items: center; justify-content: space-between;
+  gap: .5cqw; padding: .35cqh .6cqw; border: 0; background: transparent;
+  box-shadow: none; border-radius: 0; overflow: hidden; color: #395845;
+}
+#menu #menu-profile .profile-label { flex: none; font-size: 1.75cqh; color: #97714f; }
+#menu #menu-profile strong { flex: 1; min-width: 0; font-size: 2.35cqh; color: #385647; }
+#menu #edit-name {
+  flex: none; color: #fff6dc; background: #4a6b58; font-size: 1.8cqh;
+  border: .25cqh solid #f0d6a5; border-radius: .3cqh; padding: .35cqh .55cqw;
+}
+#menu #studio-credit {
+  z-index: 2; display: flex; gap: .5cqw; justify-content: center; align-items: center;
+  color: #f3e9d1; text-shadow: 0 .15cqh #1e392d;
+  font-size: 1.85cqh; letter-spacing: .04cqw; white-space: nowrap;
+}
+#menu #studio-credit strong { color: #ffe1a6; font-weight: 900; }
+
+/* Fullscreen belongs to Settings, not a detached menu corner. */
+#settings-screen .settings-fullscreen {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 2cqw; border-top: .3cqh solid #c0d3be; padding-top: 1cqh;
+  color: #fff6e3; font-size: 2.4cqh;
+}
+#settings-screen .settings-fullscreen .wood-button {
+  font-size: 2.3cqh; padding: .8cqh 1.7cqw; white-space: nowrap;
+}
+#settings-screen .settings-fullscreen .wood-button[aria-pressed="true"] {
+  background: linear-gradient(#e9d5a3,#bc9165); border-color: #e9d4aa;
+}
+@media (prefers-reduced-motion: reduce) {
+  #menu #main-actions .scene-button { transition: none; }
+}

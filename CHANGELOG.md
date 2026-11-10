@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.1 - Interactive bakery interior and Fullscreen settings (2026-11-10)
+
+- Completely replace the flat storefront menu with an original interior scene featuring an animated-feel brick oven hearth, bakery order clipboard, open Recipe Book, hanging settings and credits plaques, and a compact maker's sign.
+- Unify the painting and all clickable HTML controls using shared 480x270 coordinates from `src/art/menuLayout.ts`. The menu remains aligned under landscape scaling on mobile and desktop, without separate CSS guesswork.
+- Treat the oven as **Start Baking**, the paper order clipboard as **Level Select**, and the open book as **Recipe Book**. Keep keyboard focus, touch targeting and the existing accessible button actions.
+- Remove the floating menu Fullscreen control. Add a Fullscreen action inside Settings that reflects real browser fullscreen state and disables itself where unsupported.
+- Preserve player name customization, SekaFaji Games branding, save reset protection, credits, sound, campaign, recipes, butter and reward-card gameplay.
+- Add geometry, routing, fullscreen and regression tests.
+
+
 ## 0.7.0 - Bakery menu, recipe cards and clear gameplay HUD (2026-11-10)
 
 - Completely redraw the main-menu bakery storefront: brighter pastel architecture, arched shop window, pastry glass case, copper fixtures and integrated recipe-board navigation.

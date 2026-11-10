@@ -13,6 +13,7 @@ import { COLUMNS, ROWS, TILE } from '../game/types.js';
 import { fitLandscape, pointerToGrid } from './viewport.js';
 import { BakerySound } from '../audio/sound.js';
 import { clearGameSave } from '../settings/saveReset.js';
+import { positionBakeryMenu } from '../art/menuLayout.js';
 
 const byId = <T extends HTMLElement>(id: string): T => {
   const element = document.getElementById(id);
@@ -53,7 +54,10 @@ export class GameApp {
     byId<HTMLImageElement>('butter-icon').src = this.sprites.url('butter-drop');
     byId<HTMLImageElement>('shovel-icon').src = this.sprites.url('shovel');
     drawMenuBackground(byId<HTMLCanvasElement>('menu-art'), this.sprites);
+    positionBakeryMenu(byId<HTMLElement>('menu'));
     this.updateProfile();
+    this.updateFullscreenControl();
+    document.addEventListener('fullscreenchange', () => this.updateFullscreenControl());
     byId<HTMLFormElement>('name-form').addEventListener('submit', e => { e.preventDefault(); this.submitName(); });
     const volume = byId<HTMLInputElement>('sound-volume');
     volume.addEventListener('input', () => {
@@ -94,6 +98,16 @@ export class GameApp {
     });
     byId<HTMLElement>('modal').classList.remove('active');
     this.resetStep = 0;
+  }
+
+  /** The browser may not expose Fullscreen on every mobile platform. */
+  private updateFullscreenControl(): void {
+    const control = byId<HTMLButtonElement>('fullscreen-setting');
+    const enabled = typeof document.documentElement.requestFullscreen === 'function';
+    const active = Boolean(document.fullscreenElement);
+    control.disabled = !enabled && !active;
+    control.textContent = active ? 'Exit Fullscreen' : enabled ? 'Enter Fullscreen' : 'Fullscreen Unavailable';
+    control.setAttribute('aria-pressed', String(active));
   }
 
   private updateSoundControls(): void {
@@ -440,8 +454,15 @@ export class GameApp {
     const action = button.dataset.action;
     if (action !== 'reset-confirm-2') this.sound.play('tap');
     if (action === 'fullscreen') {
-      if (!document.fullscreenElement) void document.documentElement.requestFullscreen?.().catch(() => {});
-      else void document.exitFullscreen?.();
+      if (!document.fullscreenElement) {
+        void document.documentElement.requestFullscreen?.()
+          .then(() => this.updateFullscreenControl())
+          .catch(() => this.updateFullscreenControl());
+      } else {
+        void document.exitFullscreen?.()
+          .then(() => this.updateFullscreenControl())
+          .catch(() => this.updateFullscreenControl());
+      }
       return;
     }
     if (action === 'skip-intro') { this.beginBattle(); return; }
@@ -459,7 +480,7 @@ export class GameApp {
     else if (action === 'tab-hoomans') { this.stopAnimation(); this.buildAlmanac('hoomans'); }
     else if (action === 'edit-name') this.openNameEditor();
     else if (action === 'cancel-name') this.closeNameEditor();
-    else if (action === 'settings') { this.stopAnimation(); this.updateSoundControls(); this.show('settings-screen'); }
+    else if (action === 'settings') { this.stopAnimation(); this.updateSoundControls(); this.updateFullscreenControl(); this.show('settings-screen'); }
     else if (action === 'credits') { this.stopAnimation(); this.show('credits-screen'); }
     else if (action === 'toggle-mute') {
       this.sound.setMuted(!this.sound.settings.muted);
