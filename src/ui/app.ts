@@ -48,7 +48,7 @@ export class GameApp {
     this.sprites = createSpriteAtlas();
     this.canvas.width = COLUMNS * TILE;
     this.canvas.height = ROWS * TILE;
-    byId<HTMLImageElement>('butter-icon').src = this.sprites.url('butter');
+    byId<HTMLImageElement>('butter-icon').src = this.sprites.url('butter-drop');
     byId<HTMLImageElement>('shovel-icon').src = this.sprites.url('shovel');
     drawMenuBackground(byId<HTMLCanvasElement>('menu-art'), this.sprites);
     this.updateProfile();

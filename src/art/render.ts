@@ -1,5 +1,6 @@
 import { SPR, human, OL } from './sprites.js';
 import { drawBakeryScene } from './bakeryScene.js';
+import { drawBakeryWorktop } from './worktop.js';
 import { DEFENDERS, ENEMIES } from '../game/catalog.js';
 import { COLUMNS, ROWS, TILE, type GameState } from '../game/types.js';
 import type { Level } from '../game/levels.js';
@@ -19,17 +20,9 @@ export const drawMenuBackground = drawBakeryScene;
 
 export function drawBattlefield(canvas: HTMLCanvasElement, state: GameState, level: Level, sprites: SpriteAtlas): void {
   const x = canvas.getContext('2d'); if (!x) throw new Error('Cannot draw game'); x.imageSmoothingEnabled = false;
-  const L = level;
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLUMNS; c++) {
-      x.fillStyle = (r + c) % 2 ? '#f3dcae' : '#e6c58a'; x.fillRect(c * TILE, r * TILE, TILE, TILE);
-      x.fillStyle = 'rgba(255,255,255,.35)'; x.fillRect(c * TILE, r * TILE, TILE, 1); x.fillRect(c * TILE, r * TILE, 1, TILE);
-      x.fillStyle = 'rgba(110,60,25,.28)'; x.fillRect(c * TILE, r * TILE + TILE - 1, TILE, 1); x.fillRect(c * TILE + TILE - 1, r * TILE, 1, TILE);
-    }
-    if (!L.activeRows.includes(r)) { x.fillStyle = 'rgba(20,10,5,.5)'; x.fillRect(0, r * TILE, COLUMNS * TILE, TILE); }
-  }
+  drawBakeryWorktop(x, level.activeRows);
   // Target oven tray slots glow during teaching steps. The rule lives in the level data.
-  const guide = L.tutorial?.[state.tutorialIndex];
+  const guide = level.tutorial?.[state.tutorialIndex];
   if (state.intro <= 0 && guide?.condition.type === 'placed' && guide.focusRow !== undefined) {
     const left = (guide.minColumn ?? 0) * TILE;
     const right = ((guide.maxColumn ?? COLUMNS - 1) + 1) * TILE;
@@ -65,6 +58,13 @@ export function drawBattlefield(canvas: HTMLCanvasElement, state: GameState, lev
     if (z.health < ENEMIES[z.kind].hp) { x.fillStyle = OL; x.fillRect(zx - 9, z.row * TILE, 18, 3); x.fillStyle = '#d8403c'; x.fillRect(zx - 8, z.row * TILE + 1, Math.max(1, 16 * z.health / ENEMIES[z.kind].hp), 1); }
   }
   for (const s of state.projectiles) { const sx = Math.round(s.x * TILE), sy = s.row * TILE + 14; x.fillStyle = OL; x.fillRect(sx - 1, sy - 1, 6, 6); x.fillStyle = s.ice ? '#8fe3ff' : '#e5a043'; x.fillRect(sx, sy, 4, 4); }
-  for (const d of state.drops) { const dx = Math.round(d.x * TILE) - 9, dy = Math.round(d.y * TILE) - 6; x.fillStyle = 'rgba(255,230,100,' + (.25 + .15 * Math.sin(state.elapsed * 6)) + ')'; x.fillRect(dx - 3, dy - 3, 24, 18); x.fillStyle = OL; x.fillRect(dx - 1, dy - 1, 20, 14); x.fillStyle = '#ffd84a'; x.fillRect(dx, dy, 18, 12); x.fillStyle = '#fffbd0'; x.fillRect(dx, dy, 18, 3); x.fillStyle = '#d9a21e'; x.fillRect(dx, dy + 9, 18, 3); }
+  // Butter is a small collectible pat, with restrained sparkle and transparent silhouette.
+  for (const d of state.drops) {
+    const cx = Math.round(d.x * TILE);
+    const cy = Math.round(d.y * TILE + Math.sin(state.elapsed * 3.3 + d.x) * 1.3);
+    x.globalAlpha = Math.min(1, Math.max(0, d.life / .55));
+    x.drawImage(sprites.images['butter-drop'], cx - 16, cy - 16);
+    x.globalAlpha = 1;
+  }
   for (const f of state.effects) for (let i = 0; i < 16; i++) { const a = i * .39, rad = (.5 - f.life) * 120; x.fillStyle = i % 2 ? '#ffb400' : '#e8481c'; x.fillRect(Math.round(f.x * TILE + Math.cos(a) * rad) - 3, Math.round(f.y * TILE + Math.sin(a) * rad) - 3, 6, 6); }
 }
