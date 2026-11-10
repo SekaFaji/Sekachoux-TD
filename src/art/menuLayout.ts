@@ -1,42 +1,31 @@
-/**
- * All menu artwork and hit targets share the SAME 480x270 scene coordinate system.
- * The CSS only styles the elements; this geometry decides where everything belongs.
+/** Pixel coordinates within the approved 16:9 menu artwork.
+ * Buttons have invisible native HTML hit areas over the painted controls.
+ * A single 480x270 coordinate system scales consistently across devices.
  */
 export const MENU_SIZE = { width: 480, height: 270 } as const;
-
 export const MENU_SLOTS = {
-  logo: { x: 41, y: 22, width: 398, height: 53 },
-  'board-heading': { x: 307, y: 86, width: 142, height: 13 },
-  oven: { x: 65, y: 156, width: 165, height: 47 },
-  orders: { x: 301, y: 104, width: 151, height: 44 },
-  book: { x: 302, y: 162, width: 150, height: 48 },
-  settings: { x: 305, y: 220, width: 68, height: 24 },
-  credits: { x: 381, y: 220, width: 68, height: 24 },
-  profile: { x: 20, y: 238, width: 206, height: 27 },
-  studio: { x: 233, y: 249, width: 222, height: 15 },
+  start: { x: 170, y: 97, width: 141, height: 35 },
+  levels: { x: 180, y: 136, width: 125, height: 23 },
+  recipes: { x: 180, y: 163, width: 125, height: 23 },
+  settings: { x: 180, y: 190, width: 125, height: 23 },
+  credits: { x: 180, y: 217, width: 125, height: 23 },
+  profile: { x: 29.5, y: 252, width: 77, height: 12 },
 } as const;
-
 export type MenuSlot = keyof typeof MENU_SLOTS;
 
-export function slotPercentage(slot: MenuSlot): { left: string; top: string; width: string; height: string } {
-  const box = MENU_SLOTS[slot];
+export function slotPercentage(name: MenuSlot): { left: string; top: string; width: string; height: string } {
+  const slot = MENU_SLOTS[name];
   return {
-    left: `${box.x / MENU_SIZE.width * 100}%`,
-    top: `${box.y / MENU_SIZE.height * 100}%`,
-    width: `${box.width / MENU_SIZE.width * 100}%`,
-    height: `${box.height / MENU_SIZE.height * 100}%`,
+    left: (slot.x / MENU_SIZE.width * 100) + '%',
+    top: (slot.y / MENU_SIZE.height * 100) + '%',
+    width: (slot.width / MENU_SIZE.width * 100) + '%',
+    height: (slot.height / MENU_SIZE.height * 100) + '%',
   };
 }
-
-/** Coordinates apply to both display and keyboard-accessible HTML hit targets. */
 export function positionBakeryMenu(root: HTMLElement): void {
   root.querySelectorAll<HTMLElement>('[data-menu-slot]').forEach(element => {
     const name = element.dataset.menuSlot as MenuSlot | undefined;
     if (!name || !(name in MENU_SLOTS)) return;
-    const style = slotPercentage(name);
-    element.style.left = style.left;
-    element.style.top = style.top;
-    element.style.width = style.width;
-    element.style.height = style.height;
+    Object.assign(element.style, slotPercentage(name));
   });
 }

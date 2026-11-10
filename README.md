@@ -18,7 +18,7 @@
 
 ## Bakery menu and identity
 
-The main menu is a hand-drawn bakery interior. Play via **Start Baking**, browse shifts with **Level Select**, or open a single **Recipe Book** to switch between pastries and Hoomans.
+The main menu uses an original **retro arcade illustration**: defending pastries stand inside a cozy bakery, while hungry Hoomans crowd outside the window. **Start Baking**, **Level Select**, **Recipe Book**, **Settings**, and **Credits** are real keyboard/touch controls aligned to the painted buttons.
 
 - A cosmetic baker name appears on the shop's nameplate. The default is `#guest#000001`. Use **Edit Name** to choose a local name (up to 18 letters, numbers, spaces, `_` or `-`), or clear the input to return to the guest label.
 - Names and discovered Hoomans are stored locally in the browser. They are not online accounts, globally unique names or cross-device identities.
@@ -61,7 +61,7 @@ This is **visual overhaul phase 1**. A future update will redesign the remaining
 
 ## Collectible recipe cards and bakery presentation (v0.7.0)
 
-The main screen is a newly painted, original pixel-art bakery storefront. Start Baking, Level Select, Recipe Book, Settings and Credits are integrated into its recipe-board signage. The pastry deck sits on the **left** of the in-game HUD, while the **butter currency is in the top-right** above pause and shovel.
+An earlier menu iteration used a programmatic storefront, now superseded by v0.8.0. Start Baking, Level Select, Recipe Book, Settings and Credits are integrated into its recipe-board signage. The pastry deck sits on the **left** of the in-game HUD, while the **butter currency is in the top-right** above pause and shovel.
 
 Each pastry and Hooman is represented by a portrait-style Recipe Book card. Locked entries remain black silhouettes labeled `??????`, with masked details and stats until earned or encountered.
 
@@ -69,11 +69,11 @@ When a new pastry is awarded for the first completion of a teaching shift, a glo
 
 ## Main-menu bakery interior (v0.7.1)
 
-The main menu is a newly painted bakery interior with a brick oven (**Start Baking**), hanging order clipboard (**Level Select**), open **Recipe Book**, and smaller **Settings** and **Credits** plaques. The baker nameplate and SekaFaji Games credit are built into the same scene.
+The previous illustrated oven/clipboard menu was retired in v0.8.0. Its replacement is a retro-arcade bakery-versus-Hoomans screen, featuring the existing pastry defenders and hungry customers outside the right-hand window.
 
-All interactive regions use **one source of truth** in `src/art/menuLayout.ts`. The pixel artwork and HTML touch/click targets share a fixed 480x270 coordinate map, which scales with the existing 16:9 stage. Keyboard-accessible buttons stay aligned with their corresponding illustrated objects.
+A shared **480x270 hitbox map** in `src/art/menuLayout.ts` positions each keyboard-accessible menu button over the artwork, keeping layout and touch targets aligned in landscape mode on phones and desktops. The optimized original illustration is packaged as `assets/menu/sekachoux-bakery-window.webp`. The player nameplate stays editable and defaults to `#guest#000001`; studio credit is in **Credits**, not the bottom-right corner.
 
-**Fullscreen** is available through **Settings**, with status and availability tied to browser support. The detached corner menu button is gone. Sound settings and the two-stage reset are unchanged.
+**Fullscreen** remains inside **Settings**, alongside sound preferences and the two-step save reset. Gameplay, recipe cards and previously saved progress are unchanged.
 
 ## Development
 
@@ -96,8 +96,8 @@ npm test
 | `src/game/campaign.ts` | Pure campaign navigation and display helpers |
 | `src/game/catalog.ts` | Tower and enemy names, stats and descriptions |
 | `src/game/progress.ts` | Persistent progress and migration from previous save versions |
-| `src/art/sprites.ts` | Original programmatic pixel-art sprite generators |
-| `src/art/bakeryScene.ts` | Layered, original pixel-art bakery menu environment |
+| `assets/menu/` | Original retro arcade menu artwork (optimized WebP) |\n| `src/art/menuLayout.ts` | Shared image-aligned hitbox coordinates for desktop and mobile |\n| `src/art/sprites.ts` | Original programmatic pixel-art sprite generators |
+| `src/art/bakeryScene.ts` | Optimized menu-art path used by the interactive title screen |
 | `src/profile/identity.ts` | Local baker identity, validated editing and guest fallback |
 | `src/game/discovery.ts` | Persistent Hooman encounter history and old-save migration |
 | `src/game/recipeBook.ts` | Pure collection catalog with masked/unlocked slots for both tabs |

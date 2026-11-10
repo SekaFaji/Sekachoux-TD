@@ -791,3 +791,82 @@ canvas, img { image-rendering: pixelated; }
 @media (prefers-reduced-motion: reduce) {
   #menu #main-actions .scene-button { transition: none; }
 }
+
+
+/* v0.8.0: approved retro-arcade bakery-versus-Hoomans main menu.
+   This section intentionally supersedes all old procedural-scene menu styles.
+   Gameplay, book, Settings, dialogs and other screens retain their styles. */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important; height: 1px !important;
+  padding: 0 !important; margin: -1px !important;
+  overflow: hidden !important; clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important; border: 0 !important;
+}
+#menu {
+  background: #7d4d33; overflow: hidden;
+}
+#menu::after { display: none; }
+#menu #menu-art {
+  position: absolute; inset: 0;
+  display: block; width: 100%; height: 100%;
+  object-fit: fill; image-rendering: auto;
+  user-select: none; pointer-events: none;
+}
+#menu #main-actions {
+  position: absolute; inset: 0; z-index: 3;
+  display: block; width: 100%; height: 100%;
+  margin: 0; padding: 0; pointer-events: none;
+}
+#menu #main-actions .retro-hit {
+  position: absolute; display: block; z-index: 2;
+  margin: 0; padding: 0; min-width: 0; min-height: 0;
+  background: transparent; border: 0;
+  border-radius: 1cqh; box-shadow: none;
+  cursor: pointer; pointer-events: auto;
+  transition: box-shadow 150ms ease, filter 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+#menu #main-actions .retro-hit:hover,
+#menu #main-actions .retro-hit:focus-visible {
+  outline: .35cqh solid #ffecb4;
+  outline-offset: -.35cqh;
+  box-shadow: 0 0 2.6cqh #ffe493ce, inset 0 0 1.5cqh #fff4cf82;
+  filter: brightness(1.06);
+}
+#menu #main-actions .retro-hit:active {
+  box-shadow: 0 0 3cqh #fff1b7, inset 0 0 2cqh #fff4cfb5;
+  filter: brightness(1.16);
+}
+#menu #menu-profile {
+  position: absolute; z-index: 5; margin: 0; overflow: hidden;
+  display: flex; flex-direction: row; align-items: center; justify-content: flex-start;
+  gap: .25cqw; padding: 0 .35cqw;
+  background: linear-gradient(180deg,#f9e8c8 0%,#f9e8c8 55%,#ffd69c 100%);
+  border: 0; border-radius: .2cqh; box-shadow: none;
+  color: #542d1e; font-family: ui-monospace, 'Trebuchet MS', monospace;
+  white-space: nowrap; text-shadow: none;
+}
+#menu #menu-profile .profile-label {
+  flex: none; margin: 0; color: #542d1e; font-size: 1.75cqh;
+  font-weight: 900; line-height: 1;
+}
+#menu #menu-profile #profile-name {
+  display: block; flex: 1; min-width: 0; margin: 0;
+  color: #542d1e; font-size: 1.75cqh; font-weight: 900;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  line-height: 1.1; text-shadow: none;
+}
+#menu #menu-profile #edit-name {
+  position: absolute; z-index: 2; inset: 0;
+  display: block; width: 100%; height: 100%;
+  margin: 0; padding: 0; background: transparent;
+  border: 0; border-radius: .2cqh; box-shadow: none;
+  opacity: 0; cursor: pointer;
+}
+#menu #menu-profile:focus-within {
+  outline: .45cqh solid #fff3b3; outline-offset: .2cqh;
+}
+@media (prefers-reduced-motion: reduce) {
+  #menu #main-actions .retro-hit { transition: none; }
+}

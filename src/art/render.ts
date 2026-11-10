@@ -1,5 +1,4 @@
 import { SPR, human, OL } from './sprites.js';
-import { drawBakeryScene } from './bakeryScene.js';
 import { drawBakeryWorktop } from './worktop.js';
 import { DEFENDERS, ENEMIES } from '../game/catalog.js';
 import { COLUMNS, ROWS, TILE, type GameState } from '../game/types.js';
@@ -15,8 +14,6 @@ export function createSpriteAtlas(): SpriteAtlas {
   }
   return { images, url: kind => images[kind].toDataURL() };
 }
-
-export const drawMenuBackground = drawBakeryScene;
 
 export function drawBattlefield(canvas: HTMLCanvasElement, state: GameState, level: Level, sprites: SpriteAtlas): void {
   const x = canvas.getContext('2d'); if (!x) throw new Error('Cannot draw game'); x.imageSmoothingEnabled = false;

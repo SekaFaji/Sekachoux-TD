@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.8.0 - Retro arcade bakery-versus-Hoomans menu (2026-11-10)
+
+- Replace the previous programmatic bakery-interior artwork with the approved original illustrated retro arcade main menu, showing Croissant, Butter Block and pastry allies defending against hungry Hoomans gathered outside the bakery window.
+- Ship the real menu artwork as an optimized 1280x720 WebP asset (about 140 KB), packaged into the GitHub Pages deployment.
+- Match five transparent, accessible HTML menu buttons to the painted Start Baking, Level Select, Recipe Book, Settings and Credits controls. Hover/focus highlights follow their actual button positions.
+- Keep baker-name editing functional using a dynamic nameplate over the artwork, defaulting to `#guest#000001` and retaining custom saved names.
+- Remove the unwanted lower-right studio badge from the main menu. SekaFaji Games remains credited in the Credits screen.
+- Retain Fullscreen only in Settings; preserve sound, two-step save reset, gameplay, HUD, unlock cards and Recipe Book.
+- Update the shared 480x270 menu hitbox geometry and automated tests. Retire the procedural menu renderer without touching gameplay artwork.
+
+
 ## 0.7.1 - Interactive bakery interior and Fullscreen settings (2026-11-10)
 
 - Completely replace the flat storefront menu with an original interior scene featuring an animated-feel brick oven hearth, bakery order clipboard, open Recipe Book, hanging settings and credits plaques, and a compact maker's sign.

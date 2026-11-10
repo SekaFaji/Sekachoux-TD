@@ -1,4 +1,4 @@
-import { createSpriteAtlas, drawBattlefield, drawMenuBackground, type SpriteAtlas } from '../art/render.js';
+import { createSpriteAtlas, drawBattlefield, type SpriteAtlas } from '../art/render.js';
 import { APPROACH_DURATION_MS, drawApproachFrame, drawApproachWorld } from '../art/approach.js';
 import { DEFENDERS } from '../game/catalog.js';
 import { campaignLevelLabel, nextPlayableLevel, stageCompleteMessage } from '../game/campaign.js';
@@ -14,6 +14,7 @@ import { fitLandscape, pointerToGrid } from './viewport.js';
 import { BakerySound } from '../audio/sound.js';
 import { clearGameSave } from '../settings/saveReset.js';
 import { positionBakeryMenu } from '../art/menuLayout.js';
+import { MENU_IMAGE_PATH } from '../art/bakeryScene.js';
 
 const byId = <T extends HTMLElement>(id: string): T => {
   const element = document.getElementById(id);
@@ -53,7 +54,7 @@ export class GameApp {
     this.canvas.height = ROWS * TILE;
     byId<HTMLImageElement>('butter-icon').src = this.sprites.url('butter-drop');
     byId<HTMLImageElement>('shovel-icon').src = this.sprites.url('shovel');
-    drawMenuBackground(byId<HTMLCanvasElement>('menu-art'), this.sprites);
+    byId<HTMLImageElement>('menu-art').src = MENU_IMAGE_PATH;
     positionBakeryMenu(byId<HTMLElement>('menu'));
     this.updateProfile();
     this.updateFullscreenControl();
