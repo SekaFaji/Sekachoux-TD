@@ -7,24 +7,27 @@
   <meta name="description" content="Sekachoux TD: Bakery Defense. Build a pastry army and defend the bakery against hungry customers.">
   <title>Sekachoux TD - Bakery Defense</title>
   <link rel="stylesheet" href="./styles.css">
-  <link rel="preload" as="image" href="./assets/menu/sekachoux-bakery-window.webp">
 </head>
 <body>
   <main id="app">
     <div id="stage" aria-label="Sekachoux TD landscape game">
       <section id="menu" class="screen active" aria-label="Sekachoux TD main menu">
-        <img id="menu-art" width="1280" height="720" alt="" draggable="false" decoding="async">
-        <h1 class="visually-hidden">Sekachoux TD - Bakery Defense</h1>
+        <canvas id="menu-art" width="320" height="180" aria-hidden="true"></canvas>
+        <div id="title-block">
+          <h1>SEKACHOUX <span>TD</span></h1>
+          <p>BAKERY DEFENSE</p>
+        </div>
         <nav id="main-actions" aria-label="Main menu">
-          <button class="retro-hit" data-menu-slot="start" data-action="start-baking" aria-label="Start Baking"><span class="visually-hidden">Start Baking</span></button>
-          <button class="retro-hit" data-menu-slot="levels" data-action="levels" aria-label="Level Select"><span class="visually-hidden">Level Select</span></button>
-          <button class="retro-hit" data-menu-slot="recipes" data-action="recipe-book" aria-label="Recipe Book"><span class="visually-hidden">Recipe Book</span></button>
-          <button class="retro-hit" data-menu-slot="settings" data-action="settings" aria-label="Settings"><span class="visually-hidden">Settings</span></button>
-          <button class="retro-hit" data-menu-slot="credits" data-action="credits" aria-label="Credits"><span class="visually-hidden">Credits</span></button>
+          <button class="title-action title-primary" data-action="start-baking">Start Baking</button>
+          <button class="title-action" data-action="levels">Level Select</button>
+          <button class="title-action" data-action="recipe-book">Recipe Book</button>
+          <button class="title-action" data-action="settings">Settings</button>
+          <button class="title-action" data-action="credits">Credits</button>
         </nav>
-        <div id="menu-profile" data-menu-slot="profile" aria-label="Baker profile">
-          <span class="profile-label">Baker:</span><strong id="profile-name">#guest#000001</strong>
-          <button id="edit-name" data-action="edit-name" aria-label="Edit baker name" title="Edit baker name"><span class="visually-hidden">Edit name</span></button>
+        <div id="menu-profile" aria-label="Baker profile">
+          <span class="profile-label">BAKER</span>
+          <strong id="profile-name">#guest#000001</strong>
+          <button id="edit-name" data-action="edit-name" aria-label="Edit baker name">EDIT</button>
         </div>
       </section>
       <section id="level-screen" class="screen panel-screen" aria-label="Level select">

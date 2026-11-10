@@ -50,8 +50,8 @@ test('new menu has integrated bakery controls and preserved navigation', () => {
   for (const action of ['start-baking','levels','recipe-book','settings','credits']) {
     assert.ok(html.includes('data-action="' + action + '"'));
   }
-  assert.ok(html.includes('id="menu-art"'));
-  assert.ok(html.includes('data-menu-slot="start"'));
+  assert.ok(html.includes('<canvas id="menu-art"'));
+  assert.ok(html.includes('class="title-action title-primary"'));
   assert.ok(!html.includes('id="studio-credit"'));
   assert.ok(html.includes('SekaFaji Games'));
 });
