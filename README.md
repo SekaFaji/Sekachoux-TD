@@ -67,6 +67,12 @@ Each pastry and Hooman is represented by a portrait-style Recipe Book card. Lock
 
 When a new pastry is awarded for the first completion of a teaching shift, a glowing **recipe card falls where the last Hooman was defeated**. Tap the card to collect it, or let it auto-collect after **five seconds**. The victory dialog then displays the full card and lets you continue. Progress is saved when you win, so exiting during the pickup cannot lose your unlock. Replays do not show duplicate card drops.
 
+## Main-menu Hooman animation (v0.9.1)
+
+Hoomans outside the bakery window now follow short, independent, title-only action cycles: approach, stand still, blink, lean toward the pastries, gesture and briefly walk away. The Customer points hungrily, the Jogger taps the glass, and the Food Critic consults a small order slip. Their feet remain planted while watching, and movement uses the original two-frame walking sprites only when approaching or leaving. Characters are clipped behind the window frame so they cannot wander onto the bakery interior or menu controls.
+
+The behavior is purely decorative. No real enemy spawn, Hooman discovery, save, gameplay-balance or animation data is changed.
+
 ## Living title scene (v0.9.0)
 
 The former promotional WebP menu and its painted-button hitboxes have been removed. Instead, `src/art/bakeryScene.ts` renders a dedicated **320x180 living bakery scene** using the same real pastry and Hooman pixel sprites as gameplay. It features subtle oven fire, flour motes and small idle animations. The title screen only animates while visible, is throttled to approximately 30 FPS, and respects reduced-motion accessibility settings.
