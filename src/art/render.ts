@@ -1,4 +1,5 @@
-import { SPR, human, px, blob, box, OL, WD } from './sprites.js';
+import { SPR, human, OL } from './sprites.js';
+import { drawBakeryScene } from './bakeryScene.js';
 import { DEFENDERS, ENEMIES } from '../game/catalog.js';
 import { COLUMNS, ROWS, TILE, type GameState } from '../game/types.js';
 import type { Level } from '../game/levels.js';
@@ -14,16 +15,8 @@ export function createSpriteAtlas(): SpriteAtlas {
   return { images, url: kind => images[kind].toDataURL() };
 }
 
-export function drawMenuBackground(c: HTMLCanvasElement, sprites: SpriteAtlas): void {
-  const b = c.getContext('2d'); if (!b) throw new Error('Cannot draw menu'); c.width = 160; c.height = 90; b.imageSmoothingEnabled = false;
-  for (let y = 0; y < 62; y++) { const t = y / 62; px(b, 0, y, `rgb(${143 + 110 * t | 0},${211 + 22 * t | 0},${255 - 63 * t | 0})`, 160, 1); }
-  for (let y = 62; y < 90; y++) for (let i = 0; i < 20; i++) px(b, i * 8, y, (i + (y >> 2)) % 2 ? '#c8b08a' : '#b99c74', 8, 1);
-  blob(b, 140, 18, 10, 10, ['#fff6b0', '#ffe066', '#ffc233']);
-  px(b, 4, 24, '#b5533c', 92, 40); for (let y = 24; y < 64; y += 4) px(b, 4, y, '#8a3a28', 92, 1);
-  box(b, 12, 38, 28, 22, ['#bfe9ff', '#8fd3ff', '#5aa8d8']); box(b, 66, 36, 20, 28, WD);
-  for (let i = 0; i < 12; i++) { px(b, 2 + i * 8, 26, i % 2 ? '#ffffff' : '#d8403c', 8, 7); px(b, 2 + i * 8, 33, i % 2 ? '#e0e0e0' : '#a82c2c', 8, 2); }
-  b.drawImage(sprites.images.croissant, 18, 50); b.drawImage(sprites.images.baguette, 40, 48); b.drawImage(sprites.images.pretzel, 62, 52);
-}
+export const drawMenuBackground = drawBakeryScene;
+
 export function drawBattlefield(canvas: HTMLCanvasElement, state: GameState, level: Level, sprites: SpriteAtlas): void {
   const x = canvas.getContext('2d'); if (!x) throw new Error('Cannot draw game'); x.imageSmoothingEnabled = false;
   const L = level;
