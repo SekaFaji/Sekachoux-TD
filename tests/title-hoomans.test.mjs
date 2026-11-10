@@ -59,10 +59,10 @@ test('title renderer clips the crowd to the window and keeps gameplay sprites un
   assert.ok(renderer.includes('titleHoomanPose('));
   assert.ok(renderer.includes('c.clip()'));
   assert.ok(renderer.includes('c.restore()'));
-  assert.ok(renderer.includes('pose.kind+pose.frame'));
+  assert.match(renderer,/pose\.kind\s*\+\s*pose\.frame/);
   assert.ok(!renderer.includes('const crowd='));
-  assert.ok(renderer.includes("pose.role==='impatient'"));
-  assert.ok(renderer.includes("pose.role==='hungry'"));
-  assert.ok(renderer.includes("pose.reaction==='peer'"));
+  assert.match(renderer,/pose\.role\s*===\s*'impatient'/);
+  assert.match(renderer,/pose\.role\s*===\s*'hungry'/);
+  assert.match(renderer,/pose\.reaction\s*===\s*'peer'/);
   assert.ok(renderer.includes('rgba(255,251,230'));
 });
