@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.0 - Bakery art direction, butter and field overhaul (2026-11-10)
+
+- Replace checkerboard tile fills with continuous pale stone and linen baking trays, subtle placement registration marks, copper trim and subdued inactive lanes.
+- Introduce a shared sage, cream, copper and honey palette for the battlefield, main menu controls, HUD, recipe collection, panels and tool cards.
+- Redraw the Butter Block pastry as a foil-wrapped golden pat with a clearer face, bevels and reflected highlights.
+- Give collectible butter its own distinct 32px pixel-art pat sprite; remove the large pulsing rectangular resource graphics.
+- Change the resource HUD icon to the collectible butter art.
+- Keep all game mechanics, campaign progression, credits, settings, player names and saved data unchanged.
+- Add automated tests for the shared palette, new rendering integration and existing navigation.
+- Prepare character silhouette/animation overhaul as the next separate visual milestone.
+
+
 ## 0.5.0 - Settings, credits and camera pan (2026-11-10)
 
 - Add dedicated bakery Settings and Credits screens reachable from the main menu.

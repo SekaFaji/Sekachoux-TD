@@ -51,6 +51,14 @@ Browser `localStorage` stores the highest available stage. The v2 save key is `s
 - Credits identify **SekaFaji Games** and the original in-project game art, code and sound effects.
 - Every level begins with upcoming Hoomans standing on the street at the right, followed by a **fixed-scale horizontal camera pan left** to the complete playfield. The intro does not zoom.
 
+## Visual identity (v0.6.0)
+
+This patch removes the previous checkerboard field. The battlefield is now a continuous bakery worktop with pale linen and stone lanes, small cell registration marks, muted sage edging and copper trim. Active and inactive lanes remain clearly distinguishable.
+
+The Butter Block tower now looks like a wrapped golden pat with its own character silhouette. Collectible butter is a separate shiny pickup sprite, also used in the HUD counter. The UI and game surfaces share a warm cream, sage, copper and honey palette. No gameplay rules, rewards, or saved progress change in this art pass.
+
+This is **visual overhaul phase 1**. A future update will redesign the remaining pastries, Hoomans, animations and effects without borrowing third-party game assets.
+
 ## Development
 
 Requires Node.js 22 or later.
