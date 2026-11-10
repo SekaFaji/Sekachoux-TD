@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.1 - Hoomans at the window: animation polish (2026-11-11)
+
+- Replace continuous Hooman bobbing and walk-cycle flicker in the main menu with grounded, staggered choreography.
+- Characters enter the window, stop walking, occasionally blink and peer inside, and react with role-specific gestures: the hungry Customer points at pastries, the Jogger knocks on the glass, and the Food Critic checks an order.
+- Keep all actors inside a clipped window; reduce overlapping silhouettes and add separate window panes and a stable foot-level sill.
+- Retain the same genuine game sprites and the existing menu, control positions, gameplay, Hooman discovery rules and saved data.
+- Add deterministic tests for stationary idle poses, periodic transitions, positions, clipping and non-synchronized movement.
+
+
 ## 0.9.0 - Living bakery title menu (2026-11-10)
 
 - Replace the static retro-arcade image menu with a small in-game canvas scene, inspired by the proven Sekampfire title-screen approach.

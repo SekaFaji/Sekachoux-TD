@@ -8,8 +8,12 @@ test('living title uses the same 16:9 native pixel grid as a Sekampfire-style ga
   assert.equal(TITLE_HEIGHT,180);
   assert.equal(typeof drawBakeryTitleScene, 'function');
   const scene=readFileSync(new URL('../dist/art/bakeryScene.js',import.meta.url),'utf8');
-  for(const unit of ['croissant','butter','baguette','pin','walk','jog','critic']) {
+  for(const unit of ['croissant','butter','baguette','pin']) {
     assert.ok(scene.includes("'"+unit+"'"),unit+' should reuse real game art');
+  }
+  const crowd = readFileSync(new URL('../dist/art/titleHoomans.js',import.meta.url),'utf8');
+  for(const human of ['walk','jog','critic']) {
+    assert.ok(crowd.includes("'"+human+"'"),human+' should reuse real gameplay Hoomans');
   }
   assert.ok(scene.includes('Math.sin'));
   assert.ok(scene.includes("atlas.images"));

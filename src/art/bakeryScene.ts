@@ -1,4 +1,5 @@
 import type { SpriteAtlas } from './render.js';
+import { titleHoomanPose, TITLE_HOOMAN_COUNT, TITLE_WINDOW } from './titleHoomans.js';
 
 /**
  * Sekampfire-style living title scene using the SAME sprite atlas as battles.
@@ -51,26 +52,81 @@ export function drawBakeryTitleScene(canvas:HTMLCanvasElement,atlas:SpriteAtlas,
   for(const [x,y,w] of [[225,91,17],[242,86,13],[261,98,24],[292,92,15]]){
     px(c,x,y,w,126-y,'#839786');px(c,x+3,y+4,w-6,2,'#a3b6a1');
   }
-  c.globalAlpha=.3;
-  for(let i=0;i<5;i++){
-    const x=227+i*17,y=84+(i%2)*5;
-    px(c,x+4,y,9,11,'#364b43');px(c,x+1,y+10,15,22,'#364b43');
+  // Hoomans are outside the glass. Clip all actors to the window opening,
+  // let their feet rest on the same sill and only animate walk frames while
+  // approaching or moving off. No more perpetual jogging in place.
+  c.save();
+  c.beginPath();
+  c.rect(TITLE_WINDOW.x, TITLE_WINDOW.y, TITLE_WINDOW.width, TITLE_WINDOW.height);
+  c.clip();
+
+  // Two distant customers, understated behind the three recognizable sprites.
+  c.globalAlpha=.18;
+  for(const [sx,sy] of [[239,91],[292,89]]){
+    px(c,sx+3,sy,7,10,'#394d48');
+    px(c,sx,sy+10,13,16,'#394d48');
   }
   c.globalAlpha=1;
 
-  // Existing real human sprites, switching the real gameplay walking frames.
-  const crowd=[
-    {name:'walk',x:221+Math.sin(t*.7)*3,y:88+Math.sin(t*2)*1.2,size:31,speed:2.1},
-    {name:'jog',x:254+Math.sin(t*.92+2)*4,y:82+Math.sin(t*3)*2,size:35,speed:3.1},
-    {name:'critic',x:279+Math.sin(t*.55+1)*2,y:86+Math.sin(t*1.8),size:33,speed:1.7}
-  ];
-  for(const h of crowd)actor(c,atlas,h.name+(Math.floor(t*h.speed)%2),h.x,h.y,h.size);
-  // Window mullions and subtle reflections over the crowd.
-  px(c,249,33,4,96,'#3b574a');px(c,250,36,1,89,'#d6d5b5');
-  px(c,217,71,97,3,'#395849');px(c,220,72,92,1,'#e4d7af');
-  px(c,232,40,1,20,'rgba(255,251,230,.4)');
-  px(c,236,41,1,13,'rgba(255,251,230,.2)');
-  px(c,301,42,1,16,'rgba(255,251,230,.4)');
+  for(let index=0;index<TITLE_HOOMAN_COUNT;index++){
+    const pose=titleHoomanPose(t,index);
+    const x=Math.round(pose.x), y=Math.round(pose.y), size=pose.size;
+    // Grounded contact shadow: it never follows an arbitrary bobbing sine.
+    px(c,x+4,pose.y+size,Math.max(6,size-8),2,'rgba(38,45,40,.30)');
+    actor(c,atlas,pose.kind+pose.frame,x,y,size);
+
+    // A rare single-frame blink rather than a continuously twitching face.
+    if(pose.blink){
+      px(c,x+10,y+7,4,1,'#80533f');
+      px(c,x+16,y+7,4,1,'#80533f');
+    }
+    if(pose.reaction==='peer'){
+      // Small breath against the glass as a customer leans closer.
+      c.globalAlpha=.40;
+      px(c,x+13,y+14,4,2,'#eff5df');
+      px(c,x+12,y+13,1,2,'#f6f4e5');
+      px(c,x+18,y+14,1,1,'#f5f1d7');
+      c.globalAlpha=1;
+    }
+    if(pose.reaction==='gesture' && pose.gestureFrame>0){
+      if(pose.role==='impatient'){
+        // Short impatient knock, with a single-pixel impact sparkle.
+        const handY=y+14-(pose.gestureFrame===2?3:0);
+        px(c,x+size-3,handY,4,4,'#f2bb93');
+        px(c,x+size-1,handY+1,2,1,'#ffe2c7');
+        if(pose.gestureFrame===2){
+          px(c,x+size+2,handY-2,1,3,'#fff2c7');
+          px(c,x+size+2,handY+3,1,2,'#fff2c7');
+        }
+      }else if(pose.role==='hungry'){
+        // The hungry customer points at the pastries.
+        px(c,x+size-4,y+16,6,2,'#edb38c');
+        px(c,x+size+1,y+15,2,2,'#fff3de');
+      }else{
+        // The critic checks a tiny paper order instead of marching on spot.
+        px(c,x-3,y+15,8,10,'#665145');
+        px(c,x-2,y+16,6,8,'#f2e9d8');
+        px(c,x-1,y+18,4,1,'#ba9d78');
+        px(c,x-1,y+21,3,1,'#ba9d78');
+      }
+    }
+  }
+  c.restore();
+
+  // Window rails in the foreground make the three real Hoomans appear
+  // behind glass, with separate readable panes instead of overlapping faces.
+  for(const mullion of [249,278]){
+    px(c,mullion,33,3,96,'#3b574a');
+    px(c,mullion+1,36,1,89,'#d6d5b5');
+  }
+  px(c,217,71,97,3,'#395849');
+  px(c,220,72,92,1,'#e4d7af');
+  px(c,219,122,93,4,'#334b41');
+  px(c,221,122,89,1,'#e6d6aa');
+  // Sparse glints are fixed to the pane, not glued to moving sprites.
+  px(c,233,39,1,17,'rgba(255,251,230,.35)');
+  px(c,236,42,1,11,'rgba(255,251,230,.22)');
+  px(c,302,44,1,12,'rgba(255,251,230,.30)');
 
   // Working oven at left. Flickering flame gives the same calm atmosphere
   // as Sekampfire's campfire without using its setting or copied art.
