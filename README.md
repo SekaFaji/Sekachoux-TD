@@ -69,4 +69,4 @@ The GitHub Pages workflow builds and tests on each push to `main` and deploys `d
 
 ## Status and next art milestone
 
-**v0.2.0** focuses on tutorial structure, progression, unlock presentation, named tower HUD cards and introductory pacing. The existing sprite generators are intentionally retained; character animation, more detailed bakery environments and richer art are next. All art and code are made for this project, with no third-party game assets.
+**v0.2.1** improves the lane-saver presentation by replacing the awkward placeholder with a clearer right-facing rolling pin, retunes its sweep and renames the main menu entry to **Start Baking**. The broader sprite and environment art quality pass is still next. All art and code are made for this project, with no third-party game assets.

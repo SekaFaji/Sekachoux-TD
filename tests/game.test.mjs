@@ -111,6 +111,23 @@ test('unearned tower cannot be placed even during ordinary waves', () => {
   assert.equal(battle.place('nothing', 3, 2), false);
 });
 
+
+
+test('rolling pin lane-saver starts on the left edge and sweeps right through a breach', () => {
+  const engine = new GameEngine(4, () => .5);
+  engine.state.intro = 0;
+  const pin = engine.state.pins.find(pin => pin.row === 1);
+  assert.equal(pin?.x, 0.5);
+  engine.state.enemies.push({ kind: 'walk', row: 1, x: 0.95, health: 6, slow: 0 });
+  engine.update(.05);
+  assert.equal(engine.finished, false);
+  assert.equal(pin?.active, true);
+  for (let i = 0; i < 120; i++) engine.update(.05);
+  assert.equal(engine.state.enemies.length, 0);
+  assert.equal(pin?.used, true);
+  assert.equal(pin?.active, false);
+});
+
 test('save migration preserves old tutorial completion and unlocked battle stages', () => {
   assert.equal(migrateV1Unlocked(null), 1);
   assert.equal(migrateV1Unlocked('1'), 1);

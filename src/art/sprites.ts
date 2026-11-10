@@ -37,7 +37,18 @@ export const SPR: Record<string, () => HTMLCanvasElement> = {
   baguette: () => art(g => { blob(g, 16, 16, 8, 14, BR); px(g, 13, 6, BR[2], 6, 1); px(g, 12, 23, BR[2], 8, 1); px(g, 14, 26, BR[2], 4, 1); eye(g, 11, 12); eye(g, 18, 12); px(g, 10, 11, OL, 5, 1); px(g, 17, 11, OL, 5, 1); px(g, 13, 19, OL, 6, 1); }),
   pretzel: () => art(g => { ring(g, 10, 12, 6.5, PZ); ring(g, 22, 12, 6.5, PZ); blob(g, 16, 21, 9, 6, PZ); for (const [a, b] of [[8, 9], [23, 10], [13, 22], [19, 24]]) px(g, a, b, '#fff', 2, 1); eye(g, 12, 19); eye(g, 17, 19); px(g, 14, 25, OL, 4, 1); }),
   pie: () => art(g => { blob(g, 16, 21, 13, 8, CR); blob(g, 16, 18, 10, 5.5, RD); px(g, 7, 18, CR[0], 18, 1); px(g, 15, 13, CR[0], 1, 10); blob(g, 16, 9, 4, 4, RD); px(g, 16, 3, '#6a4a2a', 1, 3); px(g, 17, 1, '#ffe066', 3, 3); eye(g, 11, 17); eye(g, 18, 17); px(g, 10, 16, OL, 5, 1); px(g, 17, 16, OL, 5, 1); }),
-  pin: () => art(g => { box(g, 3, 13, 26, 7, WD); box(g, 0, 14, 4, 5, ['#a8662a', '#8a4f1c', '#6a3a10']); box(g, 28, 14, 4, 5, ['#a8662a', '#8a4f1c', '#6a3a10']); }),
+  pin: () => art(g => {
+    // A clearer bakery lane-saver: a right-facing rolling pin on a small pastry tray.
+    box(g, 2, 22, 24, 4, ['#d7d8dc', '#b9bcc2', '#8d9299']);
+    px(g, 4, 26, '#646a72', 4, 2); px(g, 20, 26, '#646a72', 4, 2);
+    blob(g, 15, 15, 8, 4.8, WD); // wooden barrel
+    blob(g, 8, 15, 3.2, 3, ['#be7d43', '#99571f', '#6a3710']); // rear handle block
+    box(g, 1, 13, 4, 4, ['#be7d43', '#99571f', '#6a3710']);
+    box(g, 22, 14, 7, 3, ['#f4e1bb', '#e9c894', '#bf945a']); // flour dust on the nose
+    px(g, 9, 13, WD[0], 11, 1); px(g, 10, 17, WD[2], 10, 1);
+    px(g, 15, 13, '#fff7e2', 2, 1); // highlight
+    px(g, 4, 18, '#b85b33', 5, 1); px(g, 6, 19, '#b85b33', 3, 1); // trailing ribbon/towel accent
+  }),
   shovel: () => art(g => { box(g, 15, 3, 3, 14, WD); box(g, 12, 2, 9, 3, ['#a8662a', '#8a4f1c', '#6a3a10']); box(g, 10, 17, 13, 11, ['#e4eaf0', '#b8c2cc', '#7b8794']); }),
 };
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1 - Rolling pin cleanup and menu wording (2026-11-10)
+
+- Reworked the lane-saver so the rolling pin reads more clearly as the bakery replacement for a lawn mower.
+- Fixed the rolling pin presentation so it sits properly on the left edge and clearly faces the direction it sweeps.
+- Increased its sweep reach and travel speed slightly so the action reads better in play.
+- Renamed the main menu button from **Adventure** to **Start Baking**.
+- Updated status documentation for the current visual priorities.
+
 ## 0.2.0 - Tutorial, unlocks and HUD clarity (2026-11-10)
 
 - Split the original long tutorial into four focused teaching levels.
