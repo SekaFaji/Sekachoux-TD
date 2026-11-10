@@ -67,6 +67,14 @@ Each pastry and Hooman is represented by a portrait-style Recipe Book card. Lock
 
 When a new pastry is awarded for the first completion of a teaching shift, a glowing **recipe card falls where the last Hooman was defeated**. Tap the card to collect it, or let it auto-collect after **five seconds**. The victory dialog then displays the full card and lets you continue. Progress is saved when you win, so exiting during the pickup cannot lose your unlock. Replays do not show duplicate card drops.
 
+## Main-menu bakery interior (v0.7.1)
+
+The main menu is a newly painted bakery interior with a brick oven (**Start Baking**), hanging order clipboard (**Level Select**), open **Recipe Book**, and smaller **Settings** and **Credits** plaques. The baker nameplate and SekaFaji Games credit are built into the same scene.
+
+All interactive regions use **one source of truth** in `src/art/menuLayout.ts`. The pixel artwork and HTML touch/click targets share a fixed 480x270 coordinate map, which scales with the existing 16:9 stage. Keyboard-accessible buttons stay aligned with their corresponding illustrated objects.
+
+**Fullscreen** is available through **Settings**, with status and availability tied to browser support. The detached corner menu button is gone. Sound settings and the two-stage reset are unchanged.
+
 ## Development
 
 Requires Node.js 22 or later.
