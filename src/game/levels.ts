@@ -1,5 +1,5 @@
 /** Campaign content is declarative. The UI and engine read the same unlock rules. */
-export type DefenderKind = 'croissant' | 'butter' | 'baguette' | 'pretzel' | 'pie';
+export type DefenderKind = 'croissant' | 'butter' | 'loaf' | 'pretzel' | 'pie';
 export type EnemyKind = 'walk' | 'jog' | 'critic' | 'insp';
 
 export interface TutorialStep {
@@ -32,9 +32,9 @@ export interface Level {
 
 const CROISSANT: readonly DefenderKind[] = ['croissant'];
 const BUTTER: readonly DefenderKind[] = ['croissant', 'butter'];
-const BAGUETTE: readonly DefenderKind[] = ['croissant', 'butter', 'baguette'];
-const PRETZEL: readonly DefenderKind[] = ['croissant', 'butter', 'baguette', 'pretzel'];
-const ALL: readonly DefenderKind[] = ['croissant', 'butter', 'baguette', 'pretzel', 'pie'];
+const LOAF: readonly DefenderKind[] = ['croissant', 'butter', 'loaf'];
+const PRETZEL: readonly DefenderKind[] = ['croissant', 'butter', 'loaf', 'pretzel'];
+const ALL: readonly DefenderKind[] = ['croissant', 'butter', 'loaf', 'pretzel', 'pie'];
 const ONE = [2] as const;
 const THREE = [1, 2, 3] as const;
 const FIVE = [0, 1, 2, 3, 4] as const;
@@ -53,7 +53,7 @@ export const LEVELS: readonly Level[] = [
     name: 'Fresh Butter', lesson: 'Learn to make and collect butter for your defenders.',
     duration: 0, spawnDelayStart: 0, spawnDelayMin: 0, weights: [1, 0, 0, 0],
     startingButter: 100, finalWaveSize: 0, activeRows: ONE, available: BUTTER,
-    previewEnemies: ['walk'], reward: 'baguette', tutorial: [
+    previewEnemies: ['walk'], reward: 'loaf', tutorial: [
       { message: 'Place a BUTTER BLOCK in the middle lane. It generates butter.', allowed: ['butter'], focusRow: 2, minColumn: 1, maxColumn: 2, condition: { type: 'placed', kind: 'butter', count: 1 } },
       { message: 'Collect the golden butter dropped by your Butter Block.', allowed: [], condition: { type: 'collected', count: 1 } },
       { message: 'Use the butter to place a CROISSANT in the middle lane.', allowed: ['croissant'], focusRow: 2, minColumn: 3, maxColumn: 5, grantButter: 100, condition: { type: 'placed', kind: 'croissant', count: 1 } },
@@ -61,13 +61,13 @@ export const LEVELS: readonly Level[] = [
     ],
   },
   {
-    name: 'Hold the Line', lesson: 'Use a sturdy Baguette to protect your ranged pastry.',
+    name: 'Hold the Line', lesson: 'Use a sturdy Loaf Bread to protect your ranged pastry.',
     duration: 0, spawnDelayStart: 0, spawnDelayMin: 0, weights: [1, 0, 0, 0],
-    startingButter: 150, finalWaveSize: 0, activeRows: ONE, available: BAGUETTE,
+    startingButter: 150, finalWaveSize: 0, activeRows: ONE, available: LOAF,
     previewEnemies: ['walk'], reward: 'pretzel', tutorial: [
       { message: 'First, place a CROISSANT in the middle lane.', allowed: ['croissant'], focusRow: 2, minColumn: 1, maxColumn: 3, condition: { type: 'placed', kind: 'croissant', count: 1 } },
-      { message: 'Place a BAGUETTE to the right of your Croissant. It blocks customers.', allowed: ['baguette'], focusRow: 2, minColumn: 4, maxColumn: 6, condition: { type: 'placed', kind: 'baguette', count: 1 } },
-      { message: 'Watch the Baguette hold the line while the Croissant attacks.', allowed: [], spawn: [{ kind: 'walk', row: 2, x: 8.7 }], condition: { type: 'kills', count: 1 } },
+      { message: 'Place a LOAF to the right of your Croissant. It blocks customers.', allowed: ['loaf'], focusRow: 2, minColumn: 4, maxColumn: 6, condition: { type: 'placed', kind: 'loaf', count: 1 } },
+      { message: 'Watch the Loaf Bread hold the line while the Croissant attacks.', allowed: [], spawn: [{ kind: 'walk', row: 2, x: 8.7 }], condition: { type: 'kills', count: 1 } },
     ],
   },
   {

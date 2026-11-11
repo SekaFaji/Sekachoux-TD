@@ -162,7 +162,7 @@ export function drawBakeryTitleScene(canvas:HTMLCanvasElement,atlas:SpriteAtlas,
   px(c,10,155,24,3,'rgba(33,29,23,.28)');
   px(c,25,150,43,4,'rgba(33,29,23,.32)');
   px(c,74,153,28,3,'rgba(33,29,23,.3)');
-  actor(c,atlas,'baguette',5,120+Math.sin(t*1.3)*1.2,31);
+  actor(c,atlas,'loaf',5,120+Math.sin(t*1.3)*1.2,31);
   actor(c,atlas,'croissant',22,101+Math.sin(t*1.7)*1.7,49);
   actor(c,atlas,'butter',72,120+Math.sin(t*2+1.8)*1.5,36);
   actor(c,atlas,'pin',92,140+Math.sin(t*1.1)*.5,21);

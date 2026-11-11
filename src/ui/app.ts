@@ -336,7 +336,11 @@ export class GameApp {
       const icon = new Image();
       const name = document.createElement('span');
       const cost = document.createElement('span');
-      button.className = 'defender-card';
+      const type = document.createElement('span');
+      const art = document.createElement('span');
+      const footer = document.createElement('span');
+      const currency = document.createElement('small');
+      button.className = 'defender-card pastry-portrait-card';
       button.dataset.action = 'card';
       button.dataset.kind = kind;
       button.id = `card-${kind}`;
@@ -344,11 +348,19 @@ export class GameApp {
       button.setAttribute('title', definition.d);
       icon.src = this.sprites.url(kind);
       icon.alt = '';
+      type.className = 'portrait-card-type';
+      type.textContent = ({ croissant: 'ATTACK', butter: 'SUPPORT',
+        loaf: 'TANK', pretzel: 'SLOW', pie: 'BLAST' } as Record<string,string>)[kind] ?? 'PASTRY';
+      art.className = 'portrait-card-art';
+      art.append(icon);
       name.className = 'card-name';
       name.textContent = definition.n;
+      footer.className = 'portrait-card-footer';
       cost.className = 'card-cost';
       cost.textContent = String(definition.c);
-      button.append(icon, name, cost);
+      currency.textContent = 'BUTTER';
+      footer.append(cost, currency);
+      button.append(type, art, name, footer);
       cards.append(button);
     }
   }

@@ -1436,3 +1436,215 @@ canvas, img { image-rendering: pixelated; }
   line-height: 1;
   padding: .8cqh 2cqw;
 }
+
+
+
+/* v0.9.3 - Portrait-style battle deck. Real collectible-looking pastry cards,
+ * much larger portraits, proper card name and butter-price footer. */
+#game-screen #toolbar {
+  height: 32%;
+  grid-template-columns: minmax(0,1fr) 19.5%;
+  gap: .75cqw;
+  padding: .65cqh .8cqw .8cqh;
+  background: linear-gradient(#e8efdf,#b5cbb8 40%,#84a28d);
+  border-bottom: .7cqh solid #4f6b59;
+  box-shadow: inset 0 .4cqh #fff9e8;
+}
+#game-screen #hud-deck {
+  min-width: 0;
+  min-height: 0;
+  gap: .45cqh;
+  justify-content: stretch;
+}
+#game-screen .hud-deck-label {
+  font-size: 1.85cqh;
+  font-weight: 900;
+  line-height: 1;
+  color: #345745;
+}
+#game-screen .hud-deck-label span {
+  font-size: 1.6cqh;
+  color: #557963;
+}
+#game-screen #defender-cards {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: .62cqw;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+#game-screen #defender-cards::-webkit-scrollbar { display: none; }
+#game-screen .defender-card.pastry-portrait-card {
+  display: grid;
+  grid-template-columns: minmax(0,1fr);
+  grid-template-rows: 2.35cqh minmax(0,1fr) minmax(3.4cqh,auto) 4.65cqh;
+  flex: 0 0 12.6cqw;
+  width: 12.6cqw;
+  max-width: 12.6cqw;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  align-items: center;
+  justify-items: center;
+  gap: .15cqh;
+  margin: 0;
+  padding: .5cqh .36cqw .55cqh;
+  border: .65cqh solid #a38458;
+  border-radius: .52cqh;
+  background: linear-gradient(165deg,#fffdf0,#f5e8d0 75%,#dcc5a2);
+  box-shadow: inset 0 .47cqh #fffefa, inset .2cqw 0 #fff4d770, 0 .4cqh #526854;
+  color: #345243;
+  text-shadow: none;
+  transform: none;
+  transition: border-color .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+#game-screen .pastry-portrait-card .portrait-card-type {
+  display: block;
+  align-self: start;
+  width: 100%;
+  color: #97724a;
+  font-size: 1.65cqh;
+  line-height: 1;
+  letter-spacing: .045cqw;
+  text-align: center;
+  white-space: nowrap;
+}
+#game-screen .pastry-portrait-card .portrait-card-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at 46% 24%,#fbf7e5,#e1e8d6 83%);
+  border: .3cqh solid #c3b18c;
+  border-radius: .25cqh;
+  box-shadow: inset 0 .4cqh #fffaf0,0 .15cqh #c7b295;
+  overflow: hidden;
+}
+#game-screen .pastry-portrait-card .portrait-card-art img {
+  display: block;
+  width: 17cqh;
+  height: 17cqh;
+  max-width: 99%;
+  max-height: 99%;
+  flex: none;
+  image-rendering: pixelated;
+  object-fit: contain;
+  filter: drop-shadow(0 .3cqh #8c8b675e);
+}
+#game-screen .pastry-portrait-card .card-name {
+  width: 100%;
+  min-width: 0;
+  font-size: 2.05cqh;
+  font-weight: 900;
+  line-height: 1.04;
+  text-align: center;
+  color: #345544;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-shadow: none;
+}
+#game-screen .pastry-portrait-card .portrait-card-footer {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .3cqw;
+  background: #ead3aa;
+  border: .24cqh solid #c6a373;
+  border-radius: .2cqh;
+  box-shadow: inset 0 .3cqh #fff2d5;
+  overflow: hidden;
+}
+#game-screen .pastry-portrait-card .card-cost {
+  display: inline-flex;
+  align-items: center;
+  gap: .12cqw;
+  flex: none;
+  width: auto;
+  font-size: 2.75cqh;
+  font-weight: 900;
+  line-height: 1;
+  color: #7c4e20;
+  border: 0;
+  padding: 0;
+}
+#game-screen .pastry-portrait-card .card-cost::before {
+  content: '';
+  display: block;
+  width: 1.5cqh;
+  height: 1.5cqh;
+  border: .19cqh solid #b88220;
+  border-radius: .15cqh;
+  background: linear-gradient(#fff4a0,#f2bc35);
+  box-shadow: inset 0 .22cqh #fff9be;
+}
+#game-screen .pastry-portrait-card .portrait-card-footer small {
+  color: #9e7444;
+  font-size: 1.35cqh;
+  font-weight: 850;
+  line-height: 1;
+}
+#game-screen .pastry-portrait-card.unavailable {
+  opacity: .83;
+  filter: saturate(.75);
+}
+#game-screen .pastry-portrait-card.unavailable .portrait-card-art {
+  background: linear-gradient(#e5e8de,#cfd4cb);
+}
+#game-screen .pastry-portrait-card.unavailable .portrait-card-art img {
+  filter: grayscale(.35) drop-shadow(0 .25cqh #677a6955);
+}
+#game-screen .pastry-portrait-card.selected {
+  opacity: 1;
+  filter: none;
+  border-color: #efc36c;
+  background: linear-gradient(#fffef0,#ffe8af 76%,#efd08b);
+  box-shadow: 0 0 0 .42cqh #617d5b, inset 0 .42cqh #fffdf3, 0 .55cqh #405a47,0 0 1.3cqh #ffe8a1;
+  transform: translateY(-.26cqh);
+}
+#game-screen .pastry-portrait-card:hover,
+#game-screen .pastry-portrait-card:focus-visible {
+  border-color: #ffdd90;
+  outline: .32cqh solid #fff4c5;
+  outline-offset: -.26cqh;
+  box-shadow: inset 0 .45cqh #fff7e9, 0 .45cqh #4a6552, 0 0 1.3cqh #f8e4b2;
+}
+#game-screen .pastry-portrait-card:active { transform: translateY(.12cqh); }
+/* Cooldown is a thin bottom progress strip, not an obscuring dark veil. */
+#game-screen .pastry-portrait-card::after {
+  position: absolute;
+  top: auto;
+  left: 0;
+  right: auto;
+  bottom: 0;
+  width: var(--cooldown,0%);
+  height: .6cqh;
+  min-height: 0;
+  background: #986b3b;
+  box-shadow: inset 0 .2cqh #e9b579;
+  pointer-events: none;
+}
+#game-screen #hud-right { min-width: 0; gap: .45cqh; }
+#game-screen #butter-counter {
+  padding: .2cqh .22cqw;
+  font-size: 3.6cqh;
+  border-radius: .45cqh;
+}
+#game-screen #butter-counter img { width: 7.2cqh; height: 7.2cqh; }
+#game-screen #toolbar-controls { height: 34%; gap: .35cqw; }
+#game-screen #toolbar-controls .small-button { font-size: 1.95cqh; }
+@media (prefers-reduced-motion: reduce) {
+  #game-screen .pastry-portrait-card { transition: none; }
+  #game-screen .pastry-portrait-card.selected,
+  #game-screen .pastry-portrait-card:active { transform: none; }
+}
