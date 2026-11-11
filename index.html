@@ -14,8 +14,8 @@
       <section id="menu" class="screen active" aria-label="Sekachoux TD main menu">
         <canvas id="menu-art" width="320" height="180" aria-hidden="true"></canvas>
         <div id="title-block">
-          <h1>SEKACHOUX <span>TD</span></h1>
-          <p>BAKERY DEFENSE</p>
+          <h1 class="visually-hidden">Sekachoux TD - Bakery Defense</h1>
+          <canvas id="title-logo" width="288" height="48" aria-hidden="true"></canvas>
         </div>
         <nav id="main-actions" aria-label="Main menu">
           <button class="title-action title-primary" data-action="start-baking">Start Baking</button>
@@ -36,14 +36,32 @@
         <button class="wood-button" data-action="menu">Back to Bakery</button>
       </section>
       <section id="almanac-screen" class="screen panel-screen" aria-label="Recipe Book">
-        <h2 id="almanac-title">Recipe Book</h2>
-        <div class="codex-tabs" role="group" aria-label="Encyclopedia sections">
-          <button class="wood-button" id="tab-pastries" data-action="tab-pastries">Pastries</button>
-          <button class="wood-button" id="tab-hoomans" data-action="tab-hoomans">Hoomans</button>
+        <header class="codex-header">
+          <div class="codex-header-title">
+            <span class="codex-eyebrow">THE BAKERY ARCHIVE</span>
+            <h2 id="almanac-title">Recipe Book</h2>
+          </div>
+          <div class="codex-header-nav">
+            <div class="codex-tabs" role="group" aria-label="Recipe Book sections">
+              <button class="wood-button" id="tab-pastries" data-action="tab-pastries">Pastries</button>
+              <button class="wood-button" id="tab-hoomans" data-action="tab-hoomans">Hoomans</button>
+            </div>
+            <p id="almanac-count" class="panel-caption"></p>
+          </div>
+        </header>
+        <div id="codex-workspace">
+          <div class="codex-gallery" aria-label="Collection gallery">
+            <div id="almanac-list" role="group" aria-label="Collection cards"></div>
+          </div>
+          <aside id="almanac-detail" aria-label="Selected collection entry" aria-live="polite">
+            <span id="detail-kicker" class="codex-detail-kicker">PASTRY RECIPE</span>
+            <div class="codex-detail-portrait"><img id="detail-image" alt="" width="64" height="64"></div>
+            <strong id="detail-name">Croissant</strong>
+            <p id="detail-description"></p>
+            <span id="detail-stat" class="codex-detail-stat"></span>
+          </aside>
         </div>
-        <p id="almanac-count" class="panel-caption"></p>
-        <div id="almanac-list"></div>
-        <button class="wood-button" data-action="menu">Back to Bakery</button>
+        <button class="wood-button codex-back" data-action="menu">Back to Bakery</button>
       </section>
       <section id="settings-screen" class="screen panel-screen" aria-label="Settings">
         <h2>Bakery Settings</h2>

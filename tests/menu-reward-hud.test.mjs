@@ -40,9 +40,9 @@ test('new recipe is an interactive glowing field card with a five-second fallbac
 test('recipe book uses real vertical cards and keeps locked mysteries', () => {
   const app = readFileSync(new URL('../dist/ui/app.js', import.meta.url), 'utf8');
   const css = readFileSync(new URL('../dist/styles.css', import.meta.url), 'utf8');
-  assert.ok(app.includes("'recipe-card '"));
-  assert.ok(css.includes('grid-template-columns: repeat(5,minmax(0,1fr))'));
-  assert.ok(css.includes('.codex-card-locked img'));
+  assert.ok(app.includes("'recipe-card codex-compact-card '"));
+  assert.ok(css.includes('grid-template-columns: repeat(4,minmax(0,1fr))'));
+  assert.ok(css.includes('.codex-compact-card.codex-card-locked img'));
 });
 
 test('new menu has integrated bakery controls and preserved navigation', () => {

@@ -6,7 +6,7 @@ import { GameEngine } from '../game/engine.js';
 import { loadDiscoveredHoomans, recordDiscoveredHooman } from '../game/discovery.js';
 import { GUEST_NAME, loadPlayerName, savePlayerName } from '../profile/identity.js';
 import type { EnemyKind } from '../game/levels.js';
-import { recipeBookEntries, type RecipeBookTab } from '../game/recipeBook.js';
+import { recipeBookEntries, type RecipeBookTab, type RecipeBookEntry } from '../game/recipeBook.js';
 import { LEVELS } from '../game/levels.js';
 import { loadUnlocked, saveUnlocked } from '../game/progress.js';
 import { COLUMNS, ROWS, TILE } from '../game/types.js';
@@ -14,6 +14,7 @@ import { fitLandscape, pointerToGrid } from './viewport.js';
 import { BakerySound } from '../audio/sound.js';
 import { clearGameSave } from '../settings/saveReset.js';
 import { drawBakeryTitleScene } from '../art/bakeryScene.js';
+import { drawBakeryPixelLogo } from '../art/titleLogo.js';
 
 const byId = <T extends HTMLElement>(id: string): T => {
   const element = document.getElementById(id);
@@ -35,6 +36,9 @@ export class GameApp {
   private knownHoomans: EnemyKind[] = loadDiscoveredHoomans(this.unlocked);
   private playerName = loadPlayerName();
   private readonly sound = new BakerySound();
+  private recipeTab: RecipeBookTab = 'pastries';
+  private recipeSelection: Record<RecipeBookTab,number> = { pastries: 0, hoomans: 0 };
+  private visibleRecipes: RecipeBookEntry[] = [];
   private resetStep: 0 | 1 | 2 = 0;
   private playing = false;
   private animation = 0;
@@ -57,6 +61,7 @@ export class GameApp {
     byId<HTMLImageElement>('butter-icon').src = this.sprites.url('butter-drop');
     byId<HTMLImageElement>('shovel-icon').src = this.sprites.url('shovel');
     drawBakeryTitleScene(byId<HTMLCanvasElement>('menu-art'), this.sprites, 0);
+    drawBakeryPixelLogo(byId<HTMLCanvasElement>('title-logo'));
     this.updateProfile();
     this.updateFullscreenControl();
     document.addEventListener('fullscreenchange', () => this.updateFullscreenControl());
@@ -219,41 +224,77 @@ export class GameApp {
     this.show('level-screen');
   }
 
+  /** Collection browsing is compact. Full details live in a separate paper panel. */
   private buildAlmanac(tab: RecipeBookTab): void {
     const list = byId<HTMLElement>('almanac-list');
     list.replaceChildren();
     const pastries = tab === 'pastries';
+    this.recipeTab = tab;
     byId<HTMLElement>('almanac-title').textContent = 'Recipe Book';
-    byId<HTMLElement>('tab-pastries').classList.toggle('active-tab', pastries);
-    byId<HTMLElement>('tab-hoomans').classList.toggle('active-tab', !pastries);
+    byId<HTMLButtonElement>('tab-pastries').classList.toggle('active-tab', pastries);
+    byId<HTMLButtonElement>('tab-hoomans').classList.toggle('active-tab', !pastries);
+    byId<HTMLButtonElement>('tab-pastries').setAttribute('aria-pressed', String(pastries));
+    byId<HTMLButtonElement>('tab-hoomans').setAttribute('aria-pressed', String(!pastries));
     const earned = LEVELS[Math.max(0, this.unlocked - 1)]?.available ?? [];
-    const entries = recipeBookEntries(tab, earned, this.knownHoomans);
-    byId<HTMLElement>('almanac-count').textContent = `${entries.filter(entry => !entry.locked).length} of ${entries.length} ${pastries ? 'pastries earned' : 'Hoomans discovered'}`;
-    for (const entry of entries) {
-      const article = document.createElement('article');
-      article.className = 'recipe-card ' + (entry.locked ? 'codex-card-locked' : 'codex-card-known');
-      article.setAttribute('aria-label', entry.locked ? (pastries ? 'Undiscovered pastry' : 'Undiscovered Hooman') : entry.name);
-      const header = document.createElement('span');
-      header.className = 'recipe-card-label';
-      header.textContent = pastries ? 'PASTRY RECIPE' : 'HOOMAN FILE';
-      const portrait = document.createElement('div');
+    this.visibleRecipes = recipeBookEntries(tab, earned, this.knownHoomans);
+    byId<HTMLElement>('almanac-count').textContent =
+      String(this.visibleRecipes.filter(entry => !entry.locked).length) + ' / ' +
+      String(this.visibleRecipes.length) + (pastries ? ' pastries earned' : ' Hoomans discovered');
+
+    this.visibleRecipes.forEach((entry, index) => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'recipe-card codex-compact-card ' +
+        (entry.locked ? 'codex-card-locked' : 'codex-card-known');
+      card.dataset.action = 'select-recipe';
+      card.dataset.index = String(index);
+      card.setAttribute('aria-label', entry.locked
+        ? (pastries ? 'Undiscovered pastry' : 'Undiscovered Hooman')
+        : entry.name);
+      card.setAttribute('aria-pressed', 'false');
+
+      const portrait = document.createElement('span');
       portrait.className = 'codex-portrait';
       const image = new Image();
       image.alt = '';
       image.src = this.sprites.url(entry.imageKey);
       portrait.append(image);
-      const heading = document.createElement('b');
-      heading.textContent = entry.name;
-      const role = document.createElement('span');
-      role.className = 'codex-detail';
-      role.textContent = entry.description;
+      const name = document.createElement('strong');
+      name.className = 'codex-card-name';
+      name.textContent = entry.name;
       const stat = document.createElement('span');
-      stat.className = 'recipe-stat';
+      stat.className = 'codex-card-stat';
       stat.textContent = entry.stat;
-      article.append(header, portrait, heading, role, stat);
-      list.append(article);
-    }
+      card.append(portrait, name, stat);
+      list.append(card);
+    });
+
     this.show('almanac-screen');
+    this.selectRecipe(Math.min(this.recipeSelection[tab], Math.max(0, this.visibleRecipes.length - 1)));
+  }
+
+  private selectRecipe(index: number): void {
+    if (!Number.isInteger(index) || index < 0 || index >= this.visibleRecipes.length) return;
+    const entry = this.visibleRecipes[index];
+    if (!entry) return;
+    this.recipeSelection[this.recipeTab] = index;
+    const cards = byId<HTMLElement>('almanac-list').querySelectorAll<HTMLButtonElement>('.codex-compact-card');
+    cards.forEach((card, i) => {
+      const selected = index === i;
+      card.classList.toggle('selected', selected);
+      card.setAttribute('aria-pressed', String(selected));
+    });
+
+    const detail = byId<HTMLElement>('almanac-detail');
+    detail.classList.toggle('codex-detail-locked', entry.locked);
+    byId<HTMLElement>('detail-kicker').textContent =
+      this.recipeTab === 'pastries' ? 'PASTRY RECIPE' : 'HOOMAN FILE';
+    const image = byId<HTMLImageElement>('detail-image');
+    image.src = this.sprites.url(entry.imageKey);
+    image.alt = '';
+    byId<HTMLElement>('detail-name').textContent = entry.name;
+    byId<HTMLElement>('detail-description').textContent = entry.description;
+    byId<HTMLElement>('detail-stat').textContent = entry.stat;
   }
 
   private updateProfile(): void {
@@ -514,6 +555,7 @@ export class GameApp {
     else if (action === 'levels') { this.stopAnimation(); this.buildLevels(); }
     else if (action === 'recipe-book' || action === 'tab-pastries') { this.stopAnimation(); this.buildAlmanac('pastries'); }
     else if (action === 'tab-hoomans') { this.stopAnimation(); this.buildAlmanac('hoomans'); }
+    else if (action === 'select-recipe') this.selectRecipe(Number(button.dataset.index));
     else if (action === 'edit-name') this.openNameEditor();
     else if (action === 'cancel-name') this.closeNameEditor();
     else if (action === 'settings') { this.stopAnimation(); this.updateSoundControls(); this.updateFullscreenControl(); this.show('settings-screen'); }
