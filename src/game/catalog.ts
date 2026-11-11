@@ -5,7 +5,7 @@ export interface EnemyDefinition { n: string; hp: number; sp: number; o: HumanAp
 export const DEFENDERS: Record<string, DefenderDefinition> = {
   butter: { n: 'Butter Block', c: 50, hp: 60, cd: 5, d: 'Produces butter, the currency of the bakery.' },
   croissant: { n: 'Croissant', c: 100, hp: 60, cd: 4, d: 'Flings crumbs at customers in its lane.' },
-  baguette: { n: 'Baguette', c: 50, hp: 400, cd: 12, d: 'A tough wall that holds customers back.' },
+  loaf: { n: 'Loaf Bread', c: 50, hp: 400, cd: 12, d: 'A sturdy, crusty whole loaf that blocks hungry Hoomans.' },
   pretzel: { n: 'Pretzel', c: 175, hp: 60, cd: 6, d: 'Shoots icing that slows customers.' },
   pie: { n: 'Pie', c: 150, hp: 1, cd: 18, d: 'Arms after a few seconds, then explodes when customers get close.' },
 };

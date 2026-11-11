@@ -14,7 +14,7 @@ export interface RecipeBookEntry {
 export const HIDDEN_NAME = '??????';
 export const HIDDEN_DESCRIPTION = '???? ?? ???? ??????';
 
-const PASTRY_ORDER = ['croissant', 'butter', 'baguette', 'pretzel', 'pie'] as const;
+const PASTRY_ORDER = ['croissant', 'butter', 'loaf', 'pretzel', 'pie'] as const;
 
 /** Build the full collection without exposing details for unearned or unencountered entries. */
 export function recipeBookEntries(

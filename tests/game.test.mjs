@@ -45,7 +45,7 @@ test('campaign keeps six original battle stages following four lessons', () => {
 });
 
 test('each tutorial awards exactly one new pastry, available in the next shift', () => {
-  assert.deepEqual(LEVELS.slice(0, 4).map(level => level.reward), ['butter', 'baguette', 'pretzel', 'pie']);
+  assert.deepEqual(LEVELS.slice(0, 4).map(level => level.reward), ['butter', 'loaf', 'pretzel', 'pie']);
   for (let i = 0; i < 4; i++) {
     const reward = rewardForLevel(i);
     assert.ok(reward && !LEVELS[i].available.includes(reward));
@@ -89,13 +89,13 @@ test('butter lesson waits for a real collect before enabling Croissant', () => {
   assert.equal(engine.place('croissant', 4, 2), true);
 });
 
-test('baguette lesson enforces protection in front of Croissant', () => {
+test('loaf lesson enforces protection in front of Croissant', () => {
   const engine = startTutorial(2);
   assert.equal(engine.place('croissant', 2, 2), true);
   stepForward(engine);
-  assert.equal(engine.allowed('baguette'), true);
-  assert.equal(engine.place('baguette', 1, 2), false);
-  assert.equal(engine.place('baguette', 4, 2), true);
+  assert.equal(engine.allowed('loaf'), true);
+  assert.equal(engine.place('loaf', 1, 2), false);
+  assert.equal(engine.place('loaf', 4, 2), true);
   stepForward(engine);
   assert.equal(engine.state.enemies.length, 1);
 });

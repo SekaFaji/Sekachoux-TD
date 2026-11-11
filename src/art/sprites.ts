@@ -1,4 +1,5 @@
 import type { HumanAppearance } from "../game/catalog.js";
+import { croissantSprite, loafSprite } from './heroSprites.js';
 export type C2 = CanvasRenderingContext2D;
 export type P3 = [string, string, string];
 export const OL = '#2b1608';
@@ -32,7 +33,8 @@ const BR: P3 = ['#fbd98a', '#e5a043', '#b3681f'], YL: P3 = ['#fff3a0', '#ffd84a'
 const CR: P3 = ['#f3c47a', '#d99a45', '#a8651f'], RD: P3 = ['#ff8a7a', '#d8403c', '#9c2420'], SK: P3 = ['#ffe0c2', '#f2b992', '#c98a68'];
 export const WD: P3 = ['#ecc890', '#d49a55', '#a8662a'];
 export const SPR: Record<string, () => HTMLCanvasElement> = {
-  croissant: () => art(g => { blob(g, 6, 22, 4, 3.5, BR); blob(g, 26, 22, 4, 3.5, BR); blob(g, 10, 17, 5.5, 5, BR); blob(g, 22, 17, 5.5, 5, BR); blob(g, 16, 14, 8, 7.5, BR); px(g, 11, 13, BR[2], 1, 5); px(g, 21, 13, BR[2], 1, 5); px(g, 8, 20, BR[2], 1, 3); px(g, 24, 20, BR[2], 1, 3); eye(g, 12, 12); eye(g, 17, 12); px(g, 14, 18, OL, 4, 1); px(g, 13, 17, OL); px(g, 18, 17, OL); }),
+  croissant: () => croissantSprite(),
+  'croissant-attack': () => croissantSprite(true),
   butter: () => art(g => {
     // A characterful wrapped pat of butter, rather than a flat yellow box.
     px(g, 3, 26, '#716052', 26, 2); // warm contact shadow
@@ -79,7 +81,8 @@ export const SPR: Record<string, () => HTMLCanvasElement> = {
     px(g, 6, 10, '#fff7d6', 1, 5); px(g, 4, 12, '#fff7d6', 5, 1);
     px(g, 27, 7, '#ffe7a2', 1, 4); px(g, 25, 9, '#ffe7a2', 5, 1);
   }),
-  baguette: () => art(g => { blob(g, 16, 16, 8, 14, BR); px(g, 13, 6, BR[2], 6, 1); px(g, 12, 23, BR[2], 8, 1); px(g, 14, 26, BR[2], 4, 1); eye(g, 11, 12); eye(g, 18, 12); px(g, 10, 11, OL, 5, 1); px(g, 17, 11, OL, 5, 1); px(g, 13, 19, OL, 6, 1); }),
+  loaf: () => loafSprite(),
+  'loaf-guard': () => loafSprite(true),
   pretzel: () => art(g => { ring(g, 10, 12, 6.5, PZ); ring(g, 22, 12, 6.5, PZ); blob(g, 16, 21, 9, 6, PZ); for (const [a, b] of [[8, 9], [23, 10], [13, 22], [19, 24]]) px(g, a, b, '#fff', 2, 1); eye(g, 12, 19); eye(g, 17, 19); px(g, 14, 25, OL, 4, 1); }),
   pie: () => art(g => { blob(g, 16, 21, 13, 8, CR); blob(g, 16, 18, 10, 5.5, RD); px(g, 7, 18, CR[0], 18, 1); px(g, 15, 13, CR[0], 1, 10); blob(g, 16, 9, 4, 4, RD); px(g, 16, 3, '#6a4a2a', 1, 3); px(g, 17, 1, '#ffe066', 3, 3); eye(g, 11, 17); eye(g, 18, 17); px(g, 10, 16, OL, 5, 1); px(g, 17, 16, OL, 5, 1); }),
   pin: () => art(g => {

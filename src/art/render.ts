@@ -46,7 +46,14 @@ export function drawBattlefield(canvas: HTMLCanvasElement, state: GameState, lev
   }
   for (const p of state.defenders) {
     x.globalAlpha = (p.kind === 'pie' && p.timer > 0 ? .6 : 1) * (.5 + .5 * Math.min(1, p.health / DEFENDERS[p.kind].hp));
-    x.drawImage(sprites.images[p.kind], p.column * TILE, p.row * TILE + Math.round(Math.sin(state.elapsed * 3 + p.column + p.row))); x.globalAlpha = 1;
+    // Use actual attack/brace poses only at their matching game moments.
+    const shooting = p.kind === 'croissant' && p.timer > 1.15 && p.timer <= 1.4;
+    const blocking = p.kind === 'loaf' && state.enemies.some(z =>
+      z.row === p.row && Math.abs(z.x - p.column - .6) < .5);
+    const poseKey = shooting ? 'croissant-attack' : blocking ? 'loaf-guard' : p.kind;
+    x.drawImage(sprites.images[poseKey], p.column * TILE,
+      p.row * TILE + Math.round(Math.sin(state.elapsed * 3 + p.column + p.row)));
+    x.globalAlpha = 1;
   }
   const fm = Math.floor(state.elapsed * 4) % 2;
   for (const z of state.enemies) {

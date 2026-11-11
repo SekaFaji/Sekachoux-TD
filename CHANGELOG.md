@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.3 - Croissant and Loaf Bread, portrait battle HUD (2026-11-11)
+
+- Replace the current Baguette tank with **Loaf Bread**, reserving Baguette for a future distinct unit. Keep the tank's 50 Butter cost, 400 HP, 12-second cooldown, tutorial placement requirement and campaign reward timing intact.
+- Hand-author original 32x32 Croissant and Loaf Bread pixel art: real flaky croissant layers, golden highlights, toasted tips, small expressions and feet; a broad crusty loaf with scored crown, golden crumb, grounded arms and sturdy posture.
+- Add context-specific action poses: Croissant throws when it fires an actual projectile, Loaf Bread braces while directly blocking an approaching Hooman. These do not change attack speed, health or AI.
+- Use the new sprites consistently throughout the living menu, Recipe Book, reward portraits and actual battlefield. The approved Butter Block sprite remains untouched.
+- Redesign the battle's top pastry deck into real compact **portrait cards** with larger framed artwork, subtle role labels, readable names and dedicated Butter-price footers. Selected/unavailable states and cooldown progress remain visible without darkening the full portrait.
+- Preserve all browser save keys and level-number unlock progression, HUD actions, recipe mystery placeholders and enemy discovery.
+- Add tests for Loaf Bread migration, unchanged tank balance, pixel-art frames and the new portrait HUD.
+
+
 ## 0.9.2 - Compact Recipe Book and hand-crafted pixel title (2026-11-11)
 
 - Redesign the Recipe Book as a four-column, two-visible-row collection grid alongside a separate selected-entry detail page. Compact cards show portraits, names and a small stat instead of repeating full descriptions on every card.
