@@ -48,13 +48,24 @@ export function drawBakeryWorktop(ctx: CanvasRenderingContext2D, activeRows: rea
       ctx.fillStyle = '#f8d8a9'; ctx.fillRect(x, y + 10, 1, 2); ctx.fillRect(x, y + 21, 1, 2);
     }
 
+    if (active) {
+      // Very small, deterministic flour flecks add life without obscuring units.
+      for (let fleck = 0; fleck < 12; fleck++) {
+        const fx = 7 + (fleck * 47 + row * 19) % (width - 14);
+        const fy = y + 7 + (fleck * 7 + row * 3) % 14;
+        ctx.fillStyle = fleck % 3 === 0 ? '#fff8e7' : '#cbbda8';
+        ctx.fillRect(fx, fy, fleck % 4 === 0 ? 2 : 1, 1);
+      }
+    }
+
     if (!active) {
-      // Unavailable trays read as covered linen, not blacked-out tiles.
-      ctx.fillStyle = 'rgba(65,77,72,.58)';
+      // Covered linen still shows an inviting worktop in early one-lane lessons.
+      ctx.fillStyle = 'rgba(65,77,72,.48)';
       ctx.fillRect(3, y + 3, width - 6, 25);
       ctx.fillStyle = '#adbaae'; ctx.fillRect(10, y + 15, width - 20, 1);
       for (let x = 14; x < width - 8; x += 24) {
         ctx.fillStyle = '#81958a'; ctx.fillRect(x, y + 11, 6, 1); ctx.fillRect(x + 4, y + 20, 5, 1);
+        ctx.fillStyle = '#d2d9ca'; ctx.fillRect(x + 7, y + 14, 4, 1);
       }
     }
   }
