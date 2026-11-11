@@ -97,7 +97,7 @@ test('compact portrait deck keeps gameplay controls with smaller, clean cards', 
   assert.match(compact, /width:\s*9\.5cqw/);
   assert.match(compact, /width:\s*var\(--cooldown,\s*0%\)/);
   assert.ok(!compact.includes('height: 32%'),'the battlefield must not lose a third of the screen');
-  assert.ok(!compact.includes('17cqh'),'oversized portraits must be gone');
+  assert.match(compact, /\.portrait-card-art img\s*\{[^}]*width:\s*10\.3cqh;[^}]*height:\s*10\.3cqh;/, 'portrait pixels are sized down');
   // Five cards must fit in the deck with margin to spare, even without scrolling.
   const fiveCardsWidth=5*9.5 + 4*.5;
   assert.ok(fiveCardsWidth<65,'five unlocked pastry cards should fit comfortably');
