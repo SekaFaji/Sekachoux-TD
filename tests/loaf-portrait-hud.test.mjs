@@ -88,7 +88,8 @@ test('compact portrait deck keeps gameplay controls with smaller, clean cards', 
   assert.ok(app.includes("button.dataset.kind = kind"));
   assert.ok(app.includes("button.setAttribute('aria-pressed'"));
   assert.ok(app.includes("button.append(portrait, name, price)"));
-  assert.ok(app.includes("'loaf'") || app.includes('loaf:'));
+  assert.equal(DEFENDERS.loaf.n, 'Loaf Bread');
+  assert.ok(app.includes('this.engine.level.available'), 'HUD uses the catalog-backed earned roster');
   assert.ok(compact.includes('#game-screen .defender-card.pastry-portrait-card'));
   assert.ok(compact.includes('#game-screen .pastry-portrait-card .portrait-card-art img'));
   assert.match(compact, /#game-screen #toolbar\s*\{\s*height:\s*22\.5%/);
