@@ -16,13 +16,14 @@ test('first-time recipe reward is anchored to the last defeated Hooman', () => {
   assert.deepEqual(engine.takeEvents().filter(e => e.type === 'win'), [{ type: 'win' }]);
 });
 
-test('HUD puts butter counter inside the right block, after pastry cards', () => {
+test('HUD fixes shift and butter at left, portraits in the middle and tools at right', () => {
   const html = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
-  const a = html.indexOf('id="hud-deck"');
+  const status = html.indexOf('id="hud-status"');
+  const butter = html.indexOf('id="butter-counter"');
+  const deck = html.indexOf('id="hud-deck"');
   const cards = html.indexOf('id="defender-cards"');
   const right = html.indexOf('id="hud-right"');
-  const butter = html.indexOf('id="butter-counter"');
-  assert.ok(a > 0 && a < cards && cards < right && right < butter);
+  assert.ok(status > 0 && status < butter && butter < deck && deck < cards && cards < right);
   assert.ok(html.includes('id="reward-drop-layer"'));
   assert.ok(html.includes('data-action="collect-reward"'));
 });
