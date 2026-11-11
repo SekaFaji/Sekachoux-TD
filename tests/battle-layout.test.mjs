@@ -31,7 +31,7 @@ test('gameplay viewport keeps camera and live board identically scaled', () => {
   assert.match(current, /#game-screen #battlefield\s*\{[^}]*width:\s*100%;[^}]*height:\s*100%;[^}]*object-fit:\s*fill/);
   assert.match(current, /#game-screen #approach-canvas\s*\{[^}]*width:\s*100%;[^}]*height:\s*100%;[^}]*object-fit:\s*fill/);
   assert.match(current, /#game-screen #approach-intro,\s*#game-screen #lane-reveal,\s*#game-screen #reward-drop-layer\s*\{[^}]*inset:\s*0/);
-  assert.ok(!current.includes('object-fit: contain'),'no aspect-ratio change at the intro handoff');
+  assert.ok(!/#game-screen #battlefield\\s*\\{[^}]*object-fit:\\s*contain/.test(current),'board must not letterbox');
   assert.ok(app.includes("byId<HTMLElement>('game-screen').classList.remove('cinematic')") ||
     app.includes("byId('game-screen').classList.remove('cinematic')"));
   assert.ok(app.includes('drawApproachFrame'));
