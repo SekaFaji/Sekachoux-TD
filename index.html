@@ -101,41 +101,44 @@
       </section>
       <section id="game-screen" class="screen" aria-label="Bakery defense game">
         <header id="toolbar">
+          <div id="hud-status">
+            <div id="level-label" aria-label="Current shift"></div>
+            <div id="butter-counter" aria-label="Butter resource"><img id="butter-icon" alt="" width="32" height="32"><span id="butter-value">0</span><small>BUTTER</small></div>
+          </div>
           <div id="hud-deck">
             <span class="hud-deck-label">YOUR PASTRIES</span>
             <div id="defender-cards" aria-label="Choose a pastry"></div>
           </div>
           <div id="hud-right">
-            <div id="butter-counter" aria-label="Butter resource"><img id="butter-icon" alt="" width="32" height="32"><span id="butter-value">0</span><small>BUTTER</small></div>
-            <div id="toolbar-controls">
-              <button class="tool-card" id="shovel" data-action="shovel" aria-label="Remove pastry" title="Remove pastry"><img id="shovel-icon" alt="" width="32" height="32"></button>
-              <button class="small-button" data-action="pause">Pause</button>
-            </div>
+            <button class="tool-card" id="shovel" data-action="shovel" aria-label="Remove pastry" title="Remove pastry"><img id="shovel-icon" alt="" width="32" height="32"></button>
+            <button class="small-button" data-action="pause" aria-label="Pause shift">Pause</button>
           </div>
         </header>
         <div id="battle-area">
-          <canvas id="battlefield" width="288" height="160" aria-label="Tap a tile to place a pastry"></canvas>
-          <div id="level-label"></div>
+          <canvas id="battle-scenery" width="320" height="180" aria-hidden="true"></canvas>
+          <div id="board-viewport">
+            <canvas id="battlefield" width="288" height="160" aria-label="Tap a tile to place a pastry"></canvas>
+            <div id="lane-reveal" aria-hidden="true"></div>
+            <div id="reward-drop-layer" hidden>
+              <span class="reward-drop-prompt">NEW RECIPE! TAP TO COLLECT</span>
+              <button id="reward-drop-card" class="recipe-card reward-drop-card" data-action="collect-reward" aria-label="Collect new recipe card">
+                <span class="recipe-card-label">NEW RECIPE</span>
+                <img id="reward-drop-image" alt="" width="56" height="56">
+                <strong id="reward-drop-name"></strong>
+                <span class="card-sparkle" aria-hidden="true">✦</span>
+              </button>
+              <span id="reward-auto-label">Automatically collected in 5 seconds</span>
+            </div>
+            <div id="approach-intro" hidden aria-label="Camera preview of incoming Hoomans">
+              <canvas id="approach-canvas" width="288" height="160" aria-hidden="true"></canvas>
+              <span id="approach-label">HOOMANS APPROACHING!</span>
+              <button id="skip-approach" class="small-button" data-action="skip-intro">SKIP INTRO</button>
+            </div>
+          </div>
           <div id="banner" role="status" aria-live="polite"></div>
           <div id="tutorial-tip" role="status" aria-live="polite"></div>
           <div id="selected-info" aria-live="polite"><strong id="selected-name"></strong><span id="selected-description"></span></div>
           <div id="level-progress"><i id="progress-fill"></i></div>
-          <div id="lane-reveal" aria-hidden="true"></div>
-          <div id="reward-drop-layer" hidden>
-            <span class="reward-drop-prompt">NEW RECIPE! TAP TO COLLECT</span>
-            <button id="reward-drop-card" class="recipe-card reward-drop-card" data-action="collect-reward" aria-label="Collect new recipe card">
-              <span class="recipe-card-label">NEW RECIPE</span>
-              <img id="reward-drop-image" alt="" width="56" height="56">
-              <strong id="reward-drop-name"></strong>
-              <span class="card-sparkle" aria-hidden="true">✦</span>
-            </button>
-            <span id="reward-auto-label">Automatically collected in 5 seconds</span>
-          </div>
-          <div id="approach-intro" hidden aria-label="Camera preview of incoming Hoomans">
-            <canvas id="approach-canvas" width="288" height="160" aria-hidden="true"></canvas>
-            <span id="approach-label">HOOMANS APPROACHING!</span>
-            <button id="skip-approach" class="small-button" data-action="skip-intro">SKIP INTRO</button>
-          </div>
         </div>
       </section>
       <section id="identity-dialog" class="screen overlay" role="dialog" aria-modal="true" aria-labelledby="identity-title">
