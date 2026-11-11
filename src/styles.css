@@ -71,64 +71,6 @@ canvas, img { image-rendering: pixelated; }
 #almanac-list img { width: 8.5cqh; height: 8.5cqh; flex: none; }
 #almanac-list b { display: block; font-size: 2.5cqh; color: #fffadf; }
 
-/* In-game HUD: every unlocked pastry has a visible, persistent name. */
-#game-screen { flex-direction: column; background: #614126; }
-#toolbar {
-  display: flex; align-items: stretch; gap: .8cqw; padding: 1.2cqh 1.1cqw;
-  height: 24%; flex: none; background: linear-gradient(#c08a4c,#986038 56%,#63361e);
-  border-bottom: .9cqh solid #342012; box-shadow: inset 0 .65cqh #edc48a;
-}
-#butter-counter {
-  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  width: 11%; min-width: 0; padding: .4cqh .2cqw; flex: none;
-  border: .6cqh solid #593019; border-radius: .7cqh;
-  background: linear-gradient(#fff1c2,#deb777); color: #4c270e; font-size: 4.2cqh;
-  box-shadow: inset 0 .6cqh #fff7dd;
-}
-#butter-counter img { width: 5.4cqh; height: 5.4cqh; }
-#butter-counter small { color: #714017; font-size: 1.7cqh; letter-spacing: .1cqw; }
-#defender-cards { display: flex; flex: 1; align-items: stretch; gap: .75cqw; min-width: 0; }
-.defender-card {
-  position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  flex: 1; min-width: 0; max-width: 13cqw; gap: .3cqh; padding: .35cqh .2cqw;
-  border: .65cqh solid #55321e; border-radius: .7cqh;
-  background: linear-gradient(#fff1cf,#d8aa6d); box-shadow: inset 0 .55cqh #fffaf0, 0 .5cqh #452512;
-  color: #392012; text-align: center;
-}
-.defender-card img { width: 7.4cqh; height: 7.4cqh; object-fit: contain; }
-.defender-card .card-name { font-size: 2.3cqh; line-height: 1.05; white-space: nowrap; letter-spacing: -.03cqw; }
-.defender-card .card-cost { display: flex; gap: .2cqw; align-items: center; justify-content: center; font-size: 2.55cqh; color: #573016; }
-.defender-card .card-cost::before { content: ''; width: 1.3cqh; height: 1.3cqh; border: .22cqh solid #b6771f; border-radius: 35%; background: #ffdc4c; box-shadow: inset 0 .25cqh #fff7a8; }
-.defender-card::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: var(--cooldown,0%); background: #21130999; pointer-events: none; }
-.defender-card.unavailable { opacity: .55; }
-.defender-card.selected { border-color: #fff0a1; background: linear-gradient(#fffbd8,#f8d876); box-shadow: 0 0 0 .5cqh #a3541a, inset 0 .5cqh #fff; transform: translateY(-.4cqh); }
-#toolbar-controls { display: flex; align-items: stretch; gap: .5cqw; }
-.tool-card { display: flex; align-items: center; justify-content: center; width: 7cqw; min-width: 0; padding: .4cqh; border: .6cqh solid #55321e; border-radius: .7cqh; background: #f0d1a2; }
-.tool-card img { width: 6cqh; height: 6cqh; }
-.tool-card.selected { background: #fff4a8; }
-#toolbar-controls .small-button { font-size: 2.45cqh; padding: .8cqh .7cqw; }
-#battle-area { position: relative; flex: 1; min-height: 0; background: #b88348; }
-#battlefield { width: 100%; height: 100%; object-fit: contain; display: block; touch-action: none; }
-#level-label { position: absolute; top: 1.15cqh; left: 1.3cqw; font-size: 2.35cqh; padding: .5cqh .75cqw; color: #fff4d3; background: #342114aa; border: .3cqh solid #ffe0a054; border-radius: .6cqh; pointer-events: none; }
-#tutorial-tip {
-  display: none; position: absolute; z-index: 4; bottom: 1.8cqh; left: 1.6cqw; max-width: 65%;
-  padding: 1.35cqh 1cqw; background: #fff2c9; color: #4b2b15; border: .55cqh solid #694224;
-  border-radius: .8cqh; box-shadow: 0 .5cqh #3b200e88; font-size: 2.65cqh; line-height: 1.15;
-  pointer-events: none;
-}
-#tutorial-tip::before { content: 'TODAY\'S LESSON'; display: block; margin-bottom: .5cqh; font-size: 1.9cqh; color: #a15525; }
-#selected-info {
-  display: none; position: absolute; z-index: 4; top: 1.5cqh; right: 1.1cqw;
-  width: 25%; padding: 1cqh .85cqw; background: #372214df; color: #fff4d7;
-  border: .4cqh solid #b48047; border-radius: .7cqh; pointer-events: none;
-}
-#selected-info strong { display: block; font-size: 2.5cqh; color: #ffe39c; }
-#selected-info span { display: block; margin-top: .6cqh; font-size: 1.95cqh; line-height: 1.18; }
-#level-progress { position: absolute; right: 1.8cqw; bottom: 2cqh; width: 25%; height: 3.6cqh; border: .5cqh solid #523420; border-radius: 1cqh; background: #fff4d7; overflow: hidden; }
-#level-progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg,#e58b4b,#ffe277); }
-#banner { display: none; position: absolute; z-index: 5; top: 34%; left: 0; right: 0; text-align: center; font-size: 6.4cqh; color: #fff3c6; text-shadow: 2px 3px 0 #4e2210, 0 0 2cqh #3b120c; pointer-events: none; }
-#banner.active { display: block; }
-
 /* Original opening: woven bakery table runners roll off each lane, one by one. */
 #lane-reveal { position: absolute; z-index: 3; inset: 0; pointer-events: none; visibility: hidden; }
 #lane-reveal.revealing { visibility: visible; }
@@ -513,56 +455,6 @@ canvas, img { image-rendering: pixelated; }
 .menu-fullscreen {
   z-index: 4; bottom: 1.2%; right: 3.1%;
   font-size: 1.65cqh; padding: .65cqh .7cqw; border-width: .3cqh;
-}
-
-/* HUD: pastry deck on left and a dedicated upper-right butter readout. */
-#toolbar {
-  display: grid; grid-template-columns: minmax(0,1fr) 19.5%;
-  align-items: stretch; gap: 1cqw;
-  padding: .9cqh 1.05cqw; height: 24%;
-  background: linear-gradient(#e9f0df,#aac8b1 52%,#759986);
-  border-bottom: .7cqh solid #476756;
-  box-shadow: inset 0 .5cqh #fffdf0;
-}
-#hud-deck { min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: .6cqh; }
-.hud-deck-label {
-  display: flex; align-items: center; justify-content: space-between;
-  color: #3b5c4c; font-size: 2.2cqh; letter-spacing: .06cqw; line-height: 1;
-}
-.hud-deck-label span { font-size: 1.7cqh; color: #668575; }
-#defender-cards { flex: 1; min-width: 0; gap: .65cqw; align-items: stretch; }
-.defender-card {
-  max-width: none; flex: 1; gap: .2cqh;
-  background: linear-gradient(#fffdf5,#f8f0e2 60%,#deead9);
-  border: .48cqh solid #789686; border-radius: .6cqh;
-  box-shadow: inset 0 .45cqh #fff, 0 .25cqh #557464;
-  padding: .25cqh .15cqw;
-}
-.defender-card img { width: 7.6cqh; height: 7.6cqh; }
-.defender-card .card-name { color: #385345; font-size: 2.2cqh; }
-.defender-card .card-cost { font-size: 2.35cqh; color: #9b6b36; }
-.defender-card.selected { border-color: #d19a48; background: linear-gradient(#fff9de,#ffe8b3); }
-#hud-right { min-width: 0; display: flex; flex-direction: column; gap: .5cqh; }
-#butter-counter {
-  width: 100%; min-width: 0; flex: 1; min-height: 0;
-  position: relative; flex-direction: row; justify-content: center; align-items: center;
-  gap: .4cqw; padding: .35cqh .35cqw;
-  border: .52cqh solid #bd9058; border-radius: .75cqh;
-  background: linear-gradient(#fffce7,#ffeec2);
-  box-shadow: inset 0 .45cqh #fffef4, 0 .3cqh #496d58;
-  font-size: 4cqh; font-weight: 900;
-}
-#butter-counter img { width: 8.2cqh; height: 8.2cqh; flex: none; }
-#butter-counter span { color: #684b2d; }
-#butter-counter small {
-  position: absolute; right: .7cqw; bottom: .2cqh;
-  font-size: 1.65cqh; color: #936c3c;
-}
-#toolbar-controls { display: flex; flex: none; height: 35%; gap: .55cqw; }
-#toolbar-controls .tool-card { width: 37%; border-width: .35cqh; padding: .1cqh; border-radius: .45cqh; }
-#toolbar-controls .tool-card img { width: 4.5cqh; height: 4.5cqh; }
-#toolbar-controls .small-button {
-  flex: 1; font-size: 2.1cqh; padding: .15cqh .25cqw; border-width: .35cqh;
 }
 
 /* Recipe Book: full vertical collector cards including silhouette mysteries. */
@@ -1437,63 +1329,135 @@ canvas, img { image-rendering: pixelated; }
   padding: .8cqh 2cqw;
 }
 
-
-
-/* v0.9.4 - Small portrait HUD, with battlefield space restored.
- * Replaces the oversized v0.9.3 battle-card styling in place. */
-#game-screen #toolbar {
-  height: 22.5%;
-  grid-template-columns: minmax(0, 1fr) 19.5%;
-  gap: .65cqw;
-  padding: .55cqh .75cqw .55cqh;
-  background: linear-gradient(#e5eddd, #abc5ad 52%, #7e9e88);
-  border-bottom: .6cqh solid #466755;
-  box-shadow: inset 0 .35cqh #fffaf0;
+/* v0.9.5 - Living bakery battle layout.
+ * One canonical 9:5 board viewport owns gameplay, approach, runner reveal
+ * and reward coordinates; the surrounding scenery is decorative only. */
+#game-screen {
+  flex-direction: column;
+  background: #344c42;
 }
-#game-screen #hud-deck {
+
+#game-screen #toolbar {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 14.5% minmax(0, 1fr) 11.5%;
+  height: 15.5%;
+  flex: 0 0 15.5%;
+  align-items: stretch;
+  gap: .8cqw;
+  padding: .45cqh .8cqw;
+  background: linear-gradient(#344e43, #52715f 48%, #364c42);
+  border-bottom: .6cqh solid #c5a578;
+  box-shadow: inset 0 .32cqh #8aa48c, 0 .3cqh #1c332c;
+}
+#game-screen #hud-status {
+  display: flex;
+  flex-direction: column;
+  gap: .25cqh;
   min-width: 0;
   min-height: 0;
-  gap: .3cqh;
+}
+#game-screen #level-label {
+  position: static;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  flex: none;
+  color: #f7e7c4;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: .15cqh 0;
+  font-size: 1.65cqh;
+  line-height: 1.2;
+  text-align: center;
+  text-shadow: .12cqh .2cqh #192e28;
+  box-shadow: none;
+}
+#game-screen #butter-counter {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  gap: .45cqw;
+  padding: .2cqh .4cqw;
+  position: relative;
+  border: .37cqh solid #ae8554;
+  border-radius: .4cqh;
+  background: linear-gradient(#fff7df, #ebd19f);
+  box-shadow: inset 0 .3cqh #fffdf0, 0 .15cqh #263b31;
+  color: #704825;
+  font-size: 3.2cqh;
+  font-weight: 900;
+}
+#game-screen #butter-counter img {
+  width: 5.3cqh;
+  height: 5.3cqh;
+  flex: none;
+  image-rendering: pixelated;
+}
+#game-screen #butter-counter small { display: none; }
+
+#game-screen #hud-deck {
+  display: flex;
+  flex-direction: column;
+  gap: .15cqh;
+  min-width: 0;
+  min-height: 0;
 }
 #game-screen .hud-deck-label {
-  font-size: 1.7cqh;
+  display: block;
+  flex: none;
+  color: #e9d6ad;
+  text-align: center;
+  font-size: 1.42cqh;
   font-weight: 900;
-  line-height: 1;
-  color: #395a46;
+  line-height: 1.1;
+  letter-spacing: .1cqw;
 }
 #game-screen #defender-cards {
   display: flex;
   flex: 1;
-  min-height: 0;
-  min-width: 0;
   align-items: stretch;
   justify-content: flex-start;
-  gap: .5cqw;
+  gap: .52cqw;
+  min-width: 0;
+  min-height: 0;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
 }
 #game-screen #defender-cards::-webkit-scrollbar { display: none; }
+
 #game-screen .defender-card.pastry-portrait-card {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) minmax(2.5cqh, auto) 3.25cqh;
-  flex: 0 0 9.5cqw;
-  width: 9.5cqw;
-  max-width: 9.5cqw;
+  grid-template-rows: minmax(0, 1fr) minmax(2cqh, auto) 2.65cqh;
+  align-items: center;
+  justify-items: center;
+  flex: 0 0 8.4cqw;
+  width: 8.4cqw;
+  max-width: 8.4cqw;
   min-width: 0;
   min-height: 0;
   height: 100%;
-  align-items: center;
-  justify-items: center;
   gap: .12cqh;
   margin: 0;
-  padding: .28cqh .22cqw .4cqh;
-  border: .43cqh solid #937b58;
-  border-radius: .32cqh;
-  background: linear-gradient(#fffdf2, #f2e6d0 72%, #e2cfb2);
-  color: #385345;
-  box-shadow: inset 0 .32cqh #fffdf8, 0 .25cqh #5a745f;
+  padding: .24cqh .2cqw .38cqh;
+  overflow: hidden;
+  border: .4cqh solid #bba076;
+  border-radius: .3cqh;
+  background: linear-gradient(#fff8e5, #e9dbc1 73%, #d3bfa0);
+  box-shadow: inset 0 .24cqh #fffef3, 0 .16cqh #1e3c30;
+  color: #3d4d37;
+  text-align: center;
   text-shadow: none;
   transform: none;
   transition: border-color .12s ease, background .12s ease;
@@ -1504,117 +1468,264 @@ canvas, img { image-rendering: pixelated; }
   align-items: center;
   width: 100%;
   height: 100%;
-  min-width: 0;
   min-height: 0;
+  min-width: 0;
   overflow: hidden;
-  background: #e8eddf;
-  border: .22cqh solid #c0b194;
-  border-radius: .16cqh;
-  box-shadow: inset 0 .3cqh #fffef7;
+  border: .18cqh solid #bdad91;
+  background: #e4eadc;
+  border-radius: .12cqh;
+  box-shadow: inset 0 .2cqh #fffdf5;
 }
 #game-screen .pastry-portrait-card .portrait-card-art img {
   display: block;
-  width: 10.3cqh;
-  height: 10.3cqh;
-  max-width: 98%;
-  max-height: 98%;
+  width: 7.1cqh;
+  height: 7.1cqh;
+  max-width: 97%;
+  max-height: 97%;
   flex: none;
   image-rendering: pixelated;
   object-fit: contain;
-  filter: drop-shadow(0 .19cqh #7e8b7359);
+  filter: drop-shadow(0 .13cqh #7e8b7366);
 }
 #game-screen .pastry-portrait-card .card-name {
   display: block;
   width: 100%;
   min-width: 0;
-  color: #35523f;
-  font-size: 2.0cqh;
+  color: #3f5844;
+  font-size: 1.77cqh;
   font-weight: 900;
-  line-height: 1.05;
+  line-height: 1.03;
   text-align: center;
   white-space: normal;
   overflow-wrap: anywhere;
 }
 #game-screen .pastry-portrait-card .card-cost {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
-  gap: .16cqw;
   padding: 0 .25cqw;
-  color: #70451f;
-  background: #ead9b7;
-  border: .19cqh solid #c9b087;
-  border-radius: .15cqh;
-  font-size: 2.25cqh;
+  gap: .22cqw;
+  border: .15cqh solid #c2a47a;
+  border-radius: .14cqh;
+  background: #e5d0a9;
+  color: #6b4626;
+  box-shadow: inset 0 .16cqh #fff0cf;
+  font-size: 1.95cqh;
   font-weight: 900;
   line-height: 1;
-  box-shadow: inset 0 .23cqh #fff3d5;
 }
 #game-screen .pastry-portrait-card .card-cost::before {
   content: '';
-  display: block;
+  flex: none;
   width: 1.4cqh;
   height: 1.4cqh;
-  flex: none;
-  border: .17cqh solid #ac7c27;
-  border-radius: .16cqh;
-  background: linear-gradient(#fff3a5, #f2c448);
-  box-shadow: inset 0 .18cqh #fff9d8;
+  border: .15cqh solid #986823;
+  border-radius: .2cqh;
+  background: linear-gradient(#fff4aa, #ebbb4b);
 }
 #game-screen .pastry-portrait-card.unavailable {
-  opacity: .8;
+  opacity: .72;
   filter: saturate(.8);
 }
-#game-screen .pastry-portrait-card.unavailable .portrait-card-art img {
-  filter: grayscale(.3);
-}
+#game-screen .pastry-portrait-card.unavailable .portrait-card-art img { filter: grayscale(.35); }
 #game-screen .pastry-portrait-card.selected {
   opacity: 1;
   filter: none;
-  border-color: #f6cb6e;
-  background: linear-gradient(#fffde8, #f5dfac);
-  box-shadow: 0 0 0 .28cqh #6f8f6b, inset 0 .32cqh #fffdf5, 0 .23cqh #526c58;
+  background: linear-gradient(#fff9d5,#f1d99f);
+  border-color: #ffe3a0;
+  box-shadow: 0 0 0 .22cqh #e4bd68, inset 0 .2cqh #fffef2;
   transform: none;
 }
 #game-screen .pastry-portrait-card:hover,
 #game-screen .pastry-portrait-card:focus-visible {
-  border-color: #ffe2a0;
-  outline: .23cqh solid #fff0bb;
-  outline-offset: -.2cqh;
+  outline: .2cqh solid #fff3bf;
+  outline-offset: -.18cqh;
+  border-color: #fff4c7;
 }
 #game-screen .pastry-portrait-card:active { transform: none; }
-/* Only the cooldown bar animates; portraits never get hidden behind a veil. */
 #game-screen .pastry-portrait-card::after {
-  top: auto;
-  right: auto;
-  left: 0;
-  bottom: 0;
-  width: var(--cooldown,0%);
-  height: .45cqh;
-  background: #a2743a;
-  box-shadow: inset 0 .14cqh #e9bc72;
+  content: '';
+  position: absolute;
+  inset: auto auto 0 0;
+  width: var(--cooldown, 0%);
+  height: .4cqh;
+  background: #9d713c;
+  box-shadow: inset 0 .13cqh #f6cf84;
+  pointer-events: none;
 }
-#game-screen #hud-right { min-width: 0; gap: .3cqh; }
-#game-screen #butter-counter {
-  padding: .15cqh .2cqw;
-  border-radius: .36cqh;
-  font-size: 3.1cqh;
+
+#game-screen #hud-right {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: .4cqw;
+  min-width: 0;
+  min-height: 0;
 }
-#game-screen #butter-counter img {
-  width: 5.9cqh;
-  height: 5.9cqh;
+#game-screen #hud-right .tool-card,
+#game-screen #hud-right .small-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 76%;
+  min-width: 0;
+  margin: 0;
+  padding: .2cqh .25cqw;
+  background: #d3b990;
+  border: .35cqh solid #b08b61;
+  border-radius: .3cqh;
+  color: #365144;
+  box-shadow: inset 0 .28cqh #fff2d2, 0 .25cqh #263e32;
+  text-shadow: none;
+  font-size: 1.75cqh;
 }
-#game-screen #butter-counter small { font-size: 1.4cqh; }
-#game-screen #toolbar-controls {
-  height: 36%;
-  gap: .3cqw;
+#game-screen #hud-right .tool-card img { width: 4.5cqh; height: 4.5cqh; object-fit: contain; }
+#game-screen #hud-right .tool-card.selected { background: #ffe5a1; border-color: #ffdb78; }
+#game-screen #hud-right .tool-card[hidden] + .small-button { grid-column: 1 / -1; }
+#game-screen.cinematic #toolbar { opacity: 1; pointer-events: none; }
+
+#game-screen #battle-area {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: #405d4d;
 }
-#game-screen #toolbar-controls .small-button {
+#game-screen #battle-scenery {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+#game-screen #board-viewport {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  aspect-ratio: 9 / 5;
+  flex: none;
+  overflow: hidden;
+  background: #d6c3a3;
+  box-shadow: inset 0 0 0 .3cqh #ab8961, -.6cqw 0 0 #263e34aa, .6cqw 0 0 #263e34aa;
+}
+#game-screen #battlefield {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  image-rendering: pixelated;
+  touch-action: none;
+}
+#game-screen #approach-intro,
+#game-screen #lane-reveal,
+#game-screen #reward-drop-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+#game-screen #approach-intro { z-index: 7; background: #b98857; }
+#game-screen #approach-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  image-rendering: pixelated;
+}
+#game-screen #lane-reveal { z-index: 3; pointer-events: none; visibility: hidden; }
+#game-screen #lane-reveal.revealing { visibility: visible; }
+#game-screen #reward-drop-layer { z-index: 8; pointer-events: none; }
+
+#game-screen #tutorial-tip {
+  position: absolute;
+  z-index: 4;
+  bottom: 1.1cqh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 64%;
+  margin: 0;
+  padding: .6cqh .7cqw;
+  border: .3cqh solid #b49c73;
+  border-radius: .35cqh;
+  background: #f7e9caed;
+  color: #415548;
+  box-shadow: 0 .23cqh #2e4638;
   font-size: 1.9cqh;
-  padding: .18cqh .28cqw;
+  line-height: 1.14;
+  text-align: center;
+  pointer-events: none;
 }
+#game-screen #tutorial-tip::before {
+  content: 'TODAY\'S LESSON';
+  display: block;
+  margin-bottom: .15cqh;
+  color: #98703e;
+  font-size: 1.35cqh;
+  letter-spacing: .07cqw;
+}
+#game-screen #selected-info {
+  position: absolute;
+  z-index: 4;
+  top: 1.1cqh;
+  right: 1.2cqw;
+  width: 23%;
+  max-width: 23%;
+  padding: .5cqh .6cqw;
+  border: .25cqh solid #b2a27f;
+  border-radius: .3cqh;
+  background: #2e4b3edb;
+  color: #f7ead1;
+  box-shadow: 0 .15cqh #172e25;
+  pointer-events: none;
+}
+#game-screen #selected-info strong { display: block; color: #ffe2a0; font-size: 1.85cqh; }
+#game-screen #selected-info span { display: block; margin-top: .15cqh; font-size: 1.52cqh; line-height: 1.15; }
+#game-screen #level-progress {
+  position: absolute;
+  z-index: 2;
+  right: 1.4cqw;
+  bottom: 1.2cqh;
+  width: 20%;
+  height: 2.2cqh;
+  border: .28cqh solid #8a6c49;
+  border-radius: .35cqh;
+  background: #e5d6bc;
+  overflow: hidden;
+  pointer-events: none;
+}
+#game-screen #level-progress i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #c88446, #f5d478);
+}
+#game-screen #banner {
+  display: none;
+  position: absolute;
+  z-index: 5;
+  top: 33%;
+  left: 0;
+  right: 0;
+  color: #fff4d9;
+  font-size: 5.5cqh;
+  text-align: center;
+  text-shadow: .3cqh .3cqh #3d2b1d, 0 0 1.2cqh #24392f;
+  pointer-events: none;
+}
+#game-screen #banner.active { display: block; }
 @media (prefers-reduced-motion: reduce) {
   #game-screen .pastry-portrait-card { transition: none; }
 }
