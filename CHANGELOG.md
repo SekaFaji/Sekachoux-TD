@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.5 - Stable living-bakery battlefield (2026-11-11)
+
+- Give the approach camera and actual battlefield the same 288×160 logical viewport; the level no longer resizes or changes scaling when the opening pan ends.
+- Put runner reveals and falling recipe rewards inside that same viewport, preserving alignment with touch placement and last-defeated enemy locations.
+- Shrink the HUD from 22.5% to **15.5%** of the stage, with fixed shift/Butter, 8.4cqw portrait pastry cards, and compact Shovel/Pause controls.
+- Add a decorative pixel-art bakery backdrop with a glowing oven, shelves, customer doorway and subtle animation, reusing existing pastry sprites.
+- Polish covered tutorial trays, flour flecks, selection info, tutorial prompt and progress display without altering levels or game balance.
+- Consolidate superseded battle CSS into one scoped v0.9.5 section; add layout and animation regression tests.
+
 ## 0.9.4 - Smaller in-game pastry cards (2026-11-11)
 
 - Respond to feedback that the v0.9.3 battle HUD was too tall and made the game feel cramped. Reduce the toolbar from 32% to **22.5%** of the fixed 16:9 game screen, returning almost ten percentage points of space to the battlefield.
