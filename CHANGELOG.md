@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.2 - Compact Recipe Book and hand-crafted pixel title (2026-11-11)
+
+- Redesign the Recipe Book as a four-column, two-visible-row collection grid alongside a separate selected-entry detail page. Compact cards show portraits, names and a small stat instead of repeating full descriptions on every card.
+- Make each collection card a real keyboard/touch button with a persistent selected state, clearly highlighted border and a larger detailed portrait, full description and stat on the right. Preserve the last chosen entry separately for Pastries and Hoomans when switching tabs.
+- Keep locked entries fully mysterious in both the compact grid and the detail panel: black silhouettes, exact ?????? name, exact ???? ?? ???? ?????? description, and ??? stat.
+- Introduce a hand-rendered pixel-art SEKACHOUX TD logo with toasted-brown outlines, pastry-gold shaded glyphs, flour highlights and a Bakery Defense ribbon. Draw the logo once on an internal canvas, not as an imported background image or CSS-only text.
+- Polish the existing living menu with sharper, subtler wood-and-sage buttons, a better title treatment and a tidier baker-name strip. Retain the live bakery and Hooman animations, main navigation, Fullscreen inside Settings and SekaFaji Games in Credits.
+- Preserve all gameplay mechanics, butter artwork, saves, campaign unlocks and reward drops. New sprite redesigns are a separate next art milestone.
+- Add regression tests for logo rendering, responsive Recipe Book layout, selection wiring and locked collection data.
+
+
 ## 0.9.1 - Hoomans at the window: animation polish (2026-11-11)
 
 - Replace continuous Hooman bobbing and walk-cycle flicker in the main menu with grounded, staggered choreography.
