@@ -14,6 +14,7 @@ import { fitLandscape, pointerToGrid } from './viewport.js';
 import { BakerySound } from '../audio/sound.js';
 import { clearGameSave } from '../settings/saveReset.js';
 import { drawBakeryTitleScene } from '../art/bakeryScene.js';
+import { drawBattleScenery } from '../art/battleScenery.js';
 import { drawBakeryPixelLogo } from '../art/titleLogo.js';
 
 const byId = <T extends HTMLElement>(id: string): T => {
@@ -61,6 +62,7 @@ export class GameApp {
     byId<HTMLImageElement>('butter-icon').src = this.sprites.url('butter-drop');
     byId<HTMLImageElement>('shovel-icon').src = this.sprites.url('shovel');
     drawBakeryTitleScene(byId<HTMLCanvasElement>('menu-art'), this.sprites, 0);
+    drawBattleScenery(byId<HTMLCanvasElement>('battle-scenery'), this.sprites, 0);
     drawBakeryPixelLogo(byId<HTMLCanvasElement>('title-logo'));
     this.updateProfile();
     this.updateFullscreenControl();
@@ -365,6 +367,7 @@ export class GameApp {
     this.selected = null;
     this.frameCount = 0;
     this.buildCards();
+    drawBattleScenery(byId<HTMLCanvasElement>('battle-scenery'), this.sprites, 0);
     byId<HTMLElement>('level-label').textContent = `${campaignLevelLabel(index)}  ${LEVELS[index].name}`;
     byId<HTMLElement>('level-progress').style.display = this.engine.level.tutorial ? 'none' : '';
     byId<HTMLElement>('shovel').hidden = Boolean(this.engine.level.tutorial);
@@ -391,6 +394,7 @@ export class GameApp {
       if (this.introStartedAt === null) this.introStartedAt = time;
       const progress = Math.min(1, (time - this.introStartedAt) / APPROACH_DURATION_MS);
       drawApproachFrame(previewCanvas, world, progress);
+      if (this.frameCount++ % 6 === 0) drawBattleScenery(byId<HTMLCanvasElement>('battle-scenery'), this.sprites, time / 1000);
       if (progress >= 1) this.beginBattle();
       else this.introAnimation = requestAnimationFrame(animate);
     };
@@ -659,7 +663,10 @@ export class GameApp {
     this.engine.update(dt);
     this.handleEvents();
     drawBattlefield(this.canvas, this.engine.state, this.engine.level, this.sprites);
-    if (this.frameCount++ % 6 === 0) this.updateInterface();
+    if (this.frameCount++ % 6 === 0) {
+      this.updateInterface();
+      drawBattleScenery(byId<HTMLCanvasElement>('battle-scenery'), this.sprites, this.engine.state.elapsed);
+    }
     if (this.playing) this.animation = requestAnimationFrame(next => this.tick(next));
   }
 }
