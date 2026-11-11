@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9.4 - Smaller in-game pastry cards (2026-11-11)
+
+- Respond to feedback that the v0.9.3 battle HUD was too tall and made the game feel cramped. Reduce the toolbar from 32% to **22.5%** of the fixed 16:9 game screen, returning almost ten percentage points of space to the battlefield.
+- Make each playable portrait card roughly **25% narrower** (12.6cqw to 9.5cqw) and shorter, while keeping the pastry image, readable full name and clear butter cost.
+- Remove the extra role captions and repeated "BUTTER" text inside every card. Simplify card styling, borders and highlights, avoiding unnecessary visual clutter.
+- Retain all five cards without hiding previously earned units. A compact single-line butter cost, subtle selected outline and a narrow cooldown strip preserve clarity.
+- Keep the butter counter, Pause/Shovel controls, touchscreen/keyboard placement behavior, Loaf Bread and Croissant artwork, Recipe Book, rewards and saves unchanged.
+- Update regression tests for compact dimensions, card content and HUD controls. No gameplay balance or progression changes.
+
+
 ## 0.9.3 - Croissant and Loaf Bread, portrait battle HUD (2026-11-11)
 
 - Replace the current Baguette tank with **Loaf Bread**, reserving Baguette for a future distinct unit. Keep the tank's 50 Butter cost, 400 HP, 12-second cooldown, tutorial placement requirement and campaign reward timing intact.

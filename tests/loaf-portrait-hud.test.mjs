@@ -74,25 +74,37 @@ test('hand-authored Croissant and Loaf Bread have independent idle and action sp
   assert.ok(art.includes('32'));
 });
 
-test('portrait card HUD retains real placement actions, butter prices and useful selection state', () => {
+test('compact portrait deck keeps gameplay controls with smaller, clean cards', () => {
   const app=readFileSync(new URL('../dist/ui/app.js',import.meta.url),'utf8');
   const css=readFileSync(new URL('../dist/styles.css',import.meta.url),'utf8');
   const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
+  const compact=css.slice(css.lastIndexOf('/* v0.9.4 - Small portrait HUD'));
+  assert.ok(compact.length>0,'the latest HUD stylesheet should be present');
   assert.ok(app.includes('defender-card pastry-portrait-card'));
   assert.ok(app.includes('portrait-card-art'));
-  assert.ok(app.includes('portrait-card-type'));
-  assert.ok(app.includes('portrait-card-footer'));
-  assert.ok(app.includes("currency.textContent = 'BUTTER'"));
+  assert.ok(!app.includes('portrait-card-type'),'remove unnecessary role captions');
+  assert.ok(!app.includes('portrait-card-footer'),'remove oversized double-label footers');
   assert.ok(app.includes("button.dataset.action = 'card'"));
   assert.ok(app.includes("button.dataset.kind = kind"));
-  assert.ok(app.includes("'loaf'") || app.includes('loaf:'));
-  assert.ok(css.includes('#game-screen .defender-card.pastry-portrait-card'));
-  assert.ok(css.includes('#game-screen .pastry-portrait-card .portrait-card-art img'));
-  assert.ok(css.includes('height: 32%'));
-  assert.ok(css.includes("width: var(--cooldown,0%)") || css.includes('width: var(--cooldown, 0%)'));
+  assert.ok(app.includes("button.setAttribute('aria-pressed'"));
+  assert.ok(app.includes("button.append(portrait, name, price)"));
+  assert.equal(DEFENDERS.loaf.n, 'Loaf Bread');
+  assert.ok(app.includes('this.engine.level.available'), 'HUD uses the catalog-backed earned roster');
+  assert.ok(compact.includes('#game-screen .defender-card.pastry-portrait-card'));
+  assert.ok(compact.includes('#game-screen .pastry-portrait-card .portrait-card-art img'));
+  assert.match(compact, /#game-screen #toolbar\s*\{\s*height:\s*22\.5%/);
+  assert.match(compact, /flex:\s*0 0 9\.5cqw/);
+  assert.match(compact, /width:\s*9\.5cqw/);
+  assert.match(compact, /width:\s*var\(--cooldown,\s*0%\)/);
+  assert.ok(!compact.includes('height: 32%'),'the battlefield must not lose a third of the screen');
+  assert.match(compact, /\.portrait-card-art img\s*\{[^}]*width:\s*10\.3cqh;[^}]*height:\s*10\.3cqh;/, 'portrait pixels are sized down');
+  // Five cards must fit in the deck with margin to spare, even without scrolling.
+  const fiveCardsWidth=5*9.5 + 4*.5;
+  assert.ok(fiveCardsWidth<65,'five unlocked pastry cards should fit comfortably');
   assert.ok(html.includes('id="defender-cards"'));
   assert.ok(html.includes('id="butter-counter"'));
   assert.ok(html.includes('data-action="shovel"'));
   assert.ok(html.includes('data-action="pause"'));
-  assert.ok(html.includes('CHOOSE A PORTRAIT'));
+  assert.ok(html.includes('YOUR PASTRIES</span>'));
+  assert.ok(!html.includes('CHOOSE A PORTRAIT'));
 });

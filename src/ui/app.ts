@@ -325,42 +325,35 @@ export class GameApp {
     this.closeNameEditor();
   }
 
+  /** Compact battle cards: readable portrait, name and cost with no extra labels. */
   private buildCards(): void {
     if (!this.engine) return;
     const cards = byId<HTMLElement>('defender-cards');
     cards.replaceChildren();
-    // Only the pastries earned so far are shown. Future unlocks never crowd the bar.
+    // Show only earned pastries, retaining one native keyboard/touch button per unit.
     for (const kind of this.engine.level.available) {
       const definition = DEFENDERS[kind];
       const button = document.createElement('button');
+      const portrait = document.createElement('span');
       const icon = new Image();
       const name = document.createElement('span');
-      const cost = document.createElement('span');
-      const type = document.createElement('span');
-      const art = document.createElement('span');
-      const footer = document.createElement('span');
-      const currency = document.createElement('small');
+      const price = document.createElement('span');
       button.className = 'defender-card pastry-portrait-card';
       button.dataset.action = 'card';
       button.dataset.kind = kind;
       button.id = `card-${kind}`;
       button.setAttribute('aria-label', `${definition.n}, ${definition.c} butter. ${definition.d}`);
       button.setAttribute('title', definition.d);
+      button.setAttribute('aria-pressed', 'false');
       icon.src = this.sprites.url(kind);
       icon.alt = '';
-      type.className = 'portrait-card-type';
-      type.textContent = ({ croissant: 'ATTACK', butter: 'SUPPORT',
-        loaf: 'TANK', pretzel: 'SLOW', pie: 'BLAST' } as Record<string,string>)[kind] ?? 'PASTRY';
-      art.className = 'portrait-card-art';
-      art.append(icon);
+      portrait.className = 'portrait-card-art';
+      portrait.append(icon);
       name.className = 'card-name';
       name.textContent = definition.n;
-      footer.className = 'portrait-card-footer';
-      cost.className = 'card-cost';
-      cost.textContent = String(definition.c);
-      currency.textContent = 'BUTTER';
-      footer.append(cost, currency);
-      button.append(type, art, name, footer);
+      price.className = 'card-cost';
+      price.textContent = String(definition.c);
+      button.append(portrait, name, price);
       cards.append(button);
     }
   }
