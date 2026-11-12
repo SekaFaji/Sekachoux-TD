@@ -1,6 +1,10 @@
 export const COLUMNS = 9;
 export const ROWS = 5;
 export const TILE = 32;
+/** World coordinates measured from the playable field's left edge. */
+export const STREET_END_X = COLUMNS + 3;
+export const STREET_SPAWN_X = COLUMNS + 2.35;
+export const OUTSIDE_WALK_SPEED = 1.4;
 
 export interface Defender { kind: string; column: number; row: number; health: number; timer: number }
 export interface Enemy { kind: string; x: number; row: number; health: number; slow: number }
@@ -18,6 +22,10 @@ export interface GameState {
   drops: ButterDrop[];
   effects: Effect[];
   pins: RollingPin[];
+  /** One protected royal per physical shelf row, true after being eaten. */
+  royalsEaten: boolean[];
+  lastRoyalEaten: number | null;
+  royalHitAt: number;
   elapsed: number;
   spawnTimer: number;
   dropTimer: number;
@@ -36,5 +44,7 @@ export type GameEvent =
   | { type: 'banner'; message: string; duration: number }
   | { type: 'tip'; message: string }
   | { type: 'hooman'; kind: string }
+  | { type: 'royal-eaten'; row: number; royalIndex: number; remaining: number }
+  | { type: 'wheel'; row: number }
   | { type: 'win' }
   | { type: 'lose' };
