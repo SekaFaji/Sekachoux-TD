@@ -10,7 +10,7 @@ import { recipeBookEntries, type RecipeBookTab, type RecipeBookEntry } from '../
 import { LEVELS } from '../game/levels.js';
 import { royalsRemaining, ROYAL_FAMILY } from '../game/royalty.js';
 import { loadUnlocked, saveUnlocked } from '../game/progress.js';
-import { COLUMNS, ROWS, TILE } from '../game/types.js';
+import { COLUMNS, ROWS, TILE, LANE_HEIGHT } from '../game/types.js';
 import { fitLandscape, pointerToGrid } from './viewport.js';
 import { BakerySound } from '../audio/sound.js';
 import { clearGameSave } from '../settings/saveReset.js';
@@ -60,7 +60,7 @@ export class GameApp {
   constructor() {
     this.sprites = createSpriteAtlas();
     this.canvas.width = COLUMNS * TILE;
-    this.canvas.height = ROWS * TILE;
+    this.canvas.height = ROWS * LANE_HEIGHT;
     byId<HTMLImageElement>('butter-icon').src = this.sprites.url('butter-drop');
     byId<HTMLImageElement>('shovel-icon').src = this.sprites.url('shovel');
     drawBakeryTitleScene(byId<HTMLCanvasElement>('menu-art'), this.sprites, 0);

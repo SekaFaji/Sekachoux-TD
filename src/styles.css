@@ -1628,7 +1628,7 @@ canvas, img { image-rendering: pixelated; }
   height: 100%;
   width: 100%;
   max-width: none;
-  aspect-ratio: 9 / 5;
+  aspect-ratio: 36 / 25;
   flex: none;
   overflow: hidden;
   background: #d6c3a3;
@@ -1808,9 +1808,11 @@ canvas, img { image-rendering: pixelated; }
    landscape scene. The cinematic owns that same scene rather than an inset
    board-only overlay. Height is constrained by the available battle area. */
 #game-screen #battle-room {
-  width: min(100%, 260cqh);
-  height: auto;
-  max-height: 100%;
+  /* Use the entire area below the HUD: the native scene is now 416x200. */
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  aspect-ratio: auto;
 }
 #game-screen #hud-deck-header {
   display: flex;

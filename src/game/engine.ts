@@ -224,7 +224,12 @@ export class GameEngine {
     for (const shot of s.projectiles) {
       shot.x += 3.2 * dt;
       const enemy = s.enemies.find(z => z.row === shot.row && Math.abs(z.x - shot.x) < .3);
-      if (enemy) { enemy.health -= 1; if (shot.ice) enemy.slow = 3; shot.consumed = true; }
+      if (enemy) {
+        enemy.health -= 1;
+        if (shot.ice) enemy.slow = 3;
+        else s.effects.push({ x: shot.x, y: shot.row + .5, life: .18, kind: 'crumb' });
+        shot.consumed = true;
+      }
       else if (shot.x > COLUMNS + .3) shot.consumed = true;
     }
     for (const drop of s.drops) { drop.y = Math.min(drop.targetY, drop.y + .75 * dt); drop.life -= dt; }

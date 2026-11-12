@@ -79,12 +79,17 @@ export function croissantSprite(attack=false):HTMLCanvasElement {
     rect(g,7,21,3,2,C.honey);rect(g,23,20,3,3,C.gold);
     rect(g,7,22,2,2,C.caramel);rect(g,24,22,2,2,C.caramel);
     if(attack){
-      // Short throwing animation, timed to an actual crumb projectile.
-      rect(g,23,20,3,4,C.caramel);
-      rect(g,24,17,3,3,C.honey);
-      rect(g,26,16,2,3,C.gold);
-      rect(g,29,13,2,2,C.gold);
-      rect(g,29,14,1,1,C.flour);
+      // A tiny crust-powered crumb launcher grows from the leading pastry tip.
+      // It is a bakery nozzle, not a separate realistic weapon.
+      rect(g,22,19,4,5,C.roast);       // braced shoulder
+      rect(g,24,18,4,4,C.caramel);    // outstretched golden arm
+      rect(g,26,17,4,4,C.crust);      // short pastry barrel
+      rect(g,27,17,3,2,C.honey);
+      rect(g,29,18,3,3,C.gold);       // crumb-spitting muzzle
+      rect(g,30,18,2,1,C.flour);
+      rect(g,23,23,3,2,C.roast);      // arm recoil fold
+      rect(g,16,22,3,2,C.ink);       // determined open-mouth firing face
+      rect(g,16,22,1,1,C.flour);
     }else{
       rect(g,4,12,1,2,C.light);
     }
