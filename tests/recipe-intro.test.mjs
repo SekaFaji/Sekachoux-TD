@@ -54,7 +54,7 @@ test('camera starts over Hoomans on right and pans left at constant zoom', () =>
   assert.equal(end.sourceX, 0);
   for (const frame of [start, held, middle, end, approachCamera(-1), approachCamera(2)]) {
     assert.equal(frame.sourceY, 0);
-    assert.equal(frame.sourceWidth, 288);
+    assert.equal(frame.sourceWidth, 416);
     assert.equal(frame.sourceHeight, 160);
   }
 });
@@ -99,4 +99,18 @@ test('the camera keeps the lineup held, pans at constant size, then settles on t
   assert.ok(app.includes('roster.replaceChildren()'));
   assert.ok(app.includes("this.engine.state.intro = .01"), 'no extra 2.6-second countdown after the camera');
   assert.ok(app.includes("data-action") || app.includes("intro.classList.toggle('lineup'"));
+});
+
+
+test('street-side camera uses the actual continuous live room instead of a distinct background', () => {
+  const approach = readFileSync(new URL('../dist/art/approach.js', import.meta.url), 'utf8');
+  assert.ok(approach.includes('drawBattleScenery(shelf, door, street, sprites, state, time)'));
+  assert.ok(approach.includes('drawOutdoorPavement'));
+  assert.ok(approach.includes('ctx.drawImage(board, SHELF_WIDTH, 0)'));
+  assert.ok(approach.includes('ctx.drawImage(street, SHELF_WIDTH + COLUMNS * TILE + DOOR_WIDTH, 0)'));
+  assert.equal(approachCamera(0).sourceX, 192);
+  assert.equal(approachCamera(1).sourceX, 0);
+  assert.equal(approachCamera(1).sourceWidth, 416);
+  const html = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
+  assert.ok(html.includes('id="approach-canvas" width="416" height="160"'));
 });
