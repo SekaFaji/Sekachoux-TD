@@ -165,6 +165,7 @@ export class GameEngine {
     // the door, then resume their original speed on the nine-tile worktop.
     // Every Hooman is a single simulation object across all three surfaces.
     for (const z of s.enemies) {
+      if (z.health <= 0) continue;
       z.slow = Math.max(0, z.slow - dt);
       const blocking = s.defenders.find(p =>
         p.row === z.row && p.health > 0 && z.x <= COLUMNS &&
