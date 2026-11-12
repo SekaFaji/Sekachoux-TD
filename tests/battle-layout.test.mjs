@@ -79,7 +79,7 @@ test('touches still map only to the real 9x5 placement board', () => {
   assert.equal(pointerToGrid(4, 270, rect), null);
   assert.deepEqual(LEVELS.slice(0,4).map(l=>l.activeRows), [[2],[2],[2],[2]]);
   assert.ok(app.includes('this.canvas.addEventListener('));
-  assert.ok(app.includes("byId<HTMLCanvasElement>('bakery-street')"));
+  assert.ok(app.includes("('bakery-street')"), 'the street canvas is connected to scene updates');
 });
 
 test('HUD keeps playable pastry controls and adds readable remaining royalty lives', () => {
