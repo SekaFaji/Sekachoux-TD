@@ -22,12 +22,14 @@ test('landscape never crops or switches orientation on portrait screens', () => 
   assert.deepEqual(fitLandscape(800, 300), { width: 533, height: 300 });
 });
 
-test('pointer maps touch accurately and ignores outer letterbox', () => {
+test('pointer maps every visible row accurately without an inner letterbox', () => {
   const rect = { left: 10, top: 20, width: 400, height: 300 };
   assert.equal(pointerToGrid(210, 170, rect)?.column, 4);
   assert.equal(pointerToGrid(210, 170, rect)?.row, 2);
-  assert.equal(pointerToGrid(30, 30, rect), null);
-  assert.equal(pointerToGrid(401, 310, rect), null);
+  assert.deepEqual({ column: pointerToGrid(30, 30, rect)?.column, row: pointerToGrid(30, 30, rect)?.row }, { column: 0, row: 0 });
+  assert.deepEqual({ column: pointerToGrid(400, 310, rect)?.column, row: pointerToGrid(400, 310, rect)?.row }, { column: 8, row: 4 });
+  assert.equal(pointerToGrid(9, 30, rect), null);
+  assert.equal(pointerToGrid(411, 321, rect), null);
 });
 
 test('campaign keeps six original battle stages following four lessons', () => {
