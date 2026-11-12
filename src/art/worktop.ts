@@ -1,4 +1,4 @@
-import { COLUMNS, ROWS, TILE } from '../game/types.js';
+import { COLUMNS, ROWS, TILE, LANE_HEIGHT } from '../game/types.js';
 import { BAKERY_PALETTE as P, laneColor, laneShadow } from './palette.js';
 
 /**
@@ -7,23 +7,23 @@ import { BAKERY_PALETTE as P, laneColor, laneShadow } from './palette.js';
  */
 export function drawBakeryWorktop(ctx: CanvasRenderingContext2D, activeRows: readonly number[]): void {
   const width = COLUMNS * TILE;
-  const height = ROWS * TILE;
+  const height = ROWS * LANE_HEIGHT;
   ctx.save();
   ctx.fillStyle = P.ink;
   ctx.fillRect(0, 0, width, height);
 
   for (let row = 0; row < ROWS; row++) {
-    const y = row * TILE;
+    const y = row * LANE_HEIGHT;
     const active = activeRows.includes(row);
 
     // Soft recessed tray edging and the uninterrupted working surface.
-    ctx.fillStyle = '#605650'; ctx.fillRect(0, y, width, TILE);
+    ctx.fillStyle = '#605650'; ctx.fillRect(0, y, width, LANE_HEIGHT);
     ctx.fillStyle = P.copper; ctx.fillRect(0, y, width, 2);
     ctx.fillStyle = P.copperLight; ctx.fillRect(0, y + 2, width, 1);
-    ctx.fillStyle = laneColor(row); ctx.fillRect(2, y + 3, width - 4, 25);
-    ctx.fillStyle = laneShadow(row); ctx.fillRect(2, y + 25, width - 4, 3);
-    ctx.fillStyle = '#8d756c'; ctx.fillRect(0, y + 28, width, 3);
-    ctx.fillStyle = '#5e5853'; ctx.fillRect(0, y + 31, width, 1);
+    ctx.fillStyle = laneColor(row); ctx.fillRect(2, y + 3, width - 4, LANE_HEIGHT - 7);
+    ctx.fillStyle = laneShadow(row); ctx.fillRect(2, y + LANE_HEIGHT - 7, width - 4, 3);
+    ctx.fillStyle = '#8d756c'; ctx.fillRect(0, y + LANE_HEIGHT - 4, width, 3);
+    ctx.fillStyle = '#5e5853'; ctx.fillRect(0, y + LANE_HEIGHT - 1, width, 1);
 
     // Fine fabric lines: evenly spaced, faint, and not random noise.
     ctx.fillStyle = row % 2 === 0 ? '#f2ead9' : '#eaf0e7';
@@ -42,8 +42,8 @@ export function drawBakeryWorktop(ctx: CanvasRenderingContext2D, activeRows: rea
       ctx.fillRect(x + 1, y + 6, 1, 2);
     }
     // Subtle raised copper end-caps frame the pastry tray.
-    ctx.fillStyle = P.copper; ctx.fillRect(0, y + 3, 3, 25); ctx.fillRect(width - 3, y + 3, 3, 25);
-    ctx.fillStyle = P.copperLight; ctx.fillRect(3, y + 6, 1, 17); ctx.fillRect(width - 4, y + 6, 1, 17);
+    ctx.fillStyle = P.copper; ctx.fillRect(0, y + 3, 3, LANE_HEIGHT - 7); ctx.fillRect(width - 3, y + 3, 3, LANE_HEIGHT - 7);
+    ctx.fillStyle = P.copperLight; ctx.fillRect(3, y + 6, 1, LANE_HEIGHT - 14); ctx.fillRect(width - 4, y + 6, 1, LANE_HEIGHT - 14);
     for (const x of [1, width - 2]) {
       ctx.fillStyle = '#f8d8a9'; ctx.fillRect(x, y + 10, 1, 2); ctx.fillRect(x, y + 21, 1, 2);
     }
@@ -61,7 +61,7 @@ export function drawBakeryWorktop(ctx: CanvasRenderingContext2D, activeRows: rea
     if (!active) {
       // Covered linen still shows an inviting worktop in early one-lane lessons.
       ctx.fillStyle = 'rgba(65,77,72,.48)';
-      ctx.fillRect(3, y + 3, width - 6, 25);
+      ctx.fillRect(3, y + 3, width - 6, LANE_HEIGHT - 7);
       ctx.fillStyle = '#adbaae'; ctx.fillRect(10, y + 15, width - 20, 1);
       for (let x = 14; x < width - 8; x += 24) {
         ctx.fillStyle = '#81958a'; ctx.fillRect(x, y + 11, 6, 1); ctx.fillRect(x + 4, y + 20, 5, 1);
