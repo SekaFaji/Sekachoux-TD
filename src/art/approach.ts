@@ -1,7 +1,7 @@
 import { drawBattlefield, type SpriteAtlas } from './render.js';
 import { drawBattleScenery, drawOutdoorPavement, ROOM_WIDTH, ROOM_HEIGHT, SHELF_WIDTH, DOOR_WIDTH, STREET_WIDTH } from './battleScenery.js';
 import { ENEMIES } from '../game/catalog.js';
-import { COLUMNS, TILE, type GameState } from '../game/types.js';
+import { COLUMNS, TILE, LANE_HEIGHT, type GameState } from '../game/types.js';
 import type { EnemyKind, Level } from '../game/levels.js';
 
 export const APPROACH_HOLD_MS = 4000;
@@ -97,7 +97,7 @@ export function drawApproachWorld(
     const unitsInRow = count > 4 ? (row === 0 ? perRow : count - 4) : count;
     const spread = (EXTRA_STREET_WIDTH - 36) / Math.max(1, unitsInRow);
     const x = Math.round(ROOM_WIDTH + 18 + (position + .5) * spread);
-    const y = (count > 4 ? (row ? 134 : 86) : 116) +
+    const y = (count > 4 ? (row ? 172 : 108) : 146) +
       Math.round(Math.sin(time * 3 + index * 1.5) * 2);
     ctx.fillStyle = '#72513f70';
     ctx.fillRect(x - 13, y - 2, 26, 3);
