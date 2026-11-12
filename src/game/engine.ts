@@ -176,6 +176,7 @@ export class GameEngine {
       const pin = s.pins.find(p => p.row === z.row);
       if (pin && z.x < 1 && !pin.active && !pin.used) {
         pin.active = true;
+        this.events.push({ type: 'wheel', row: pin.row });
         this.wheelVictims.set(pin.row,
           new Set(s.enemies.filter(enemy => enemy.row === pin.row && enemy.health > 0)));
       }
