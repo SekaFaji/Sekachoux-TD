@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9.7 - Royal Chouquettes, five-life siege and continuous outdoor world (2026-11-12)
+
+- Add five custom-animated non-playable Royal Chouquettes (Queen, King, Princess, Prince and Grandpa) to the protected left-side shelves, with individual outfits, reactions and eaten states.
+- Replace first-unprotected-breach defeat with five distinct family lives. Each successful breach after its lane's one-use wheel is spent consumes one survivor; the Hoomans win only when the fifth royal is eaten. One-lane tutorials can still threaten all five via the nearest-living-royal rule.
+- Make the rolling wheel take an activation-time snapshot of ALL live enemies in its lane and sweep across the battlefield and outdoor street, sparing all new arrivals and other lanes.
+- Connect a two-tile real exterior to the doorway and spawn Hoomans at the far-right end; they walk quickly through the outdoor approach, then use original combat speeds.
+- Reconstruct the 7.5-second level preview from the exact same full-size 416×160 world slices, so the outdoor scene no longer disappears or snaps when gameplay starts.
+- Display remaining royal lives in the compact HUD and add an eaten-royal announcement, warning visuals and a final-family defeat presentation.
+- Keep the 9×5 placement grid, existing defender costs, campaign progression, rolling-wheel single-use nature and save migration intact. Add dedicated engine and scene regression tests.
+
 ## 0.9.6 - Bakery shelves, real customer doorway and longer lineup (2026-11-12)
 
 - Replace the empty strips beside the playable board with a connected 32px pastry-shelf objective and a 32px glass bakery doorway, rendered at exactly the same scale as the existing 9×5 worktop.
