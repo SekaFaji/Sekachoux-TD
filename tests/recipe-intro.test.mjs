@@ -55,7 +55,7 @@ test('camera starts over Hoomans on right and pans left at constant zoom', () =>
   for (const frame of [start, held, middle, end, approachCamera(-1), approachCamera(2)]) {
     assert.equal(frame.sourceY, 0);
     assert.equal(frame.sourceWidth, 416);
-    assert.equal(frame.sourceHeight, 160);
+    assert.equal(frame.sourceHeight, 200);
   }
 });
 
@@ -112,5 +112,5 @@ test('street-side camera uses the actual continuous live room instead of a disti
   assert.equal(approachCamera(1).sourceX, 0);
   assert.equal(approachCamera(1).sourceWidth, 416);
   const html = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
-  assert.ok(html.includes('id="approach-canvas" width="416" height="160"'));
+  assert.ok(html.includes('id="approach-canvas" width="416" height="200"'));
 });
