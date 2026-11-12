@@ -50,9 +50,9 @@ test('full-height shelves, board, glass door and street share native 416x200 pix
   const scene = css.slice(css.lastIndexOf('/* v0.9.5 - Living bakery battle layout'));
   assert.match(scene, /#game-screen #battle-room\s*\{[^}]*grid-template-columns:\s*32fr 288fr 32fr 64fr/);
   const fullHeight = css.slice(css.lastIndexOf('/* v0.9.7 - The royalty shelves'));
-  assert.match(fullHeight, /#game-screen #battle-room\\s*\\{[^}]*width:\\s*100%/);
-  assert.match(fullHeight, /#game-screen #battle-room\\s*\\{[^}]*height:\\s*100%/);
-  assert.match(fullHeight, /#game-screen #battle-room\\s*\\{[^}]*aspect-ratio:\\s*auto/);
+  assert.match(fullHeight, /#game-screen #battle-room\s*\{[^}]*width:\s*100%/);
+  assert.match(fullHeight, /#game-screen #battle-room\s*\{[^}]*height:\s*100%/);
+  assert.match(fullHeight, /#game-screen #battle-room\s*\{[^}]*aspect-ratio:\s*auto/);
   assert.ok(!/#game-screen #battlefield\s*\{[^}]*object-fit:\s*contain/.test(scene));
   assert.ok(scene.includes('#game-screen #approach-intro'));
   assert.ok(scene.includes('#game-screen #approach-canvas'));
