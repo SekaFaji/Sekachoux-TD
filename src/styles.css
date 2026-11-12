@@ -1600,22 +1600,24 @@ canvas, img { image-rendering: pixelated; }
 #game-screen #battle-room {
   position: relative;
   display: grid;
-  grid-template-columns: 32fr 288fr 32fr;
+  grid-template-columns: 32fr 288fr 32fr 64fr;
   width: 100%;
   max-height: 100%;
-  aspect-ratio: 11 / 5;
+  aspect-ratio: 13 / 5;
   align-items: stretch;
   overflow: hidden;
   background: #4d5b4c;
   box-shadow: 0 .35cqh #263b2e, 0 -.2cqh #927c5e;
 }
 #game-screen #battle-scenery,
-#game-screen #bakery-door {
+#game-screen #bakery-door,
+#game-screen #bakery-street {
   position: relative;
   z-index: 1;
   display: block;
   width: 100%;
   height: 100%;
+  min-width: 0;
   image-rendering: pixelated;
   object-fit: fill;
   pointer-events: none;
@@ -1799,4 +1801,74 @@ canvas, img { image-rendering: pixelated; }
   z-index: 3;
   bottom: 3%;
   right: 2%;
+}
+
+
+/* v0.9.7 - The royalty shelves, worktop, door and street form ONE native 416px
+   landscape scene. The cinematic owns that same scene rather than an inset
+   board-only overlay. Height is constrained by the available battle area. */
+#game-screen #battle-room {
+  width: min(100%, 260cqh);
+  height: auto;
+  max-height: 100%;
+}
+#game-screen #hud-deck-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6cqw;
+  min-width: 0;
+  min-height: 0;
+  flex: none;
+  padding: 0 .3cqw;
+}
+#game-screen #hud-deck-header .hud-deck-label {
+  line-height: 1;
+}
+#game-screen #royal-counter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: #f9e3b0;
+  font-size: 1.78cqh;
+  line-height: 1;
+  letter-spacing: .02cqw;
+  font-weight: 900;
+  text-shadow: 0 .12cqh #26392f;
+  white-space: nowrap;
+}
+#game-screen #royal-counter.warning {
+  color: #ffc897;
+}
+#game-screen #royal-counter.critical {
+  color: #ff8b85;
+}
+#game-screen #approach-intro {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  overflow: hidden;
+  background: #ccb08c;
+}
+#game-screen #approach-canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+#game-screen #battle-area {
+  background:
+    repeating-linear-gradient(90deg, #45624f 0, #45624f 5.4cqw, #4e6a56 5.4cqw, #4e6a56 5.7cqw),
+    #415b49;
+}
+#game-screen #battle-area::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg,#2b4539a9,transparent 23%,transparent 80%,#283d30a9);
+}
+#game-screen #battle-area #banner.active {
+  display: block;
+  background: #31281bcc;
+  padding: .8cqh .3cqw;
 }
