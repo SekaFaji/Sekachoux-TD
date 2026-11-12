@@ -1,6 +1,8 @@
 export const COLUMNS = 9;
 export const ROWS = 5;
 export const TILE = 32;
+/** Visual lane pitch: 32px sprites stay square inside taller 40px scenery rows. */
+export const LANE_HEIGHT = 40;
 /** World coordinates measured from the playable field's left edge. */
 export const STREET_END_X = COLUMNS + 3;
 export const STREET_SPAWN_X = COLUMNS + 2.35;
@@ -10,7 +12,7 @@ export interface Defender { kind: string; column: number; row: number; health: n
 export interface Enemy { kind: string; x: number; row: number; health: number; slow: number }
 export interface Projectile { x: number; row: number; ice: boolean; consumed?: boolean }
 export interface ButterDrop { x: number; y: number; targetY: number; life: number }
-export interface Effect { x: number; y: number; life: number }
+export interface Effect { x: number; y: number; life: number; kind?: 'crumb' }
 export interface RollingPin { row: number; x: number; active: boolean; used: boolean }
 
 export interface GameState {
