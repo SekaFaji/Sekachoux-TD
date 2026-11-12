@@ -1,7 +1,7 @@
 import { drawBattlefield, type SpriteAtlas } from './render.js';
 import { drawBattleScenery, drawOutdoorPavement, ROOM_WIDTH, ROOM_HEIGHT, SHELF_WIDTH, DOOR_WIDTH, STREET_WIDTH } from './battleScenery.js';
 import { ENEMIES } from '../game/catalog.js';
-import { COLUMNS, TILE, LANE_HEIGHT, type GameState } from '../game/types.js';
+import { COLUMNS, TILE, type GameState } from '../game/types.js';
 import type { EnemyKind, Level } from '../game/levels.js';
 
 export const APPROACH_HOLD_MS = 4000;
