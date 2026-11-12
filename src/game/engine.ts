@@ -1,6 +1,7 @@
 import { DEFENDERS, ENEMIES } from './catalog.js';
 import { LEVELS, type TutorialStep } from './levels.js';
-import { COLUMNS, type GameEvent, type GameState } from './types.js';
+import { COLUMNS, OUTSIDE_WALK_SPEED, STREET_END_X, STREET_SPAWN_X, type Enemy, type GameEvent, type GameState } from './types.js';
+import { chooseRoyalToEat, royalsRemaining, ROYAL_FAMILY } from './royalty.js';
 
 /** Deterministic update rules except for the injected spawn/drop RNG. Never reads the DOM. */
 export class GameEngine {
@@ -8,6 +9,8 @@ export class GameEngine {
   private readonly events: GameEvent[] = [];
   private ended = false;
   private readonly encountered = new Set<string>();
+  /** Snapshots prevent the wheel from killing customers spawned after it starts. */
+  private readonly wheelVictims = new Map<number, Set<Enemy>>();
 
   constructor(levelIndex: number, private readonly random: () => number = Math.random) {
     const level = LEVELS[levelIndex];
@@ -15,6 +18,7 @@ export class GameEngine {
     this.state = {
       levelIndex, butter: level.startingButter, defenders: [], enemies: [], projectiles: [],
       drops: [], effects: [], pins: level.activeRows.map(row => ({ row, x: .5, active: false, used: false })),
+      royalsEaten: Array(ROYAL_FAMILY.length).fill(false), lastRoyalEaten: null, royalHitAt: -10,
       elapsed: 0, spawnTimer: 10, dropTimer: 4, cooldowns: {}, firstWave: false, finalWave: false,
       collected: 0, placed: {}, kills: 0, lastDefeated: null, tutorialIndex: 0, intro: 2.6, introLabel: '',
     };
@@ -63,10 +67,11 @@ export class GameEngine {
     return true;
   }
 
-  private spawnEnemy(kind: string, row: number, x = COLUMNS + .3): void {
+  private spawnEnemy(kind: string, row: number, x = STREET_SPAWN_X): void {
     const enemy = ENEMIES[kind];
     if (!enemy) throw new RangeError(`Unknown Hooman type: ${kind}`);
-    this.state.enemies.push({ kind, row, x, health: enemy.hp, slow: 0 });
+    // Scripted tutorials also enter from the real far-right street.
+    this.state.enemies.push({ kind, row, x: Math.max(x, STREET_SPAWN_X), health: enemy.hp, slow: 0 });
     if (!this.encountered.has(kind)) {
       this.encountered.add(kind);
       this.events.push({ type: 'hooman', kind });
@@ -97,7 +102,7 @@ export class GameEngine {
       if (r <= 0) { kind = candidate; break; }
     }
     const rows = this.level.activeRows;
-    this.spawnEnemy(kind, rows[Math.min(rows.length - 1, Math.floor(this.random() * rows.length))], COLUMNS + .3 + this.random() * .8);
+    this.spawnEnemy(kind, rows[Math.min(rows.length - 1, Math.floor(this.random() * rows.length))], STREET_SPAWN_X + this.random() * .2);
   }
 
   update(deltaSeconds: number): void {
@@ -156,19 +161,63 @@ export class GameEngine {
         s.effects.push({ x: p.column + .5, y: p.row + .5, life: .5 });
       }
     }
+    // Exterior: customers visibly walk from the far street end, through
+    // the door, then resume their original speed on the nine-tile worktop.
+    // Every Hooman is a single simulation object across all three surfaces.
     for (const z of s.enemies) {
       z.slow = Math.max(0, z.slow - dt);
-      const blocking = s.defenders.find(p => p.row === z.row && p.health > 0 && Math.abs(z.x - p.column - .6) < .4);
+      const blocking = s.defenders.find(p =>
+        p.row === z.row && p.health > 0 && z.x <= COLUMNS &&
+        Math.abs(z.x - p.column - .6) < .4);
       if (blocking) blocking.health -= 20 * dt;
-      else z.x -= ENEMIES[z.kind].sp * (z.slow > 0 ? .5 : 1) * dt;
+      else z.x -= (z.x > COLUMNS ? OUTSIDE_WALK_SPEED : ENEMIES[z.kind].sp) *
+        (z.slow > 0 ? .5 : 1) * dt;
       const pin = s.pins.find(p => p.row === z.row);
-      if (pin && z.x < 1 && !pin.active && !pin.used) pin.active = true;
-      if (z.x < .1 && (!pin || pin.used)) { this.finish('lose'); return; }
+      if (pin && z.x < 1 && !pin.active && !pin.used) {
+        pin.active = true;
+        this.wheelVictims.set(pin.row,
+          new Set(s.enemies.filter(enemy => enemy.row === pin.row && enemy.health > 0)));
+      }
     }
+
+    // A used wheel cannot regenerate. It sweeps all the way through the
+    // doorway and outdoor street, removing ONLY its activation-time victims.
     for (const pin of s.pins) if (pin.active) {
-      pin.x += 4.8 * dt;
-      for (const z of s.enemies) if (z.row === pin.row && z.x < pin.x + .55) z.health = 0;
-      if (pin.x > COLUMNS + .8) { pin.active = false; pin.used = true; }
+      pin.x += 5.4 * dt;
+      const victims = this.wheelVictims.get(pin.row);
+      if (victims) for (const z of victims) {
+        if (z.health > 0 && z.x < pin.x + .55) z.health = 0;
+      }
+      if (pin.x > STREET_END_X + .6) {
+        if (victims) for (const z of victims) z.health = 0;
+        this.wheelVictims.delete(pin.row);
+        pin.active = false;
+        pin.used = true;
+      }
+    }
+
+    // A new breach consumes exactly ONE survivor from the nearest royal
+    // display. When only one lane is active, successive customers can still
+    // reach all five royals through the connected shelf passage.
+    const escaped = new Set<Enemy>();
+    for (const z of s.enemies) {
+      if (z.health <= 0 || z.x >= .1) continue;
+      const pin = s.pins.find(p => p.row === z.row);
+      const protectedBySweep = pin?.active && this.wheelVictims.get(z.row)?.has(z);
+      if (protectedBySweep || (pin && !pin.used && !pin.active)) continue;
+      escaped.add(z);
+      const royalIndex = chooseRoyalToEat(s.royalsEaten, z.row);
+      if (royalIndex < 0) continue;
+      s.royalsEaten[royalIndex] = true;
+      s.lastRoyalEaten = royalIndex;
+      s.royalHitAt = s.elapsed;
+      const remaining = royalsRemaining(s.royalsEaten);
+      this.events.push({ type: 'royal-eaten', row: z.row, royalIndex, remaining });
+      if (remaining === 0) {
+        s.enemies = s.enemies.filter(enemy => !escaped.has(enemy));
+        this.finish('lose');
+        return;
+      }
     }
     for (const shot of s.projectiles) {
       shot.x += 3.2 * dt;
@@ -186,7 +235,7 @@ export class GameEngine {
     }
     s.kills += defeated.length;
     s.projectiles = s.projectiles.filter(shot => !shot.consumed);
-    s.enemies = s.enemies.filter(z => z.health > 0);
+    s.enemies = s.enemies.filter(z => z.health > 0 && !escaped.has(z));
     s.defenders = s.defenders.filter(p => p.health > 0);
     s.drops = s.drops.filter(drop => drop.life > 0);
     s.effects = s.effects.filter(effect => effect.life > 0);
