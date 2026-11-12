@@ -106,7 +106,7 @@
             <div id="butter-counter" aria-label="Butter resource"><img id="butter-icon" alt="" width="32" height="32"><span id="butter-value">0</span><small>BUTTER</small></div>
           </div>
           <div id="hud-deck">
-            <span class="hud-deck-label">YOUR PASTRIES</span>
+            <div id="hud-deck-header"><span class="hud-deck-label">YOUR PASTRIES</span><span id="royal-counter" aria-label="Chouquette royalty remaining" aria-live="polite">👑 5/5 SAFE</span></div>
             <div id="defender-cards" aria-label="Choose a pastry"></div>
           </div>
           <div id="hud-right">
@@ -115,28 +115,30 @@
           </div>
         </header>
         <div id="battle-area">
-          <div id="battle-room" aria-label="Bakery shelves, worktop, and customer entrance">
-            <canvas id="battle-scenery" width="32" height="160" aria-label="Pastry shelves to defend" role="img"></canvas>
+          <div id="battle-room" aria-label="Royal Chouquette shelves, worktop and outdoor customer street">
+            <canvas id="battle-scenery" width="32" height="160" aria-label="Royal Chouquette family displays" role="img"></canvas>
             <div id="board-viewport">
-            <canvas id="battlefield" width="288" height="160" aria-label="Tap a tile to place a pastry"></canvas>
-            <div id="lane-reveal" aria-hidden="true"></div>
-            <div id="reward-drop-layer" hidden>
-              <span class="reward-drop-prompt">NEW RECIPE! TAP TO COLLECT</span>
-              <button id="reward-drop-card" class="recipe-card reward-drop-card" data-action="collect-reward" aria-label="Collect new recipe card">
-                <span class="recipe-card-label">NEW RECIPE</span>
-                <img id="reward-drop-image" alt="" width="56" height="56">
-                <strong id="reward-drop-name"></strong>
-                <span class="card-sparkle" aria-hidden="true">✦</span>
-              </button>
-              <span id="reward-auto-label">Automatically collected in 5 seconds</span>
+              <canvas id="battlefield" width="288" height="160" aria-label="Tap a tile to place a pastry"></canvas>
+              <div id="lane-reveal" aria-hidden="true"></div>
+              <div id="reward-drop-layer" hidden>
+                <span class="reward-drop-prompt">NEW RECIPE! TAP TO COLLECT</span>
+                <button id="reward-drop-card" class="recipe-card reward-drop-card" data-action="collect-reward" aria-label="Collect new recipe card">
+                  <span class="recipe-card-label">NEW RECIPE</span>
+                  <img id="reward-drop-image" alt="" width="56" height="56">
+                  <strong id="reward-drop-name"></strong>
+                  <span class="card-sparkle" aria-hidden="true">✦</span>
+                </button>
+                <span id="reward-auto-label">Automatically collected in 5 seconds</span>
+              </div>
             </div>
-            <div id="approach-intro" hidden aria-label="Camera preview of incoming Hoomans">
-              <canvas id="approach-canvas" width="288" height="160" aria-hidden="true"></canvas>
+            <canvas id="bakery-door" width="32" height="160" aria-label="Bakery entrance" role="img"></canvas>
+            <canvas id="bakery-street" width="64" height="160" aria-label="Outside street where Hoomans enter" role="img"></canvas>
+            <div id="approach-intro" hidden aria-label="Preview of incoming Hoomans outside the bakery">
+              <canvas id="approach-canvas" width="416" height="160" aria-hidden="true"></canvas>
               <span id="approach-label">HOOMANS APPROACHING!</span>
               <div id="approach-roster" aria-label="Customer types arriving this shift" aria-live="polite"></div>
               <button id="skip-approach" class="small-button" data-action="skip-intro">SKIP INTRO</button>
             </div>
-            <canvas id="bakery-door" width="32" height="160" aria-label="Customer entrance" role="img"></canvas>
           </div>
           <div id="banner" role="status" aria-live="polite"></div>
           <div id="tutorial-tip" role="status" aria-live="polite"></div>
