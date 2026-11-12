@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { COLUMNS, ROWS, TILE, STREET_END_X, STREET_SPAWN_X } from '../dist/game/types.js';
+import { COLUMNS, ROWS, TILE, LANE_HEIGHT, STREET_END_X, STREET_SPAWN_X } from '../dist/game/types.js';
 import { LEVELS } from '../dist/game/levels.js';
 import { pointerToGrid } from '../dist/ui/viewport.js';
 import { ROOM_WIDTH, ROOM_HEIGHT, SHELF_WIDTH, DOOR_WIDTH, STREET_WIDTH } from '../dist/art/battleScenery.js';
@@ -20,35 +20,39 @@ test('the cutscene covers the exact same full 416px room as the gameplay scene',
   const boardEnd = room.indexOf('id="bakery-door"');
   assert.ok(boardStart >= 0 && boardEnd > boardStart);
   const board = room.slice(boardStart, boardEnd);
-  assert.ok(board.includes('id="battlefield" width="288" height="160"'));
+  assert.ok(board.includes('id="battlefield" width="288" height="200"'));
   assert.ok(board.includes('id="lane-reveal"'));
   assert.ok(board.includes('id="reward-drop-layer"'));
   assert.ok(!board.includes('id="approach-intro"'), 'intro owns whole room, not board only');
   assert.ok(room.indexOf('id="approach-intro"') > room.indexOf('id="bakery-street"'));
-  assert.ok(room.includes('id="approach-canvas" width="416" height="160"'));
+  assert.ok(room.includes('id="approach-canvas" width="416" height="200"'));
   assert.ok(room.includes('id="approach-roster"'));
   assert.ok(room.includes('data-action="skip-intro"'));
 });
 
-test('shelves, board, glass door and outdoor street have matching native pixels', () => {
+test('full-height shelves, board, glass door and street share native 416x200 pixels', () => {
   assert.equal(SHELF_WIDTH, 32);
   assert.equal(COLUMNS * TILE, 288);
   assert.equal(DOOR_WIDTH, 32);
   assert.equal(STREET_WIDTH, 64);
   assert.equal(ROOM_WIDTH, 416);
-  assert.equal(ROOM_HEIGHT, 160);
-  assert.equal(ROWS * TILE, ROOM_HEIGHT);
+  assert.equal(ROOM_HEIGHT, 200);
+  assert.equal(ROWS * LANE_HEIGHT, ROOM_HEIGHT);
+  assert.equal(LANE_HEIGHT, 40);
   assert.equal(STREET_END_X, 12);
   assert.ok(STREET_SPAWN_X > 11 && STREET_SPAWN_X < STREET_END_X);
 
   const room = html.slice(html.indexOf('<div id="battle-room"'), html.indexOf('<div id="banner"'));
-  assert.match(room, /id="battle-scenery" width="32" height="160"/);
-  assert.match(room, /id="bakery-door" width="32" height="160"/);
-  assert.match(room, /id="bakery-street" width="64" height="160"/);
-  assert.match(room, /id="battlefield" width="288" height="160"/);
+  assert.match(room, /id="battle-scenery" width="32" height="200"/);
+  assert.match(room, /id="bakery-door" width="32" height="200"/);
+  assert.match(room, /id="bakery-street" width="64" height="200"/);
+  assert.match(room, /id="battlefield" width="288" height="200"/);
   const scene = css.slice(css.lastIndexOf('/* v0.9.5 - Living bakery battle layout'));
   assert.match(scene, /#game-screen #battle-room\s*\{[^}]*grid-template-columns:\s*32fr 288fr 32fr 64fr/);
-  assert.match(scene, /#game-screen #battle-room\s*\{[^}]*aspect-ratio:\s*13\s*\/\s*5/);
+  const fullHeight = css.slice(css.lastIndexOf('/* v0.9.7 - The royalty shelves'));
+  assert.match(fullHeight, /#game-screen #battle-room\\s*\\{[^}]*width:\\s*100%/);
+  assert.match(fullHeight, /#game-screen #battle-room\\s*\\{[^}]*height:\\s*100%/);
+  assert.match(fullHeight, /#game-screen #battle-room\\s*\\{[^}]*aspect-ratio:\\s*auto/);
   assert.ok(!/#game-screen #battlefield\s*\{[^}]*object-fit:\s*contain/.test(scene));
   assert.ok(scene.includes('#game-screen #approach-intro'));
   assert.ok(scene.includes('#game-screen #approach-canvas'));
