@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.8 - Full-height bakery battle and crumb-firing Croissant (2026-11-13)
+
+- Remove the empty green strips above and below the battlefield by making the live room fill the entire space beneath the unchanged HUD.
+- Expand each of the five visual lanes from 32 to 40 logical pixels while keeping Croissant, Hoomans, wheels, and the royal artwork at their original 32-pixel proportions. The native intro and gameplay scene now share a 416x200 canvas.
+- Keep the nine playable columns, five rows, actual enemy spawn positions, one-time lane wheels, royal lives, pastry balance, and campaign saves unchanged.
+- Remap board touches to the full visible 9x5 grid, including the newly opened top and bottom row space, with no inner letterboxing.
+- Upgrade Croissant's short attack pose to a crust-crumb launcher, add muzzle flashes, slight recoil, irregular flying crumb sprites and small crumbs on hit; keep the same 1.4-second firing interval and 1 damage per hit.
+- Add full-height layout, cinematic continuity, touch-grid, and crumb impact regression coverage.
+
 ## 0.9.7 - Royal Chouquettes, five-life siege and continuous outdoor world (2026-11-12)
 
 - Add five custom-animated non-playable Royal Chouquettes (Queen, King, Princess, Prince and Grandpa) to the protected left-side shelves, with individual outfits, reactions and eaten states.
