@@ -1,4 +1,4 @@
-import { COLUMNS, ROWS, TILE, type GameState } from '../game/types.js';
+import { COLUMNS, ROWS, TILE, LANE_HEIGHT, type GameState } from '../game/types.js';
 import { royalsRemaining, ROYAL_FAMILY } from '../game/royalty.js';
 import { laneColor } from './palette.js';
 import { drawRoyalChouquette } from './royaltyArt.js';
@@ -8,7 +8,7 @@ export const SHELF_WIDTH = TILE;
 export const DOOR_WIDTH = TILE;
 export const STREET_WIDTH = TILE * 2;
 export const ROOM_WIDTH = SHELF_WIDTH + COLUMNS * TILE + DOOR_WIDTH + STREET_WIDTH;
-export const ROOM_HEIGHT = ROWS * TILE;
+export const ROOM_HEIGHT = ROWS * LANE_HEIGHT;
 
 type PixelContext = CanvasRenderingContext2D;
 
@@ -36,18 +36,18 @@ function drawShelves(ctx: PixelContext, state: GameState | null, t: number): voi
   rect(ctx, 30, 0, 2, ROOM_HEIGHT, '#e7c78e');
 
   for (let row = 0; row < ROYAL_FAMILY.length; row++) {
-    const y = row * TILE;
+    const y = row * LANE_HEIGHT;
     const threatened = Boolean(state?.enemies.some(enemy => enemy.row === row && enemy.x < 1.7));
     const eaten = state?.royalsEaten[row] ?? false;
     const flashing = state?.lastRoyalEaten === row && t - (state?.royalHitAt ?? -100) < .9;
     const afraid = threatened || Boolean(state?.pins.find(pin => pin.row === row && pin.used));
     // Five sculpted wooden royal display alcoves, connected by a service passage.
-    rect(ctx, 5, y + 1, 24, 29, '#4b322b');
-    rect(ctx, 7, y + 3, 20, 24, eaten ? '#5a4d40' : '#b48a5f');
-    rect(ctx, 8, y + 4, 18, 20, eaten ? '#50463e' : '#896a53');
-    rect(ctx, 6, y + 26, 23, 4, threatened ? '#e6ab6a' : '#dcaf6e');
-    rect(ctx, 7, y + 26, 21, 1, '#ffe5a1');
-    drawRoyalChouquette(ctx, row, 0, y, t, eaten, afraid, flashing);
+    rect(ctx, 5, y + 1, 24, LANE_HEIGHT - 2, '#4b322b');
+    rect(ctx, 7, y + 3, 20, LANE_HEIGHT - 7, eaten ? '#5a4d40' : '#b48a5f');
+    rect(ctx, 8, y + 4, 18, LANE_HEIGHT - 12, eaten ? '#50463e' : '#896a53');
+    rect(ctx, 6, y + LANE_HEIGHT - 6, 23, 4, threatened ? '#e6ab6a' : '#dcaf6e');
+    rect(ctx, 7, y + LANE_HEIGHT - 6, 21, 1, '#ffe5a1');
+    drawRoyalChouquette(ctx, row, 0, y + 4, t, eaten, afraid, flashing);
     if (!eaten && threatened && Math.sin(t * 11) > 0) {
       rect(ctx, 5, y + 4, 2, 16, '#fff1b4');
       rect(ctx, 27, y + 6, 2, 13, '#fac987');
@@ -71,13 +71,13 @@ export function drawOutdoorPavement(
   t: number,
 ): void {
   for (let row = 0; row < ROWS; row++) {
-    const y = row * TILE;
-    rect(ctx, destX, y, width, TILE, row % 2 ? '#d1baa0' : '#e1c8a8');
+    const y = row * LANE_HEIGHT;
+    rect(ctx, destX, y, width, LANE_HEIGHT, row % 2 ? '#d1baa0' : '#e1c8a8');
     rect(ctx, destX, y + 1, width, 2, '#f5dbb2');
-    rect(ctx, destX, y + 27, width, 4, '#ab9075');
+    rect(ctx, destX, y + LANE_HEIGHT - 5, width, 4, '#ab9075');
     for (let worldX = startWorldX; worldX < startWorldX + width; worldX += 32) {
       const x = destX + worldX - startWorldX;
-      rect(ctx, x + 29, y + 2, 1, 24, '#b69e83');
+      rect(ctx, x + 29, y + 2, 1, LANE_HEIGHT - 9, '#b69e83');
       rect(ctx, x + 11 + row % 3, y + 12 + row % 4, 4, 1, '#f3dec5');
       rect(ctx, x + 19, y + 20, 2, 2, '#c0a68b');
     }
@@ -93,10 +93,10 @@ export function drawOutdoorPavement(
  */
 function drawDoor(ctx: PixelContext, state: GameState | null, sprites: SpriteAtlas, t: number): void {
   for (let row = 0; row < ROWS; row++) {
-    const y = row * TILE;
-    rect(ctx, 0, y, DOOR_WIDTH, TILE, laneColor(row));
+    const y = row * LANE_HEIGHT;
+    rect(ctx, 0, y, DOOR_WIDTH, LANE_HEIGHT, laneColor(row));
     rect(ctx, 0, y, DOOR_WIDTH, 2, '#f2e1c2');
-    rect(ctx, 0, y + 27, DOOR_WIDTH, 4, '#ae9c81');
+    rect(ctx, 0, y + LANE_HEIGHT - 5, DOOR_WIDTH, 4, '#ae9c81');
   }
   // Entry frame and shared lintel. Its opening remains completely passable.
   rect(ctx, 0, 0, DOOR_WIDTH, 4, '#5b4131');
@@ -139,7 +139,7 @@ function drawActorsInSegment(
     const sprite = sprites.images[enemy.kind + ((frame + enemy.row) % 2)];
     if (!sprite) continue;
     const x = Math.round((enemy.x - beginX) * TILE);
-    ctx.drawImage(sprite, x - 16, enemy.row * TILE - 2);
+    ctx.drawImage(sprite, x - 16, enemy.row * LANE_HEIGHT + 2);
   }
 }
 
@@ -149,7 +149,7 @@ function drawWheelInSegment(
   for (const pin of state?.pins ?? []) {
     if (!pin.active || pin.x < beginX - 1 || pin.x > beginX + 3.5) continue;
     const x = Math.round((pin.x - beginX) * TILE);
-    ctx.drawImage(sprites.images.pin, x - 16, pin.row * TILE + 2);
+    ctx.drawImage(sprites.images.pin, x - 16, pin.row * LANE_HEIGHT + 6);
   }
 }
 
