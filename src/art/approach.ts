@@ -121,8 +121,8 @@ export function drawApproachWorld(
     const row = count > 4 ? Math.floor(index / 4) : 0;
     const position = count > 4 ? index % 4 : index;
     const unitsInRow = count > 4 ? (row === 0 ? upperCount : count - 4) : count;
-    const spread = 148 / Math.max(1, unitsInRow);
-    const x = Math.round(340 + (position + .5) * spread);
+    const spread = 135 / Math.max(1, unitsInRow);
+    const x = Math.round(334 + (position + .5) * spread);
     const y = (count > 4 ? (row ? 134 : 86) : 116) + Math.round(Math.sin(seconds * 3 + index * 1.5) * 2);
     ctx.fillStyle = '#72513f70';
     ctx.fillRect(x - 13, y - 2, 26, 3);
