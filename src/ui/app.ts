@@ -8,6 +8,7 @@ import { GUEST_NAME, loadPlayerName, savePlayerName } from '../profile/identity.
 import type { EnemyKind } from '../game/levels.js';
 import { recipeBookEntries, type RecipeBookTab, type RecipeBookEntry } from '../game/recipeBook.js';
 import { LEVELS } from '../game/levels.js';
+import { royalsRemaining, ROYAL_FAMILY } from '../game/royalty.js';
 import { loadUnlocked, saveUnlocked } from '../game/progress.js';
 import { COLUMNS, ROWS, TILE } from '../game/types.js';
 import { fitLandscape, pointerToGrid } from './viewport.js';
@@ -54,6 +55,7 @@ export class GameApp {
   private menuLastDraw = 0;
   private pendingReward: { kind: string; levelIndex: number } | null = null;
   private rewardTimer = 0;
+  private lossTimer = 0;
 
   constructor() {
     this.sprites = createSpriteAtlas();
@@ -364,6 +366,7 @@ export class GameApp {
     drawBattleScenery(
       byId<HTMLCanvasElement>('battle-scenery'),
       byId<HTMLCanvasElement>('bakery-door'),
+      byId<HTMLCanvasElement>('bakery-street'),
       this.sprites,
       this.engine?.state ?? null,
       elapsed,
@@ -480,6 +483,11 @@ export class GameApp {
     const engine = this.engine;
     const state = engine.state;
     byId<HTMLElement>('butter-value').textContent = String(state.butter);
+    const remainingRoyals = royalsRemaining(state.royalsEaten);
+    const royalty = byId<HTMLElement>('royal-counter');
+    royalty.textContent = '👑 ' + remainingRoyals + '/' + ROYAL_FAMILY.length + ' ROYALS';
+    royalty.classList.toggle('warning', remainingRoyals <= 3 && remainingRoyals > 1);
+    royalty.classList.toggle('critical', remainingRoyals <= 1);
     byId<HTMLElement>('progress-fill').style.width = `${engine.level.duration ? Math.min(100, state.elapsed / engine.level.duration * 100) : 0}%`;
     for (const kind of engine.level.available) {
       const unit = DEFENDERS[kind];
@@ -628,6 +636,8 @@ export class GameApp {
   private stopAnimation(): void {
     this.playing = false;
     clearTimeout(this.rewardTimer);
+    clearTimeout(this.lossTimer);
+    this.lossTimer = 0;
     this.rewardTimer = 0;
     this.pendingReward = null;
     byId<HTMLElement>('reward-drop-layer').hidden = true;
@@ -676,6 +686,14 @@ export class GameApp {
       if (event.type === 'banner') this.showBanner(event.message, event.duration);
       else if (event.type === 'tip') this.setTip(event.message);
       else if (event.type === 'hooman') this.knownHoomans = recordDiscoveredHooman(this.knownHoomans, event.kind);
+      else if (event.type === 'wheel') this.sound.play('roll');
+      else if (event.type === 'royal-eaten') {
+        const name = ROYAL_FAMILY[event.royalIndex].toUpperCase();
+        this.sound.play('tap');
+        this.showBanner('THE CHOUQUETTE ' + name + ' WAS EATEN!', 1500);
+        this.updateInterface();
+        this.drawBakeryRoom(this.engine.state.elapsed);
+      }
       else if (event.type === 'win') {
         const index = this.engine.state.levelIndex;
         const reward = this.unlocked <= index + 1 ? this.engine.level.reward : undefined;
@@ -689,7 +707,16 @@ export class GameApp {
       } else if (event.type === 'lose') {
         this.sound.play('lose');
         this.stopAnimation();
-        this.modal('BAKERY OVERRUN!', 'The customers got past your defenses. Try a different pastry lineup!', ['Retry Shift', 'retry'], ['Level Select', 'levels']);
+        this.drawBakeryRoom(this.engine.state.elapsed);
+        this.updateInterface();
+        this.showBanner('THE ROYAL CHOUQUETTE FAMILY HAS FALLEN!', 1300);
+        // Show the empty displays and last crumbs before the defeat dialog.
+        this.lossTimer = window.setTimeout(() => {
+          this.lossTimer = 0;
+          this.modal('ROYAL FAMILY EATEN!',
+            'All five royal chouquettes have been eaten. Defend the family and try again!',
+            ['Retry Shift', 'retry'], ['Level Select', 'levels']);
+        }, 1350);
       }
     }
   }
