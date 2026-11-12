@@ -45,5 +45,6 @@ export type GameEvent =
   | { type: 'tip'; message: string }
   | { type: 'hooman'; kind: string }
   | { type: 'royal-eaten'; row: number; royalIndex: number; remaining: number }
+  | { type: 'wheel'; row: number }
   | { type: 'win' }
   | { type: 'lose' };
