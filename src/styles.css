@@ -1597,27 +1597,40 @@ canvas, img { image-rendering: pixelated; }
   overflow: hidden;
   background: #405d4d;
 }
-#game-screen #battle-scenery {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
+#game-screen #battle-room {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32fr 288fr 32fr;
+  width: 100%;
+  max-height: 100%;
+  aspect-ratio: 11 / 5;
+  align-items: stretch;
+  overflow: hidden;
+  background: #4d5b4c;
+  box-shadow: 0 .35cqh #263b2e, 0 -.2cqh #927c5e;
+}
+#game-screen #battle-scenery,
+#game-screen #bakery-door {
+  position: relative;
+  z-index: 1;
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
   image-rendering: pixelated;
+  object-fit: fill;
   pointer-events: none;
 }
 #game-screen #board-viewport {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   height: 100%;
-  width: auto;
-  max-width: 100%;
+  width: 100%;
+  max-width: none;
   aspect-ratio: 9 / 5;
   flex: none;
   overflow: hidden;
   background: #d6c3a3;
-  box-shadow: inset 0 0 0 .3cqh #ab8961, -.6cqw 0 0 #263e34aa, .6cqw 0 0 #263e34aa;
+  box-shadow: inset .25cqh 0 #ab8961, inset -.25cqh 0 #ab8961;
 }
 #game-screen #battlefield {
   display: block;
@@ -1728,4 +1741,62 @@ canvas, img { image-rendering: pixelated; }
 #game-screen #banner.active { display: block; }
 @media (prefers-reduced-motion: reduce) {
   #game-screen .pastry-portrait-card { transition: none; }
+}
+
+/* v0.9.6 - The shelf and entrance panels now occupy every horizontal pixel.
+ * Each side canvas is 32x160 and shares the battlefield's exact pixel scale. */
+#game-screen #battle-area {
+  background: linear-gradient(#405b4b, #62745d 40%, #374f43);
+}
+#game-screen #approach-label {
+  top: 5%;
+  font-size: 2.9cqh;
+  z-index: 2;
+}
+#game-screen #approach-roster {
+  position: absolute;
+  z-index: 2;
+  bottom: 3%;
+  left: 2%;
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 73%;
+  gap: .55cqh .5cqw;
+  padding: .5cqh .6cqw;
+  background: #362719e6;
+  border: .25cqh solid #c9a16e;
+  border-radius: .4cqh;
+  color: #fce7bc;
+  font-size: 1.8cqh;
+  transition: opacity .22s ease;
+  pointer-events: none;
+}
+#game-screen #approach-roster::before {
+  content: 'INCOMING';
+  margin-right: .4cqw;
+  color: #f8ca81;
+  font-weight: 900;
+}
+#game-screen #approach-roster .roster-kind {
+  display: inline-flex;
+  align-items: center;
+  gap: .24cqw;
+  white-space: nowrap;
+  padding: .12cqh .4cqw;
+  background: #68513a;
+  border-radius: .2cqh;
+}
+#game-screen #approach-roster img {
+  width: 2.9cqh;
+  height: 2.9cqh;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+#game-screen #approach-intro:not(.lineup) #approach-roster {
+  opacity: 0;
+}
+#game-screen #skip-approach {
+  z-index: 3;
+  bottom: 3%;
+  right: 2%;
 }

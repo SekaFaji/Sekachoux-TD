@@ -1,6 +1,6 @@
 import { createSpriteAtlas, drawBattlefield, type SpriteAtlas } from '../art/render.js';
-import { APPROACH_DURATION_MS, drawApproachFrame, drawApproachWorld } from '../art/approach.js';
-import { DEFENDERS } from '../game/catalog.js';
+import { APPROACH_DURATION_MS, APPROACH_HOLD_MS, APPROACH_PAN_MS, drawApproachFrame, drawApproachWorld, incomingKinds } from '../art/approach.js';
+import { DEFENDERS, ENEMIES } from '../game/catalog.js';
 import { campaignLevelLabel, nextPlayableLevel, stageCompleteMessage } from '../game/campaign.js';
 import { GameEngine } from '../game/engine.js';
 import { loadDiscoveredHoomans, recordDiscoveredHooman } from '../game/discovery.js';
@@ -62,7 +62,7 @@ export class GameApp {
     byId<HTMLImageElement>('butter-icon').src = this.sprites.url('butter-drop');
     byId<HTMLImageElement>('shovel-icon').src = this.sprites.url('shovel');
     drawBakeryTitleScene(byId<HTMLCanvasElement>('menu-art'), this.sprites, 0);
-    drawBattleScenery(byId<HTMLCanvasElement>('battle-scenery'), this.sprites, 0);
+    this.drawBakeryRoom(0);
     drawBakeryPixelLogo(byId<HTMLCanvasElement>('title-logo'));
     this.updateProfile();
     this.updateFullscreenControl();
@@ -360,6 +360,16 @@ export class GameApp {
     }
   }
 
+  private drawBakeryRoom(elapsed: number): void {
+    drawBattleScenery(
+      byId<HTMLCanvasElement>('battle-scenery'),
+      byId<HTMLCanvasElement>('bakery-door'),
+      this.sprites,
+      this.engine?.state ?? null,
+      elapsed,
+    );
+  }
+
   private startLevel(index: number): void {
     if (!Number.isInteger(index) || index < 0 || index >= LEVELS.length || index >= this.unlocked) return;
     this.stopAnimation();
@@ -367,7 +377,7 @@ export class GameApp {
     this.selected = null;
     this.frameCount = 0;
     this.buildCards();
-    drawBattleScenery(byId<HTMLCanvasElement>('battle-scenery'), this.sprites, 0);
+    this.drawBakeryRoom(0);
     byId<HTMLElement>('level-label').textContent = `${campaignLevelLabel(index)}  ${LEVELS[index].name}`;
     byId<HTMLElement>('level-progress').style.display = this.engine.level.tutorial ? 'none' : '';
     byId<HTMLElement>('shovel').hidden = Boolean(this.engine.level.tutorial);
@@ -379,22 +389,47 @@ export class GameApp {
     this.showApproach();
   }
 
-  /** In-world preview: start on the far-right pavement, then pan and zoom back to the bakery. */
+  /** Give each real incoming customer type a readable street-side introduction. */
   private showApproach(): void {
     if (!this.engine) return;
     const intro = byId<HTMLElement>('approach-intro');
+    const label = byId<HTMLElement>('approach-label');
+    const roster = byId<HTMLElement>('approach-roster');
     const previewCanvas = byId<HTMLCanvasElement>('approach-canvas');
-    const world = drawApproachWorld(this.engine.level, this.engine.state, this.sprites);
+    const level = this.engine.level;
+    roster.replaceChildren();
+    for (const kind of incomingKinds(level)) {
+      const entry = document.createElement('span');
+      entry.className = 'roster-kind';
+      const portrait = document.createElement('img');
+      portrait.alt = '';
+      portrait.src = this.sprites.url(kind + '0');
+      const name = document.createElement('span');
+      name.textContent = ENEMIES[kind].n;
+      entry.append(portrait, name);
+      roster.append(entry);
+    }
+    let world = drawApproachWorld(level, this.engine.state, this.sprites);
     byId<HTMLElement>('game-screen').classList.add('cinematic');
     intro.hidden = false;
+    intro.classList.add('lineup');
+    label.textContent = 'OVENS READY...';
     this.introStartedAt = null;
     drawApproachFrame(previewCanvas, world, 0);
     const animate = (time: number): void => {
       if (!this.engine || intro.hidden) return;
       if (this.introStartedAt === null) this.introStartedAt = time;
-      const progress = Math.min(1, (time - this.introStartedAt) / APPROACH_DURATION_MS);
+      const elapsed = time - this.introStartedAt;
+      const progress = Math.min(1, elapsed / APPROACH_DURATION_MS);
+      intro.classList.toggle('lineup', elapsed < APPROACH_HOLD_MS);
+      label.textContent = elapsed < 1200 ? 'OVENS READY...'
+        : elapsed < APPROACH_HOLD_MS ? "TODAY'S CUSTOMERS"
+          : elapsed < APPROACH_HOLD_MS + APPROACH_PAN_MS ? 'HOOMANS AT THE DOOR!' : 'BAKE!';
+      if (this.frameCount++ % 6 === 0) {
+        world = drawApproachWorld(level, this.engine.state, this.sprites, elapsed / 1000);
+        this.drawBakeryRoom(elapsed / 1000);
+      }
       drawApproachFrame(previewCanvas, world, progress);
-      if (this.frameCount++ % 6 === 0) drawBattleScenery(byId<HTMLCanvasElement>('battle-scenery'), this.sprites, time / 1000);
       if (progress >= 1) this.beginBattle();
       else this.introAnimation = requestAnimationFrame(animate);
     };
@@ -408,6 +443,9 @@ export class GameApp {
     this.introStartedAt = null;
     byId<HTMLElement>('approach-intro').hidden = true;
     byId<HTMLElement>('game-screen').classList.remove('cinematic');
+    // The familiar "OVENS READY / BAKE" countdown is part of the preview now.
+    // Crossing the existing intro threshold starts tutorial steps normally.
+    this.engine.state.intro = .01;
     this.resume();
     const curtain = byId<HTMLElement>('lane-reveal');
     curtain.replaceChildren();
@@ -665,7 +703,7 @@ export class GameApp {
     drawBattlefield(this.canvas, this.engine.state, this.engine.level, this.sprites);
     if (this.frameCount++ % 6 === 0) {
       this.updateInterface();
-      drawBattleScenery(byId<HTMLCanvasElement>('battle-scenery'), this.sprites, this.engine.state.elapsed);
+      this.drawBakeryRoom(this.engine.state.elapsed);
     }
     if (this.playing) this.animation = requestAnimationFrame(next => this.tick(next));
   }

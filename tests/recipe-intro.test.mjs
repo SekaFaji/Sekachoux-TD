@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { recipeBookEntries, HIDDEN_NAME, HIDDEN_DESCRIPTION } from '../dist/game/recipeBook.js';
-import { approachCamera, APPROACH_DURATION_MS } from '../dist/art/approach.js';
+import { approachCamera, incomingKinds, previewActors, APPROACH_DURATION_MS, APPROACH_HOLD_MS, APPROACH_PAN_MS, APPROACH_READY_MS } from '../dist/art/approach.js';
 import { LEVELS } from '../dist/game/levels.js';
 import { readFileSync } from 'node:fs';
 
@@ -38,7 +38,12 @@ test('Hooman Dex displays four slots; only encountered kinds show their names an
 });
 
 test('camera starts over Hoomans on right and pans left at constant zoom', () => {
-  assert.equal(APPROACH_DURATION_MS, 3100);
+  assert.equal(APPROACH_DURATION_MS, 7500);
+  assert.equal(APPROACH_HOLD_MS, 4000);
+  assert.equal(APPROACH_PAN_MS, 2500);
+  assert.equal(APPROACH_READY_MS, 1000);
+  assert.deepEqual(approachCamera(APPROACH_HOLD_MS / APPROACH_DURATION_MS), approachCamera(0));
+  assert.deepEqual(approachCamera((APPROACH_HOLD_MS + APPROACH_PAN_MS) / APPROACH_DURATION_MS), approachCamera(1));
   const start = approachCamera(0);
   const held = approachCamera(.12);
   const middle = approachCamera(.57);
@@ -63,4 +68,35 @@ test('menu has one Recipe Book route, separate tabs and no old popup', () => {
   assert.ok(html.includes('id="approach-canvas"'));
   assert.ok(html.includes('data-action="skip-intro"'));
   assert.ok(!html.includes('id="level-preview"'));
+});
+
+
+test('preview lineup covers actual potential wave types without pretending random counts are exact', () => {
+  const wants = [
+    ['walk'], ['walk'], ['walk'], ['jog','walk'],
+    ['walk'], ['walk','jog'], ['walk','jog','critic'], ['walk','jog','critic'],
+    ['walk','jog','critic','insp'], ['walk','jog','critic','insp'],
+  ];
+  LEVELS.forEach((level, index) => {
+    assert.deepEqual([...incomingKinds(level)].sort(), [...wants[index]].sort(), level.name);
+    assert.deepEqual([...new Set(previewActors(level))].sort(), [...wants[index]].sort(), level.name);
+    if (level.tutorial) {
+      assert.deepEqual(previewActors(level),
+        level.tutorial.flatMap(step => (step.spawn ?? []).map(enemy => enemy.kind)));
+    } else {
+      assert.ok(previewActors(level).length >= 4 && previewActors(level).length <= 8);
+      assert.ok(previewActors(level).length >= incomingKinds(level).length);
+    }
+  });
+});
+
+test('the camera keeps the lineup held, pans at constant size, then settles on the board', () => {
+  assert.equal(approachCamera(.5).sourceX, 192);
+  assert.ok(approachCamera(.65).sourceX > 0 && approachCamera(.65).sourceX < 192);
+  assert.equal(approachCamera(.9).sourceX, 0);
+  const app = readFileSync(new URL('../dist/ui/app.js', import.meta.url), 'utf8');
+  assert.ok(app.includes('incomingKinds(level)'));
+  assert.ok(app.includes('roster.replaceChildren()'));
+  assert.ok(app.includes("this.engine.state.intro = .01"), 'no extra 2.6-second countdown after the camera');
+  assert.ok(app.includes("data-action") || app.includes("intro.classList.toggle('lineup'"));
 });

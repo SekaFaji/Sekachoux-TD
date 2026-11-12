@@ -1,99 +1,132 @@
+import { COLUMNS, ROWS, TILE, type GameState } from '../game/types.js';
+import { laneColor } from './palette.js';
 import type { SpriteAtlas } from './render.js';
 
-const WIDTH = 320;
-const HEIGHT = 180;
-type CanvasContext = CanvasRenderingContext2D;
+const SIDE_WIDTH = TILE;
+const SIDE_HEIGHT = ROWS * TILE;
+type PixelContext = CanvasRenderingContext2D;
 
-function block(ctx: CanvasContext, x: number, y: number, w: number, h: number, color: string): void {
+function rect(ctx: PixelContext, x: number, y: number, width: number, height: number, color: string): void {
   ctx.fillStyle = color;
-  ctx.fillRect(x, y, w, h);
+  ctx.fillRect(Math.round(x), Math.round(y), Math.round(width), Math.round(height));
+}
+
+function prepare(canvas: HTMLCanvasElement): PixelContext | null {
+  if (canvas.width !== SIDE_WIDTH) canvas.width = SIDE_WIDTH;
+  if (canvas.height !== SIDE_HEIGHT) canvas.height = SIDE_HEIGHT;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+  ctx.imageSmoothingEnabled = false;
+  ctx.clearRect(0, 0, SIDE_WIDTH, SIDE_HEIGHT);
+  return ctx;
 }
 
 /**
- * The playable nine-by-five worktop floats inside the SAME living bakery as
- * the main menu. All animation is decoration and never modifies game state.
- * The board is drawn in its own fixed-ratio viewport above this background.
+ * Actual bakery objective: a shelf of five displays, one next to every lane.
+ * These are scene props, not extra health or a change to the defeat condition.
  */
-export function drawBattleScenery(canvas: HTMLCanvasElement, sprites: SpriteAtlas, elapsed = 0): void {
-  if (canvas.width !== WIDTH) canvas.width = WIDTH;
-  if (canvas.height !== HEIGHT) canvas.height = HEIGHT;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  ctx.imageSmoothingEnabled = false;
-  const t = Number.isFinite(elapsed) ? elapsed : 0;
-  const flicker = .5 + .5 * Math.sin(t * 4.2);
-  const glow = .5 + .5 * Math.sin(t * 2.1 + 1.6);
-
-  // Bricked sage walls and warm stone countertop continue behind the board.
-  block(ctx, 0, 0, WIDTH, HEIGHT, '#425b51');
-  for (let y = 8; y < 126; y += 18) {
-    block(ctx, 0, y, WIDTH, 1, '#708174');
-    for (let x = ((y / 18) % 2 ? 12 : 0); x < WIDTH; x += 40) {
-      block(ctx, x, y + 2, 1, 16, '#314b45');
+function drawShelves(ctx: PixelContext, sprites: SpriteAtlas, state: GameState | null, t: number): void {
+  rect(ctx, 0, 0, 32, 160, '#40534a');
+  rect(ctx, 0, 0, 3, 160, '#263d37');
+  rect(ctx, 3, 0, 4, 160, '#ad8053');
+  rect(ctx, 7, 0, 23, 160, '#86633f');
+  rect(ctx, 10, 0, 20, 160, '#55432e');
+  rect(ctx, 30, 0, 2, 160, '#2a3f34');
+  const displayKinds = ['croissant', 'loaf', 'pretzel', 'butter', 'pie'];
+  for (let row = 0; row < ROWS; row++) {
+    const y = row * TILE;
+    const threatened = Boolean(state?.enemies.some(e => e.row === row && e.x < 1.15));
+    const glint = (Math.sin(t * 1.7 + row * 2.3) + 1) / 2;
+    // Five lit wooden bread display compartments, not empty wallpaper.
+    rect(ctx, 7, y + 1, 22, 26, '#3c372d');
+    rect(ctx, 9, y + 2, 18, 22, '#bfa378');
+    rect(ctx, 10, y + 4, 17, 19, '#6b5841');
+    rect(ctx, 11, y + 5, 15, 16, '#8b7151');
+    rect(ctx, 8, y + 23, 21, 5, threatened ? '#bd6b47' : '#d6ad71');
+    rect(ctx, 7, y + 27, 24, 4, '#4f3728');
+    rect(ctx, 9, y + 27, 20, 1, '#e4c38c');
+    rect(ctx, 12, y + 20, 14, 3, '#e9c598');
+    const pastry = sprites.images[displayKinds[row]];
+    if (pastry) ctx.drawImage(pastry, 10, y + 2, 19, 19);
+    // The narrow glass edge of each case picks up light as the bakery breathes.
+    rect(ctx, 10, y + 5, 1, 15, '#dfca9b');
+    rect(ctx, 12, y + 7 + Math.floor(glint * 8), 1, 2, '#fff1c5');
+    if (threatened && Math.sin(t * 11) > 0) {
+      rect(ctx, 5, y + 2, 2, 27, '#ffe49d');
+      rect(ctx, 28, y + 12, 2, 8, '#f4ac6c');
     }
   }
-  block(ctx, 0, 0, WIDTH, 5, '#263f37');
-  block(ctx, 0, 5, WIDTH, 2, '#b6b69b');
-  block(ctx, 0, 126, WIDTH, 5, '#ac8a69');
-  block(ctx, 0, 131, WIDTH, 49, '#6c675b');
-  for (let y = 136; y < HEIGHT; y += 12) {
-    block(ctx, 0, y, WIDTH, 1, '#9a9680');
-    for (let x = y % 24 ? 10 : 0; x < WIDTH; x += 35) block(ctx, x, y + 1, 1, 11, '#5c5b54');
+  // The protective rail meets the game's existing rolling pins at the seam.
+  rect(ctx, 29, 0, 2, SIDE_HEIGHT, '#cfb17f');
+  for (let row = 0; row < ROWS; row++) rect(ctx, 29, row * TILE + 25, 2, 3, '#6a4934');
+}
+
+/**
+ * Doorway shares native 32px cells with the board. Hoomans remain the SAME
+ * GameState enemies in transit: no copied actors, no extra random spawns.
+ * World x=9 starts at the board/door seam.
+ */
+function drawEntrance(ctx: PixelContext, sprites: SpriteAtlas, state: GameState | null, t: number): void {
+  // Continuing stone lanes let all five game rows meet one tall entrance.
+  for (let row = 0; row < ROWS; row++) {
+    const y = row * TILE;
+    rect(ctx, 0, y, SIDE_WIDTH, TILE, laneColor(row));
+    rect(ctx, 0, y, SIDE_WIDTH, 2, '#e9d5b2');
+    rect(ctx, 0, y + 27, SIDE_WIDTH, 4, '#aa9579');
+    for (let x = 5; x < SIDE_WIDTH; x += 11) {
+      rect(ctx, x + row % 3, y + 10 + row % 4, 2, 1, '#c0b8a0');
+    }
   }
 
-  // Left: a genuine warm oven, with an animated ember rather than an emoji.
-  block(ctx, 0, 29, 37, 112, '#2b3e38');
-  block(ctx, 0, 31, 34, 7, '#c6aa7e');
-  block(ctx, 1, 39, 31, 91, '#6c6555');
-  block(ctx, 3, 43, 27, 79, '#c3aa89');
-  block(ctx, 5, 48, 23, 60, '#3a332f');
-  block(ctx, 7, 51, 19, 54, '#6c3a25');
-  block(ctx, 8, 58, 17, 39, '#c16e30');
-  const oven = ctx.createRadialGradient(16, 85, 1, 16, 85, 33);
-  oven.addColorStop(0, 'rgba(255,202,91,' + (.6 + flicker * .2) + ')');
-  oven.addColorStop(1, 'rgba(255,132,49,0)');
-  ctx.fillStyle = oven;
-  ctx.fillRect(0, 50, 38, 78);
-  block(ctx, 11, 88 - Math.floor(flicker * 4), 4, 12 + flicker * 4, '#ffe5a0');
-  block(ctx, 17, 82 - Math.floor(glow * 3), 4, 17 + glow * 3, '#ffc366');
-  block(ctx, 8, 111, 19, 2, '#e5c99d');
-  block(ctx, 6, 118, 24, 5, '#56463b');
-  block(ctx, 8, 121, 5, 2, '#dbbd8d');
-  block(ctx, 22, 121, 5, 2, '#dbbd8d');
+  // One tall open glass bakery entrance beyond the connected lane thresholds.
+  rect(ctx, 23, 0, 9, SIDE_HEIGHT, '#5a7e78');
+  rect(ctx, 25, 0, 5, SIDE_HEIGHT, '#a2c1b8');
+  rect(ctx, 27, 0, 2, SIDE_HEIGHT, '#cde1d4');
+  rect(ctx, 30, 0, 2, SIDE_HEIGHT, '#59432e');
+  rect(ctx, 0, 0, SIDE_WIDTH, 5, '#58402b');
+  rect(ctx, 0, 5, SIDE_WIDTH, 2, '#e3bc80');
+  rect(ctx, 0, SIDE_HEIGHT - 6, SIDE_WIDTH, 3, '#bc956b');
+  rect(ctx, 0, SIDE_HEIGHT - 3, SIDE_WIDTH, 3, '#6a5039');
 
-  // Right: the customer entrance, a glimpse of the street and its awning.
-  block(ctx, 289, 24, 31, 117, '#2f4a43');
-  block(ctx, 293, 31, 27, 99, '#aa916f');
-  block(ctx, 295, 35, 25, 85, '#6e9697');
-  block(ctx, 296, 76, 24, 44, '#94a8a0');
-  block(ctx, 296, 103, 24, 17, '#aa9f7e');
-  block(ctx, 291, 26, 29, 7, '#d2b486');
-  for (let x = 294; x < 320; x += 8) block(ctx, x, 27, 4, 7, '#b75f48');
-  block(ctx, 292, 119, 28, 6, '#5b5145');
-  block(ctx, 294, 124, 26, 3, '#d9bea0');
-  block(ctx, 295, 38, 2, 77, '#e7d8b5');
-  block(ctx, 303, 66, 1, 45, '#e7dbc1');
-  block(ctx, 293, 17, 27, 7, '#e6c994');
-  block(ctx, 296, 19, 23, 2, '#7b5235');
-  // Moving shadow outside the glass implies passing customers.
-  ctx.globalAlpha = .18 + .09 * Math.sin(t * .8);
-  block(ctx, 308 + 3 * Math.sin(t * .4), 89, 7, 22, '#283e3d');
-  ctx.globalAlpha = 1;
+  const approaching = Boolean(state?.enemies.some(e => e.x > COLUMNS - .5 && e.x < COLUMNS + 1.4));
+  const opening = approaching ? 4 : 0;
+  rect(ctx, 28 + opening, 11, 1, SIDE_HEIGHT - 22, '#f3e9ce');
 
-  // Bakery shelves and recognizable pastry shapes that tie back to the menu.
-  block(ctx, 34, 13, 21, 4, '#cead81');
-  block(ctx, 35, 17, 19, 1, '#6b4939');
-  if (sprites.images.croissant) ctx.drawImage(sprites.images.croissant, 36, 1, 16, 16);
-  block(ctx, 269, 14, 22, 4, '#cead81');
-  block(ctx, 271, 17, 18, 1, '#6b4939');
-  if (sprites.images.loaf) ctx.drawImage(sprites.images.loaf, 271, 1, 16, 16);
-
-  // Occasional tiny flour dust flecks in the frame only.
-  for (let i = 0; i < 7; i++) {
-    const x = i % 2 ? 304 + i : 7 + i;
-    const y = 10 + ((i * 23 + t * (1 + i % 3)) % 116);
-    ctx.globalAlpha = .16 + .12 * Math.sin(t * 1.2 + i);
-    block(ctx, x, y, 1, 1, '#fff4d7');
+  // Reveal actual running enemies in the hallway BEFORE they enter the board.
+  // A crossing sprite is naturally split between the two adjacent canvases.
+  const frame = Math.floor(t * 4) % 2;
+  for (const enemy of state?.enemies ?? []) {
+    if (enemy.x <= COLUMNS - .5 || enemy.x >= COLUMNS + 1.5) continue;
+    const sprite = sprites.images[enemy.kind + ((frame + enemy.row) % 2)];
+    if (!sprite) continue;
+    const localX = Math.round((enemy.x - COLUMNS) * TILE);
+    ctx.drawImage(sprite, localX - TILE / 2, enemy.row * TILE - 2);
   }
-  ctx.globalAlpha = 1;
+
+  // Door frame remains in front, making entry look like walking THROUGH it.
+  rect(ctx, 29, 0, 3, SIDE_HEIGHT, '#654930');
+  rect(ctx, 29, 4, 1, SIDE_HEIGHT - 8, '#e4c089');
+  rect(ctx, 0, 0, 2, SIDE_HEIGHT, '#b28f66');
+  for (let row = 0; row < ROWS; row++) {
+    rect(ctx, 0, row * TILE + 24, 2, 3, '#6d5941');
+  }
+}
+
+/**
+ * Side panels occupy the unused width at the same pixel density as the board:
+ * 32px shelf + 288px battlefield + 32px entrance = 352px world.
+ */
+export function drawBattleScenery(
+  shelvesCanvas: HTMLCanvasElement,
+  entranceCanvas: HTMLCanvasElement,
+  sprites: SpriteAtlas,
+  state: GameState | null = null,
+  elapsed = 0,
+): void {
+  const shelves = prepare(shelvesCanvas);
+  const entrance = prepare(entranceCanvas);
+  if (!shelves || !entrance) return;
+  const t = Number.isFinite(elapsed) ? elapsed : 0;
+  drawShelves(shelves, sprites, state, t);
+  drawEntrance(entrance, sprites, state, t);
 }

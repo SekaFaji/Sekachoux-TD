@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.6 - Bakery shelves, real customer doorway and longer lineup (2026-11-12)
+
+- Replace the empty strips beside the playable board with a connected 32px pastry-shelf objective and a 32px glass bakery doorway, rendered at exactly the same scale as the existing 9×5 worktop.
+- Draw actual Hoomans from the game state inside the right-hand doorway before they cross into the board; no duplicate actors or spawn/balance changes.
+- Display shelves full of pastry displays by lane, with warning highlights when a Hooman approaches the objective. Existing rolling-pin and breach rules stay unchanged.
+- Extend the opening to 7.5 seconds (4s outside lineup, 2.5s constant-scale pan, 1s settle), retaining Skip Intro and removing the extra countdown after the cinematic.
+- Show names and portraits of every **possible incoming Hooman type** from real level wave weights and tutorial scripts; random-wave counts remain unpredictable.
+- Update scene/layout regression tests and preserve campaign, touch-grid, progression and save compatibility.
+
 ## 0.9.5 - Stable living-bakery battlefield (2026-11-11)
 
 - Give the approach camera and actual battlefield the same 288×160 logical viewport; the level no longer resizes or changes scaling when the opening pan ends.

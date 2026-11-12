@@ -43,8 +43,10 @@ test('decorative scenery is separate from gameplay grid and leaves touch logic u
   assert.ok(html.indexOf('id="battle-scenery"') < html.indexOf('id="board-viewport"'));
   const art = readFileSync(new URL('../dist/art/battleScenery.js', import.meta.url), 'utf8');
   assert.ok(art.includes('drawBattleScenery'));
-  assert.ok(art.includes('sprites.images.croissant'));
-  assert.ok(art.includes('sprites.images.loaf'));
+  assert.ok(art.includes("['croissant', 'loaf', 'pretzel', 'butter', 'pie']"));
+  assert.ok(art.includes('sprites.images[displayKinds[row]]'));
+  assert.ok(art.includes('state?.enemies'), 'shelf and door use live state');
+  assert.ok(art.includes('enemy.x - COLUMNS'), 'door translates real enemy world position to local coordinates');
   const rect = { left: 10, top: 20, width: 900, height: 500 };
   assert.deepEqual(
     { col: pointerToGrid(10 + 450, 20 + 250, rect)?.column, row: pointerToGrid(460, 270, rect)?.row },
@@ -60,4 +62,37 @@ test('intro is skippable and CSS never fades or shifts the HUD', () => {
   assert.ok(html.includes('data-action="skip-intro"'));
   assert.ok(app.includes('this.beginBattle()'));
   assert.ok(app.includes('drawBattleScenery'));
+});
+
+
+test('side margins are two pixel-aligned parts of the bakery, not stretched filler', () => {
+  const start = html.indexOf('<div id="battle-room"');
+  const end = html.indexOf('<div id="banner"', start);
+  assert.ok(start > 0 && end > start);
+  const room = html.slice(start, end);
+  assert.match(room, /id="battle-scenery" width="32" height="160"/);
+  assert.match(room, /id="bakery-door" width="32" height="160"/);
+  assert.match(room, /id="battlefield" width="288" height="160"/);
+  assert.ok(room.indexOf('id="battle-scenery"') < room.indexOf('id="board-viewport"'));
+  assert.ok(room.indexOf('id="bakery-door"') > room.indexOf('id="board-viewport"'));
+  const scene = css.slice(css.lastIndexOf('/* v0.9.5 - Living bakery battle layout'));
+  assert.match(scene, /#game-screen #battle-room\s*\{[^}]*grid-template-columns:\s*32fr 288fr 32fr/);
+  assert.match(scene, /#game-screen #battle-room\s*\{[^}]*aspect-ratio:\s*11\s*\/\s*5/);
+  assert.ok(html.includes('id="approach-roster"'));
+  assert.ok(html.includes('data-action="skip-intro"'));
+  // The 9x5 tiles stay untouched, and each side is exactly 1 tile wide.
+  assert.equal(COLUMNS * TILE + 2 * TILE, 352);
+  assert.equal(ROWS * TILE, 160);
+});
+
+test('doorway renders the same real enemy objects, while the shelf remains an objective prop', () => {
+  const art = readFileSync(new URL('../dist/art/battleScenery.js', import.meta.url), 'utf8');
+  const app = readFileSync(new URL('../dist/ui/app.js', import.meta.url), 'utf8');
+  assert.match(art, /enemy\.x\s*-\s*COLUMNS/);
+  assert.ok(art.includes('sprites.images[enemy.kind'));
+  assert.ok(art.includes('state?.enemies'));
+  assert.ok(!art.includes('spawnEnemy('));
+  assert.ok(app.includes("byId('bakery-door')") || app.includes("byId('bakery-door'") || app.includes("byId('bakery-door')") ||
+    app.includes("('bakery-door')"), 'the new doorway is connected to the render loop');
+  assert.ok(app.includes('this.drawBakeryRoom(this.engine.state.elapsed)'));
 });
