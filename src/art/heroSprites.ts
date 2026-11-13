@@ -61,7 +61,7 @@ export function croissantPoseForTimer(timer: number, targetAhead: boolean): Croi
 /**
  * Reference-led side profile, not a character with crescent horns.
  * The horizontal laminated crown bends around into a vertical left-hand tail.
- * No eyes, feet or weapon: the croissant itself is the entire silhouette.
+ * No arms, feet or gun: its tiny face is drawn inside the lower curl.
  * Rows are left/right extents of filled pixels in a 29x27 reference grid.
  */
 export const CROISSANT_PROFILE: ReadonlyArray<readonly [number, number]> = [
