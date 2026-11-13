@@ -84,6 +84,16 @@ test('Croissant uses real Royal Chouquette palette and shares their expressive p
         for (let dy = 0; dy < height; dy++) for (let dx = 0; dx < width; dx++)
           pixels.set((x + dx) + ',' + (y + dy), this.fillStyle);
       },
+      getImageData(left, top, width, height) {
+        // The shared pastry outline needs a real alpha snapshot.
+        const data = new Uint8ClampedArray(width * height * 4);
+        for (const key of pixels.keys()) {
+          const [x, y] = key.split(',').map(Number);
+          if (x >= left && y >= top && x < left + width && y < top + height)
+            data[((y - top) * width + x - left) * 4 + 3] = 255;
+        }
+        return { data };
+      },
     };
     globalThis.document = {
       createElement: tag => {
@@ -103,12 +113,14 @@ test('Croissant uses real Royal Chouquette palette and shares their expressive p
     const recoil = makePixels('recoil');
     const occupied = [...idle.keys()].sort();
 
-    assert.ok(occupied.length > 350 && occupied.length < 510, 'Royal-sized pastry fills its sprite');
+    assert.ok(occupied.length > 350 && occupied.length < 640, 'Royal-sized pastry plus its one-pixel contour fits the frame');
     for (const frame of [windup, fire, recoil]) {
       assert.deepEqual([...frame.keys()].sort(), occupied, 'poses preserve Croissant shape without guns or extra limbs');
     }
 
     assert.ok(idle.has('17,6'), 'rounded top arch of the pastry is visible');
+    assert.equal(idle.get('17,4'), '#3d271b', 'a crisp 1px dark outline defines the top curve');
+    assert.equal(idle.get('30,14'), '#3d271b', 'the pointed firing tip retains its dark outline');
     assert.ok(idle.has('29,14'), 'right-hand pastry tip remains visible');
     assert.ok(!idle.has('29,20'), 'curled opening underneath the forward tip stays empty');
     assert.ok(idle.has('10,29'), 'hanging tail curves down');
@@ -127,4 +139,19 @@ test('Croissant uses real Royal Chouquette palette and shares their expressive p
     if (oldDocument === undefined) delete globalThis.document;
     else globalThis.document = oldDocument;
   }
+});
+
+
+test('main-menu Croissant uses the same display scale as Butter, without changing combat art', () => {
+  const menu = readFileSync(new URL('../src/art/bakeryScene.ts', import.meta.url), 'utf8');
+  const size = kind => {
+    const match = menu.match(new RegExp("actor\\(c,atlas,'" + kind + "',[^;]+,(\\d+)\\);"));
+    assert.ok(match, kind + ' must be drawn in the title scene');
+    return Number(match[1]);
+  };
+  assert.equal(size('croissant'), 35, 'Croissant title art is no longer an oversized 49px mascot');
+  assert.equal(size('butter'), 36);
+  assert.equal(size('loaf'), 31);
+  assert.ok(size('croissant') <= size('butter'), 'Croissant should not dominate Butter in the menu');
+  assert.ok(menu.includes("actor(c,atlas,'croissant',35,115+"), 'smaller Croissant should be recentered on the bakery counter');
 });
