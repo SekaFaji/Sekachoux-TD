@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.16 - First side-facing Customer Hooman art prototype (2026-11-13)
+
+- Rebuild ONLY the basic Customer Hooman as an original 32x32 three-quarter left-facing character to align with the right-to-left enemy travel direction.
+- Replace its overly symmetrical forward-facing look with a big asymmetrical tilted head, protruding nose and cheek, near and far unequal eyes, tiny open mouth with teeth, messy brown hair, hunched brown jacket, pale shirt and striped red tie.
+- Introduce two genuinely different shambling walk frames with offset arms, staggered legs and oversized grounded shoes.
+- Keep Jogger, Food Critic and Health Inspector pixel-for-pixel unchanged while testing this first new character's art direction. No health-damage stages or lost props yet.
+- Keep every Hooman's gameplay health, movement speed, spawning, rewards and existing collision behavior unchanged. The new Customer uses the same shared atlas in the title window, wave preview, gameplay and Recipe Book.
+- Update pixel regression tests for the new silhouette and two walk poses. 
+
 ## 0.9.15 - Seamless bakery opening, accurate Hooman lineup and refreshed Hoomans (2026-11-13)
 
 - Remove the artificial multi-lane tabletop curtain sweep entirely. The opening camera now ends directly on the playable board, with no moving strips obscuring the lanes.
