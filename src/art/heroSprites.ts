@@ -59,98 +59,109 @@ export function croissantPoseForTimer(timer: number, targetAhead: boolean): Croi
 }
 
 /**
- * Reference-led side profile, not a character with crescent horns.
- * The horizontal laminated crown bends around into a vertical left-hand tail.
- * No arms, feet or gun: its tiny face is drawn inside the lower curl.
- * Rows are left/right extents of filled pixels in a 29x27 reference grid.
+ * This Croissant belongs to the same bakery-character family as the Royal
+ * Chouquettes in royaltyArt.ts: identical honey, baked-crust, eye, cheek and
+ * smile colors, chunky pixel clusters, and a soft edge instead of black ink.
+ *
+ * Its long upper pastry roll bends into a dangling lower curl, following the
+ * user's side-view croissant reference. No separate gun, hands or legs.
  */
-export const CROISSANT_PROFILE: ReadonlyArray<readonly [number, number]> = [
-  [10,18], [9,20], [7,22], [6,24], [5,25], [4,26], [3,27],
-  [3,27], [2,28], [2,28], [2,28], [2,28], [2,21], [2,18],
-  [2,17], [2,16], [2,15], [2,14], [2,14], [3,14], [3,13],
-  [4,13], [5,13], [6,12], [7,12], [8,12], [9,11],
-];
-
-const CROISSANT_COLORS = {
-  // Butter's outline and facial tones, with a warmer toasted-pastry body.
-  outline: '#2b1608',
-  shadow: '#845b38',
-  toast: '#b3681f',
-  caramel: '#d99a3b',
-  gold: '#e9ae4e',
-  butter: '#ffd36c',
-  light: '#ffe493',
-  highlight: '#fff4b9',
-  eye: '#514234',
-  smile: '#845b38',
-  cheek: '#d97868',
+export const CROISSANT_ROYAL_PALETTE = {
+  dark: '#8f542e',
+  crust: '#aa6537',
+  middle: '#d4944d',
+  gold: '#efb86c',
+  light: '#f8d38d',
+  butter: '#f7cf86',
+  toast: '#b97940',
+  flour: '#fff4c6',
+  eye: '#49342e',
+  smile: '#aa694e',
+  cream: '#fff5de',
+  cheek: '#e9957f',
 } as const;
 
-/**
- * Butter-family Croissant. Preserve the supplied side-view croissant profile
- * while using Butter Block's soft chocolate outline, chunky golden shading,
- * two readable folded bands and a tiny sweet face on the hanging pastry.
- * No arms, feet or idle weapon; the tip itself launches crumb projectiles.
- */
+/** Rounded side-view Croissant, rendered in the exact 32px Royal style. */
 export function croissantSprite(pose: CroissantPose = 'idle'): HTMLCanvasElement {
   return sprite(g => {
-    const spans = CROISSANT_PROFILE;
-    for (let y = 0; y < spans.length; y++) {
-      const [left, right] = spans[y];
-      for (let x = left; x <= right; x++) {
-        const above = y > 0 ? spans[y - 1] : null;
-        const below = y < spans.length - 1 ? spans[y + 1] : null;
-        const edge = x === left || x === right || !above || !below ||
-          x < above[0] || x > above[1] || x < below[0] || x > below[1];
+    const P = CROISSANT_ROYAL_PALETTE;
+    // Outer shadow: a rounded arch curving right, with the pastry tail
+    // hanging beneath the left roll. This is NOT a front-facing bun.
+    for (const [x,y,w,h] of [
+      [12,5,9,2], [9,7,16,2], [6,9,21,3], [4,12,25,3],
+      [3,15,25,2], [3,17,16,5], [4,22,14,4],
+      [6,26,11,2], [8,28,7,2],
+    ]) rect(g,x,y,w,h,P.dark);
 
-        // The Butter Block uses broad blocks of yellow with warm side shadow:
-        // use exactly that rendering language on a gently toasted crust.
-        let color: string = CROISSANT_COLORS.caramel;
-        if (y <= 3 || x >= 11 && y <= 10) color = CROISSANT_COLORS.gold;
-        if (x >= 8 && x <= 19 && y >= 4 && y <= 12) color = CROISSANT_COLORS.butter;
-        if (x >= 5 && x <= 12 && y >= 12 && y <= 23) color = CROISSANT_COLORS.butter;
-        if (x >= 12 && x <= 18 && y >= 3 && y <= 8) color = CROISSANT_COLORS.light;
-        if (x >= 6 && x <= 10 && y >= 15 && y <= 21) color = CROISSANT_COLORS.light;
-        if (x >= 23 && y >= 5 && y <= 10) color = CROISSANT_COLORS.gold;
-        if (x <= 4 && y >= 11 || x >= 24 && y >= 9) color = CROISSANT_COLORS.toast;
+    // The same stacked warm blocks that build every Royal Chouquette.
+    for (const [x,y,w,h] of [
+      [13,6,8,2], [10,8,15,3], [7,10,19,4], [5,13,22,3],
+      [4,16,15,5], [5,21,12,4], [7,25,9,2], [9,27,6,2],
+    ]) rect(g,x,y,w,h,P.crust);
+    for (const [x,y,w,h] of [
+      [13,7,6,2], [10,9,12,4], [7,12,17,4], [5,15,13,5],
+      [6,19,10,6], [8,24,7,3], [10,27,4,1],
+    ]) rect(g,x,y,w,h,P.middle);
 
-        // Two big pastry folds along the upper roll, and two on the lower
-        // curl. Crisp warm shadow instead of the previous harsh black lines.
-        const upperFold = (x === 12 && y >= 4 && y <= 10) ||
-          (x === 21 && y >= 4 && y <= 9);
-        const lowerFold = (y === 14 && x >= 4 && x <= 12) ||
-          (y === 23 && x >= 7 && x <= 11);
-        if (upperFold || lowerFold) color = CROISSANT_COLORS.shadow;
+    // Golden top roll and plump lower curl, NOT neon yellow flat fills.
+    rect(g,12,9,9,3,P.gold);
+    rect(g,8,13,15,3,P.gold);
+    rect(g,6,16,11,3,P.gold);
+    rect(g,7,20,8,4,P.gold);
+    rect(g,9,24,6,2,P.gold);
+    rect(g,14,8,6,2,P.light);
+    rect(g,9,13,7,2,P.light);
+    rect(g,7,17,4,2,P.light);
+    rect(g,8,21,5,2,P.light);
+    rect(g,9,25,4,1,P.light);
 
-        // Keep the shooting pose contained inside the pastry silhouette.
-        if (!edge && x >= 24 && y >= 8 && y <= 11) {
-          if (pose === 'windup') color = CROISSANT_COLORS.light;
-          if (pose === 'fire') color = CROISSANT_COLORS.highlight;
-          if (pose === 'recoil') color = CROISSANT_COLORS.shadow;
-        }
-        if (edge) color = CROISSANT_COLORS.outline;
-        rect(g, x + 1, y + 2, 1, 1, color);
-      }
-    }
+    // Separate flaky right tip, sweeping forward to fire real crumbs.
+    rect(g,24,11,3,2,P.gold);
+    rect(g,26,13,2,2,P.middle);
+    rect(g,28,14,2,1,P.toast);
 
-    // Butter-like highlight clusters: one on the crown, one on the curled
-    // tail. Both are fully inside the original croissant silhouette.
-    rect(g, 14, 7, 3, 2, CROISSANT_COLORS.highlight);
-    rect(g, 7, 16, 3, 1, CROISSANT_COLORS.highlight);
+    // Bold rolled folds: two upper seams plus the baked lower bands.
+    rect(g,14,9,2,5,P.toast);
+    rect(g,15,10,1,3,P.dark);
+    rect(g,21,11,2,4,P.toast);
+    rect(g,21,11,1,3,P.dark);
+    rect(g,6,19,9,2,P.crust);
+    rect(g,7,20,7,1,P.toast);
+    rect(g,8,24,7,2,P.toast);
 
-    // Same tiny eye and blush colors as Butter Block. Place the face on the
-    // thick lower curl, without changing the unmistakable croissant outline.
-    rect(g, 6, 19, 2, pose === 'windup' ? 1 : 2, CROISSANT_COLORS.eye);
-    rect(g, 11, 19, 2, pose === 'windup' ? 1 : 2, CROISSANT_COLORS.eye);
-    rect(g, 5, 22, 1, 1, CROISSANT_COLORS.cheek);
-    rect(g, 13, 22, 1, 1, CROISSANT_COLORS.cheek);
+    // Royal Chouquette glints and tiny buttery flakes.
+    rect(g,11,9,1,1,P.flour);
+    rect(g,18,9,2,1,P.flour);
+    rect(g,9,17,2,1,P.flour);
+    rect(g,10,22,2,1,P.butter);
+    rect(g,25,13,1,1,P.light);
+
+    // Tiny Royal-style expression, with the exact royal eye/cheek colors.
+    // The face lives on the thick curved lower roll, inside the silhouette.
+    rect(g,7,18,2,pose === 'windup' ? 1 : 2,P.eye);
+    rect(g,13,18,2,pose === 'windup' ? 1 : 2,P.eye);
+    rect(g,5,20,2,2,P.cheek);
+    rect(g,15,20,2,2,P.cheek);
     if (pose === 'fire') {
-      rect(g, 9, 22, 2, 2, CROISSANT_COLORS.smile);
-      rect(g, 9, 23, 1, 1, CROISSANT_COLORS.highlight);
+      // Determined little Royal face, startled by its own crumb volley.
+      rect(g,10,21,2,2,P.eye);
+      rect(g,10,22,1,1,P.cream);
+    } else if (pose === 'windup') {
+      rect(g,10,21,3,1,P.smile);
+      rect(g,9,17,2,1,P.toast);
     } else {
-      rect(g, 8, 22, 3, 1, CROISSANT_COLORS.smile);
-      rect(g, 9, 23, 1, 1, CROISSANT_COLORS.smile);
+      rect(g,10,21,3,1,P.smile);
+      rect(g,11,22,2,1,P.cream);
     }
+
+    // Recoil only changes the croissant tip's baked shading: never adds
+    // a firearm or another silhouette that makes the pastry unrecognizable.
+    if (pose === 'windup') rect(g,26,13,2,1,P.light);
+    if (pose === 'fire') {
+      rect(g,27,13,2,1,P.flour);
+      rect(g,29,14,1,1,P.light);
+    }
+    if (pose === 'recoil') rect(g,26,13,2,2,P.toast);
   }, false);
 }
 
