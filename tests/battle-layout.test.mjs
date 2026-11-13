@@ -21,7 +21,7 @@ test('the cutscene covers the exact same full 416px room as the gameplay scene',
   assert.ok(boardStart >= 0 && boardEnd > boardStart);
   const board = room.slice(boardStart, boardEnd);
   assert.ok(board.includes('id="battlefield" width="288" height="200"'));
-  assert.ok(board.includes('id="lane-reveal"'));
+  assert.ok(!board.includes('id="lane-reveal"'), 'battle begins directly without an artificial lane curtain');
   assert.ok(board.includes('id="reward-drop-layer"'));
   assert.ok(!board.includes('id="approach-intro"'), 'intro owns whole room, not board only');
   assert.ok(room.indexOf('id="approach-intro"') > room.indexOf('id="bakery-street"'));
@@ -96,4 +96,14 @@ test('HUD keeps playable pastry controls and adds readable remaining royalty liv
   assert.ok(section.includes('#game-screen #royal-counter'));
   assert.ok(section.includes('#game-screen #hud-deck-header'));
   assert.ok(app.includes("this.showBanner('THE ROYAL CHOUQUETTE FAMILY HAS FALLEN!'"));
+});
+
+
+test('opening camera cuts directly to live gameplay with no moving lane curtain', () => {
+  assert.ok(!html.includes('id="lane-reveal"'));
+  assert.ok(!css.includes('.lane-cover'));
+  assert.ok(!css.includes('pull-runner'));
+  assert.ok(!app.includes("byId<HTMLElement>('lane-reveal')"));
+  assert.ok(!app.includes("className = 'lane-cover'"));
+  assert.ok(app.includes("this.engine.state.intro = .01"));
 });

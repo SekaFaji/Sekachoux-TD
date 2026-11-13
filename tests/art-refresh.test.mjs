@@ -28,3 +28,52 @@ test('visual refresh does not modify the level data or engine gameplay', () => {
   assert.ok(html.includes('data-action="settings"'));
   assert.ok(html.includes('data-action="recipe-book"'));
 });
+
+
+test('each Hooman role has readable unique costume details and two actual stride frames', async () => {
+  const { human } = await import('../dist/art/sprites.js');
+  const { ENEMIES } = await import('../dist/game/catalog.js');
+  const existing = globalThis.document;
+  const render = (kind, frame) => {
+    const pixels = new Map();
+    const ctx = {
+      fillStyle: '',
+      fillRect(x,y,w,h) {
+        for(let dy=0;dy<h;dy++) for(let dx=0;dx<w;dx++)
+          pixels.set((x+dx)+','+(y+dy),this.fillStyle);
+      },
+      getImageData(_x,_y,w,h) {
+        const data=new Uint8ClampedArray(w*h*4);
+        for (const key of pixels.keys()){
+          const [x,y]=key.split(',').map(Number);
+          if(x>=0&&y>=0&&x<w&&y<h)data[(y*w+x)*4+3]=255;
+        }
+        return {data};
+      },
+    };
+    globalThis.document={
+      createElement: tag => {
+        assert.equal(tag,'canvas');
+        return {width:0,height:0,getContext:type=>type==='2d'?ctx:null};
+      },
+    };
+    const canvas=human(frame,ENEMIES[kind].o);
+    assert.equal(canvas.width,32);
+    assert.equal(canvas.height,32);
+    return pixels;
+  };
+  try {
+    for(const kind of ['walk','jog','critic','insp']){
+      const a=render(kind,0),b=render(kind,1);
+      assert.ok(a.size>180 && a.size<900,kind+' stays readable at 32px');
+      assert.notDeepEqual([...a.entries()], [...b.entries()],kind+' must actually stride');
+    }
+    assert.equal(render('walk',0).get('4,21'),'#f5deaf','Customer has a takeaway bag');
+    assert.equal(render('jog',0).get('11,6'),'#fc7b70','Jogger has a colored headband');
+    assert.equal(render('critic',0).get('25,22'),'#8d715c','Critic carries a notepad');
+    assert.equal(render('insp',0).get('16,4'),'#5b9e70','Inspector cap has a green emblem');
+  } finally {
+    if(existing===undefined)delete globalThis.document;
+    else globalThis.document=existing;
+  }
+});

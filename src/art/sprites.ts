@@ -108,16 +108,107 @@ export const SPR: Record<string, () => HTMLCanvasElement> = {
   shovel: () => art(g => { box(g, 15, 3, 3, 14, WD); box(g, 12, 2, 9, 3, ['#a8662a', '#8a4f1c', '#6a3a10']); box(g, 10, 17, 13, 11, ['#e4eaf0', '#b8c2cc', '#7b8794']); }),
 };
 
+/**
+ * Original 32px Hooman portraits shared by the title window, approach,
+ * battlefield and Recipe Book. All four roles have actual costume details
+ * and two grounded walking poses instead of a generic body with new colors.
+ */
 export function human(f: number, o: HumanAppearance): HTMLCanvasElement {
   return art(g => {
-    const l = f ? 0 : 2, r = f ? 2 : 0;
-    px(g, 12, 24, o.pa, 4, 5 - l); px(g, 11, 29 - l, OL, 5, 2); px(g, 17, 24, o.pa, 4, 5 - r); px(g, 17, 29 - r, OL, 5, 2);
-    box(g, 10, 14, 12, 11, o.s); box(g, 21, 16, 4, 3, SK); box(g, 3, 16, 8, 3, SK);
-    px(g, 2, 11, '#cfd6dd', 1, 9); px(g, 1, 10, '#cfd6dd', 1, 2); px(g, 3, 10, '#cfd6dd', 1, 2);
-    blob(g, 16, 9, 6, 6, SK); blob(g, 16, 5.5, 6.5, 3.5, o.h);
-    eye(g, 12, 8); eye(g, 17, 8); px(g, 14, 12, OL, 5, 2); px(g, 15, 13, '#c0392b', 3, 1);
-    if (o.x === 'band') px(g, 10, 7, '#d8403c', 12, 2);
-    if (o.x === 'tie') { px(g, 15, 15, '#d8403c', 2, 7); px(g, 11, 7, OL, 10, 1); }
-    if (o.x === 'hat') { blob(g, 16, 3.5, 8, 2.5, ['#5fb47a', '#3c8d5a', '#25603a']); box(g, 22, 17, 7, 9, ['#ffffff', '#e8e8e8', '#b8b8b8']); }
+    const role = o.x;
+    const walking = f % 2 !== 0;
+    const lead = walking ? 2 : 0;
+    const trail = walking ? 0 : 2;
+
+    // Separate, genuinely different walking frames with real shoes.
+    px(g, 11, 23, o.pa, 5, 5 - lead);
+    px(g, 18, 23, o.pa, 5, 5 - trail);
+    px(g, 10, 28 - lead, '#453a35', 7, 2);
+    px(g, 18, 28 - trail, '#453a35', 7, 2);
+    px(g, 11, 28 - lead, '#9c8878', 4, 1);
+    px(g, 19, 28 - trail, '#9c8878', 4, 1);
+
+    // Coats and tunics share the game's clean three-tone pixel art language,
+    // with a contrasting collar and distinct folds.
+    box(g, 9, 13, 15, 12, o.s);
+    px(g, 10, 23, o.s[2], 13, 2);
+    px(g, 11, 14, o.s[0], 10, 2);
+    px(g, 15, 14, '#f3d7b5', 3, 3);
+
+    // Different arm phases so Hoomans are not permanently in a T-pose.
+    const armLeftY = walking ? 17 : 19;
+    const armRightY = walking ? 20 : 17;
+    px(g, 5, armLeftY, o.s[1], 5, 5);
+    px(g, 23, armRightY, o.s[1], 4, 5);
+    px(g, 5, armLeftY + 4, '#e8b78f', 4, 2);
+    px(g, 24, armRightY + 4, '#e8b78f', 3, 2);
+
+    // Friendly, softly shaded face and readable small features, matching the
+    // bakery's Royal Chouquettes better than the old enormous 3x3 eyes.
+    blob(g, 16, 9, 6, 6, SK);
+    px(g, 12, 11, '#f9d4b0', 8, 2);
+    px(g, 11, 6, o.h[1], 11, 3);
+    px(g, 12, 5, o.h[0], 8, 2);
+    px(g, 10, 8, o.h[2], 2, 3);
+    px(g, 20, 8, o.h[2], 2, 2);
+    px(g, 13, 9, '#fff5e3', 2, 2);
+    px(g, 18, 9, '#fff5e3', 2, 2);
+    px(g, 14, 9, '#443129', 1, 2);
+    px(g, 19, 9, '#443129', 1, 2);
+    px(g, 12, 12, '#e79a86', 2, 1);
+    px(g, 20, 12, '#e79a86', 2, 1);
+    px(g, 15, 13, '#895947', 4, 1);
+
+    if (role === '') {
+      // Hungry Customer: blue overcoat, bright scarf and paper takeaway bag.
+      px(g, 10, 15, '#c8e3f8', 3, 2);
+      px(g, 18, 15, '#c8e3f8', 4, 2);
+      px(g, 15, 16, '#f2c86e', 3, 5);
+      px(g, 16, 19, '#b87835', 2, 2);
+      px(g, 3, 20, '#cda978', 6, 8);
+      px(g, 4, 21, '#f5deaf', 4, 6);
+      px(g, 5, 19, '#775537', 3, 1);
+      px(g, 5, 20, '#d0ae7c', 1, 1);
+    } else if (role === 'band') {
+      // Jogger: athletic headband, diagonal sweater stripe and red sneakers.
+      px(g, 11, 6, '#fc7b70', 11, 2);
+      px(g, 12, 7, '#fff3d0', 8, 1);
+      px(g, 10, 17, '#f8ae94', 4, 2);
+      px(g, 17, 18, '#f59e87', 5, 2);
+      px(g, 12, 20, '#ffcf9a', 8, 1);
+      px(g, 11, 28 - lead, '#f16c5c', 5, 1);
+      px(g, 19, 28 - trail, '#f16c5c', 5, 1);
+      px(g, 23, 9, '#bde9ed', 2, 3);
+    } else if (role === 'tie') {
+      // Food Critic: dark jacket lapels, a proper tie and order notebook.
+      px(g, 11, 14, '#d5dbe0', 5, 5);
+      px(g, 18, 14, '#d5dbe0', 4, 5);
+      px(g, 15, 15, '#b64242', 3, 8);
+      px(g, 16, 20, '#7a3032', 2, 3);
+      px(g, 10, 15, '#4f5560', 3, 6);
+      px(g, 21, 15, '#4f5560', 2, 6);
+      px(g, 23, 19, '#74594a', 6, 8);
+      px(g, 24, 20, '#f4e8cf', 4, 6);
+      px(g, 25, 22, '#8d715c', 2, 1);
+      px(g, 25, 24, '#8d715c', 2, 1);
+      px(g, 11, 8, '#5b5149', 1, 4);
+      px(g, 21, 8, '#5b5149', 1, 4);
+      px(g, 12, 10, '#5b5149', 4, 1);
+      px(g, 18, 10, '#5b5149', 4, 1);
+    } else if (role === 'hat') {
+      // Health Inspector: white health cap, green check and a clipboard.
+      px(g, 9, 3, '#e2e8dc', 15, 4);
+      px(g, 11, 2, '#fff7e9', 11, 3);
+      px(g, 8, 6, '#d0dccf', 17, 2);
+      px(g, 15, 3, '#5b9e70', 2, 4);
+      px(g, 13, 5, '#5b9e70', 6, 1);
+      px(g, 12, 15, '#e9eee8', 3, 8);
+      px(g, 19, 15, '#e9eee8', 3, 8);
+      px(g, 16, 15, '#68ad81', 2, 9);
+      px(g, 23, 17, '#8f633e', 7, 10);
+      px(g, 24, 18, '#f1e7d6', 5, 8);
+      px(g, 25, 20, '#8f633e', 3, 1);
+      px(g, 25, 22, '#8f633e', 3, 1);
+    }
   });
 }

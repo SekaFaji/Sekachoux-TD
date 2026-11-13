@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.15 - Seamless bakery opening, accurate Hooman lineup and refreshed Hoomans (2026-11-13)
+
+- Remove the artificial multi-lane tabletop curtain sweep entirely. The opening camera now ends directly on the playable board, with no moving strips obscuring the lanes.
+- Make tutorial Hooman showcases use exact scripted spawn quantities. Rush-level previews now display the configured final-wave-size sample, with types based on the real enemy weights, rather than the invented fixed 4-8 decorative lineup. The UI identifies sample counts clearly instead of claiming a fixed total for random waves.
+- Keep all candidate enemy types visible in each preview and preserve the outdoor street-to-board camera transition.
+- Redraw Customer, Jogger, Food Critic and Health Inspector as distinguishable 32px pixel characters with unique clothing, props, faces and genuine two-frame walking poses. Reuse the same sprite atlas in the main menu, approach, combat and Recipe Book.
+- Preserve all combat mechanics, enemy statistics, level progression, rolling-pin behavior, campaign saves and unrelated art.
+- Add checks for the direct opening, intro quantities, preview types, role-specific sprite details and walking animation.
+
 ## 0.9.14 - Croissant outline and menu scale cleanup (2026-11-13)
 
 - Retain the Royal Chouquette-inspired Croissant sprite and add the same restrained, one-pixel chocolate-brown edge treatment that defines Butter and other bakery units. The existing warm colors, facial expression and attack timing stay unchanged.
