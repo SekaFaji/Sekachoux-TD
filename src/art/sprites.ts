@@ -113,8 +113,135 @@ export const SPR: Record<string, () => HTMLCanvasElement> = {
  * battlefield and Recipe Book. All four roles have actual costume details
  * and two grounded walking poses instead of a generic body with new colors.
  */
+/**
+ * First Hooman art prototype: the ordinary Customer ONLY.
+ * A three-quarter, LEFT-facing silhouette: head and hungry jaw lead on the
+ * left, rounded coat shoulders and rear foot trail to the right. Both frames
+ * are independently readable at native 32x32. No other Hooman is changed.
+ */
+function drawBasicCustomer(g: C2, frame: number): void {
+  const step = frame % 2 !== 0;
+  const ink = '#35271f';
+  const coatShadow = '#563725';
+  const coat = '#825235';
+  const coatLight = '#a8784f';
+  const skinShadow = '#bd8363';
+  const skin = '#e6b18d';
+  const skinLight = '#f6d0aa';
+  const trousers = '#364c67';
+  const shoes = '#44342b';
+
+  // Far leg sits behind the jacket. The feet swap their forward reach.
+  if (step) {
+    px(g, 17, 23, trousers, 5, 5);
+    px(g, 18, 27, '#293c54', 5, 2);
+    px(g, 19, 28, ink, 10, 2);
+    px(g, 20, 28, shoes, 8, 1);
+    px(g, 12, 23, trousers, 5, 5);
+    px(g, 10, 27, trousers, 6, 2);
+    px(g, 6, 28, ink, 11, 2);
+    px(g, 7, 28, shoes, 9, 1);
+  } else {
+    px(g, 18, 23, '#293c54', 5, 5);
+    px(g, 20, 27, trousers, 5, 2);
+    px(g, 20, 28, ink, 9, 2);
+    px(g, 21, 28, shoes, 7, 1);
+    px(g, 12, 23, trousers, 5, 4);
+    px(g, 9, 26, trousers, 6, 3);
+    px(g, 5, 28, ink, 12, 2);
+    px(g, 6, 28, shoes, 10, 1);
+  }
+  // Subtle shoe toe highlights and one off-centre knee stitch.
+  px(g, step ? 8 : 7, 28, '#86694d', 4, 1);
+  px(g, 22, 28, '#86694d', 3, 1);
+  px(g, 11, 26, '#61758d', 2, 1);
+
+  // Far arm is behind the upper body and swings against the stride.
+  px(g, 22, step ? 16 : 18, ink, 5, 8);
+  px(g, 23, step ? 17 : 19, coat, 3, 5);
+  px(g, 24, step ? 22 : 24, skinShadow, 4, 3);
+  px(g, 25, step ? 22 : 24, skin, 2, 2);
+
+  // Asymmetric hunched jacket: shoulder is forward on the LEFT, broad
+  // back curves to the right. Pale shirt and striped tie are recessed.
+  px(g, 13, 14, ink, 12, 11);
+  px(g, 12, 15, coatShadow, 12, 9);
+  px(g, 14, 14, coat, 9, 9);
+  px(g, 17, 14, coatLight, 4, 3);
+  px(g, 23, 17, coatShadow, 3, 6);
+  px(g, 15, 16, '#f1dfc6', 5, 7);
+  px(g, 16, 17, '#fff0da', 3, 5);
+  px(g, 17, 16, '#963d33', 2, 7);
+  px(g, 17, 18, '#c96553', 2, 1);
+  px(g, 17, 21, '#c96553', 2, 1);
+  px(g, 13, 16, coatLight, 3, 4); // left jacket lapel
+  px(g, 13, 19, coat, 4, 5);
+  px(g, 20, 16, coat, 3, 8);
+  px(g, 21, 17, coatLight, 1, 3);
+  px(g, 14, 23, coatShadow, 11, 2);
+  px(g, 14, 24, ink, 9, 1);
+
+  // Near arm reaches forward with a low open hand, then swings slightly.
+  if (step) {
+    px(g, 11, 16, ink, 4, 6);
+    px(g, 9, 19, coatShadow, 4, 5);
+    px(g, 8, 22, skinShadow, 4, 3);
+    px(g, 8, 22, skin, 3, 2);
+  } else {
+    px(g, 10, 17, ink, 5, 6);
+    px(g, 8, 20, coatShadow, 5, 5);
+    px(g, 7, 23, skinShadow, 5, 3);
+    px(g, 7, 23, skin, 4, 2);
+  }
+  px(g, step ? 8 : 7, step ? 23 : 24, skinLight, 2, 1);
+
+  // An original soft, forward-leaning 3/4 head. The little muzzle/nose
+  // projects LEFT, while the rear hairline remains on the RIGHT.
+  px(g, 8, 4, ink, 11, 10);
+  px(g, 5, 7, ink, 13, 8);
+  px(g, 4, 10, skinShadow, 12, 5);
+  px(g, 6, 6, skinShadow, 12, 8);
+  px(g, 7, 6, skin, 11, 8);
+  px(g, 5, 9, skin, 12, 5);
+  px(g, 6, 8, skinLight, 7, 3);
+  px(g, 4, 11, skin, 5, 2); // forward nose and cheek
+  px(g, 4, 12, skinLight, 3, 1);
+  px(g, 13, 11, skinShadow, 4, 3);
+  px(g, 16, 12, '#b37758', 2, 2);
+
+  // Uneven eyes (near larger than far) make the face three-quarter, not
+  // a symmetric forward-facing mask. Tiny jaw, teeth and goofy expression.
+  px(g, 6, 8, ink, 5, 5);
+  px(g, 7, 8, '#fff3db', 4, 4);
+  px(g, 8, 9, '#48372b', 2, 2);
+  px(g, 14, 8, ink, 3, 4);
+  px(g, 15, 9, '#fff0d6', 2, 2);
+  px(g, 15, 9, '#48372b', 1, 2);
+  px(g, 5, 13, ink, 9, 3);
+  px(g, 6, 13, '#86453b', 7, 2);
+  px(g, 7, 13, '#ffefdc', 2, 1);
+  px(g, 11, 13, '#ffefdc', 2, 1);
+  px(g, 7, 15, skinShadow, 7, 1);
+  px(g, 5, 11, '#8b563d', 2, 1); // nostril
+  px(g, 12, 11, '#e58f7c', 2, 1); // warm cheek
+
+  // Short uneven hair tufts silhouette the leaning upper head.
+  px(g, 8, 3, '#553a2d', 10, 3);
+  px(g, 9, 2, '#35271f', 7, 2);
+  px(g, 6, 5, '#553a2d', 3, 3);
+  px(g, 15, 3, '#7f583d', 4, 3);
+  px(g, 19, 6, '#35271f', 2, 3);
+  px(g, 18, 4, '#553a2d', 2, 2);
+}
+
 export function human(f: number, o: HumanAppearance): HTMLCanvasElement {
   return art(g => {
+    // Keep the other three Hoomans pixel-for-pixel unchanged until the
+    // new Customer's three-quarter silhouette has been approved.
+    if (o.x === '') {
+      drawBasicCustomer(g, f);
+      return;
+    }
     const role = o.x;
     const walking = f % 2 !== 0;
     const lead = walking ? 2 : 0;
