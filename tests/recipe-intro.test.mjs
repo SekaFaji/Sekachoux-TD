@@ -84,8 +84,10 @@ test('preview lineup covers actual potential wave types without pretending rando
       assert.deepEqual(previewActors(level),
         level.tutorial.flatMap(step => (step.spawn ?? []).map(enemy => enemy.kind)));
     } else {
-      assert.ok(previewActors(level).length >= 4 && previewActors(level).length <= 8);
+      assert.equal(previewActors(level).length, level.finalWaveSize,
+        'the street preview shows the level-defined final-wave size, not an invented 4-8 crowd');
       assert.ok(previewActors(level).length >= incomingKinds(level).length);
+      assert.ok(previewActors(level).every(kind => incomingKinds(level).includes(kind)));
     }
   });
 });
@@ -97,6 +99,9 @@ test('the camera keeps the lineup held, pans at constant size, then settles on t
   const app = readFileSync(new URL('../dist/ui/app.js', import.meta.url), 'utf8');
   assert.ok(app.includes('incomingKinds(level)'));
   assert.ok(app.includes('roster.replaceChildren()'));
+  assert.ok(app.includes('previewActors(level)'), 'intro count is derived from real preview actors');
+  assert.ok(app.includes("preview.length + ' SCRIPTED HOOMAN'"));
+  assert.ok(app.includes("preview.length + ' FINAL-WAVE SAMPLE'"));
   assert.ok(app.includes("this.engine.state.intro = .01"), 'no extra 2.6-second countdown after the camera');
   assert.ok(app.includes("data-action") || app.includes("intro.classList.toggle('lineup'"));
 });
@@ -113,4 +118,26 @@ test('street-side camera uses the actual continuous live room instead of a disti
   assert.equal(approachCamera(1).sourceWidth, 416);
   const html = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
   assert.ok(html.includes('id="approach-canvas" width="416" height="200"'));
+});
+
+
+test('preview counts and composition stay truthful for tutorials and every rush', () => {
+  for (const level of LEVELS) {
+    const samples = previewActors(level);
+    if (level.tutorial) {
+      const scripted = level.tutorial.flatMap(step => step.spawn ?? []);
+      assert.equal(samples.length, scripted.length);
+      assert.deepEqual(samples, scripted.map(enemy => enemy.kind));
+    } else {
+      assert.equal(samples.length, level.finalWaveSize, level.name);
+      assert.deepEqual([...new Set(samples)].sort(), [...incomingKinds(level)].sort());
+    }
+  }
+  const final = previewActors(LEVELS.at(-1));
+  const counts = Object.groupBy ? Object.groupBy(final, kind => kind) : null;
+  if (counts) for (const kind of incomingKinds(LEVELS.at(-1)))
+    assert.equal(counts[kind].length, 2, 'the four final-level Hooman kinds are evenly represented');
+  const renderer = readFileSync(new URL('../dist/art/approach.js', import.meta.url), 'utf8');
+  assert.ok(renderer.includes('const crowd = previewActors(level)'));
+  assert.ok(renderer.includes('for (let index = 0; index < count; index++)'));
 });
