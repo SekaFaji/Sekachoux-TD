@@ -46,7 +46,8 @@ test('Croissant sends crumb projectiles and makes a small hit burst without chan
   assert.ok(renderer.includes('croissantPoseForTimer(p.timer, hasTarget)'));
   assert.ok(renderer.includes("if (shot.ice)"));
   assert.ok(renderer.includes("if (f.kind === 'crumb')"));
-  assert.ok(sprites.includes('crumb-spitting muzzle'));
+  assert.ok(sprites.includes('No blaster, arm or other accessory'));
+  assert.ok(sprites.includes('the pastry is always the silhouette'));
 });
 
 test('Croissant windup, muzzle blast, and recoil are distinct and timed to real shots', async () => {
@@ -63,9 +64,12 @@ test('Croissant windup, muzzle blast, and recoil are distinct and timed to real 
   }
   const art = readFileSync(new URL('../dist/art/heroSprites.js', import.meta.url), 'utf8');
   const renderer = readFileSync(new URL('../dist/art/render.js', import.meta.url), 'utf8');
-  assert.ok(art.includes('Long, sharp, upturned crescent horns'));
-  assert.ok(art.includes('Distinct toasted fold on the right'));
-  assert.ok(art.includes('crumb-spitting muzzle'));
+  assert.ok(art.includes('A single unmistakable croissant outline'));
+  assert.ok(art.includes('Left tapered end'));
+  assert.ok(art.includes('Right tapered end'));
+  assert.ok(art.includes('Lamination:'));
+  assert.ok(art.includes('No blaster, arm or other accessory'));
+  assert.ok(renderer.includes('tipY = drawY + 14'));
   assert.ok(renderer.includes("croissantPoseForTimer(p.timer, hasTarget)"));
   assert.ok(renderer.includes("pose === 'fire'"));
   assert.ok(renderer.includes("pose === 'windup'"));
