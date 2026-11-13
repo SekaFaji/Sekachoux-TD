@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.11 - Croissant sprite rebuilt from supplied side-profile reference (2026-11-13)
+
+- Replace the previous front-facing character Croissant with an original 32x32 sprite based on the provided L-curved side-view silhouette: long laminated top, hooked right tip and hanging, inward-tapered lower arm.
+- Remove all eyes, legs, arms and idle gun. Use a bold dark pixel outline and clean blocks of bright butter yellow, caramel orange and deep toasted-brown fold bands.
+- Keep the idle, windup, fire and recoil frames on the exact same authentic croissant silhouette; animate only a tiny crust highlight at the firing tip. Existing flying crumb shots and impact effects remain.
+- Preserve tower costs, health, attack timing, damage, game rules, UI layout, campaign unlocks, and save compatibility.
+- Add pixel-level procedural sprite tests for silhouette coordinates, transparency and pose consistency; continue using one sprite atlas for gameplay, cards and Recipe Book.
+
 ## 0.9.10 - Croissant pastry-first rebuild (2026-11-13)
 
 - Replace the previous bread-creature and permanent crumb-blaster art with a new hand-painted 32x32 croissant built around a low, wide, golden crescent and two short inward-curled tips.
