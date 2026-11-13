@@ -157,7 +157,7 @@ export function human(f: number, o: HumanAppearance): HTMLCanvasElement {
     px(g, 19, 9, '#443129', 1, 2);
     px(g, 12, 12, '#e79a86', 2, 1);
     px(g, 20, 12, '#e79a86', 2, 1);
-    px(g, 15, 13, 4, 1, '#895947');
+    px(g, 15, 13, '#895947', 4, 1);
 
     if (role === '') {
       // Hungry Customer: blue overcoat, bright scarf and paper takeaway bag.
