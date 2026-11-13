@@ -61,13 +61,14 @@ export function drawBattlefield(canvas: HTMLCanvasElement, state: GameState, lev
     const recoil = pose === 'fire' ? -2 : pose === 'recoil' ? -1 : pose === 'windup' ? 1 : 0;
     x.drawImage(sprites.images[poseKey], p.column * TILE + recoil, drawY);
     if (p.kind === 'croissant' && pose === 'fire') {
-      // The flash lives at the pastry barrel; short enough to read as a shot.
-      const muzzleX = p.column * TILE + 30, muzzleY = drawY + 20;
-      x.fillStyle = '#fff9d7'; x.fillRect(muzzleX, muzzleY - 1, 4, 3);
-      x.fillStyle = '#ffd57b'; x.fillRect(muzzleX + 3, muzzleY, 4, 1);
-      x.fillRect(muzzleX + 1, muzzleY - 4, 2, 2);
-      x.fillRect(muzzleX + 1, muzzleY + 3, 2, 2);
-      x.fillStyle = '#bc7036'; x.fillRect(muzzleX + 6, muzzleY - 2, 2, 2);
+      // The croissant's tip releases a quick flaky burst, not a gun muzzle.
+      // Its centre lines up with the real crumb projectile at lane +18px.
+      const tipX = p.column * TILE + 30, tipY = drawY + 14;
+      x.fillStyle = '#fff4c2'; x.fillRect(tipX, tipY - 1, 3, 3);
+      x.fillStyle = '#f8cd7c'; x.fillRect(tipX + 3, tipY, 3, 2);
+      x.fillRect(tipX + 1, tipY - 4, 2, 2);
+      x.fillRect(tipX + 1, tipY + 3, 2, 2);
+      x.fillStyle = '#a75b2b'; x.fillRect(tipX + 6, tipY - 2, 2, 2);
     }
     x.globalAlpha = 1;
   }
