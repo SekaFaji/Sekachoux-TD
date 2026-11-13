@@ -161,7 +161,7 @@ export function croissantSprite(pose: CroissantPose = 'idle'): HTMLCanvasElement
     rect(g, 30, barrelY, 2, 4, C.roast);
     rect(g, 31, barrelY + 1, 1, 2, C.light);
     rect(g, 26, barrelY + 3, 2, 2, C.gold);
-    // Crumb-spitting muzzle, clearly distinct from the croissant's horn.
+    // crumb-spitting muzzle, clearly distinct from the croissant's horn.
     if (firing) {
       rect(g, 24, 22, 3, 2, C.honey);
       rect(g, 22, 24, 2, 1, C.caramel); // compressed recoil fold
