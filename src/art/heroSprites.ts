@@ -26,7 +26,7 @@ function line(g:C,coords:number[],color:string,width=1):void {
   for(let i=2;i<coords.length;i+=2)g.lineTo(coords[i]+.5,coords[i+1]+.5);
   g.stroke();
 }
-function sprite(draw:(g:C)=>void):HTMLCanvasElement {
+function sprite(draw:(g:C)=>void, addOutline=true):HTMLCanvasElement {
   const canvas=document.createElement('canvas');
   canvas.width=32;canvas.height=32;
   const g=canvas.getContext('2d');
@@ -40,7 +40,7 @@ function sprite(draw:(g:C)=>void):HTMLCanvasElement {
     if(occupied(x-1,y)||occupied(x+1,y)||occupied(x,y-1)||occupied(x,y+1))
       rect(g,x,y,1,1,INK);
   }
-  return canvas;
+  return addOutline ? outline(canvas) : canvas;
 }
 
 /**
@@ -57,118 +57,87 @@ export function croissantPoseForTimer(timer: number, targetAhead: boolean): Croi
 }
 
 /**
- * Pastry-first silhouette: a low, wide crescent with two short curled tips.
- * Three overlapping, diagonal laminated rolls provide the croissant identity.
- * No blaster, arm or other accessory is present in the idle sprite.
+ * Reference-led side profile, not a character with crescent horns.
+ * The horizontal laminated crown bends around into a vertical left-hand tail.
+ * No eyes, feet or weapon: the croissant itself is the entire silhouette.
+ * Rows are left/right extents of filled pixels in a 29x27 reference grid.
+ */
+export const CROISSANT_PROFILE: ReadonlyArray<readonly [number, number]> = [
+  [10,18], [9,20], [7,22], [6,24], [5,25], [4,26], [3,27],
+  [3,27], [2,28], [2,28], [2,28], [2,28], [2,21], [2,18],
+  [2,17], [2,16], [2,15], [2,14], [2,14], [3,14], [3,13],
+  [4,13], [5,13], [6,12], [7,12], [8,12], [9,11],
+];
+
+const CROISSANT_COLORS = {
+  outline: '#1b120b',
+  toasted: '#874319',
+  crust: '#aa5416',
+  amber: '#cd7418',
+  orange: '#ee9416',
+  gold: '#ffb51d',
+  butter: '#ffdb39',
+  highlight: '#fff052',
+} as const;
+
+/**
+ * A pure, crisp pixel-grid sprite in the photographed croissant's side-view
+ * orientation. Every fold stays inside the pastry mask, never on a floating
+ * face or accessory. The rightmost tip provides the crumb firing origin.
  */
 export function croissantSprite(pose: CroissantPose = 'idle'): HTMLCanvasElement {
   return sprite(g => {
-    const winding = pose === 'windup';
-    const firing = pose === 'fire';
-    const recoiling = pose === 'recoil';
+    const spans = CROISSANT_PROFILE;
+    for (let y = 0; y < spans.length; y++) {
+      const [left, right] = spans[y];
+      for (let x = left; x <= right; x++) {
+        const top = y > 0 ? spans[y - 1] : null;
+        const bottom = y < spans.length - 1 ? spans[y + 1] : null;
+        const border = x === left || x === right || !top || !bottom ||
+          x < top[0] || x > top[1] || x < bottom[0] || x > bottom[1];
 
-    // Only tiny, largely hidden feet: the pastry is always the silhouette.
-    rect(g, 11, 25, 4, 3, C.roast);
-    rect(g, 20, 25, 4, 3, C.roast);
-    rect(g, 10, 27, 6, 2, C.boot);
-    rect(g, 19, 27, 6, 2, C.boot);
-    rect(g, 12, 26, 2, 1, C.gold);
-    rect(g, 21, 26, 2, 1, C.gold);
+        // Broad golden flakes and deeply baked fold bands, matching the
+        // example's high-contrast orange/yellow/brown palette.
+        let color: string = CROISSANT_COLORS.orange;
+        if (y <= 3) color = CROISSANT_COLORS.gold;
+        if (x >= 6 && x <= 12 && y >= 11) color = CROISSANT_COLORS.gold;
+        if (x <= 10 && y >= 17) color = CROISSANT_COLORS.gold;
+        if (x >= 10 && x <= 19 && y >= 3 && y <= 10) color = CROISSANT_COLORS.gold;
+        if (x >= 13 && x <= 20 && y >= 4 && y <= 8) color = CROISSANT_COLORS.butter;
+        if (x >= 4 && x <= 8 && y >= 12 && y <= 19) color = CROISSANT_COLORS.gold;
+        if (x >= 6 && x <= 11 && y >= 18 && y <= 24) color = CROISSANT_COLORS.butter;
+        if (x >= 9 && x <= 14 && y >= 10 && y <= 16) color = CROISSANT_COLORS.butter;
+        if (x >= 6 && x <= 10 && y >= 7 && y <= 10) color = CROISSANT_COLORS.butter;
 
-    // A single unmistakable croissant outline: pointed side tips, generous
-    // plump centre and an arched upper edge. No tall bull-like horns.
-    shape(g, [
-      1, 12, 2, 10, 4, 10, 7, 12, 9, 10, 12, 8,
-      16, 7, 20, 8, 23, 10, 26, 12, 28, 10,
-      30, 10, 31, 12, 31, 15, 29, 18, 26, 20,
-      23, 22, 21, 25, 19, 26, 13, 26, 10, 24,
-      8, 22, 5, 20, 3, 18, 1, 15,
-    ], C.crust);
+        // One vertical seam on each rolled segment plus two clear bands on
+        // the hanging tail: individual folds, not noisy random pixel marks.
+        if ((x === 15 || x === 16) && y >= 2 && y <= 8 ||
+            (x === 21 || x === 22) && y >= 4 && y <= 9 ||
+            (x === 9 || x === 10) && y >= 5 && y <= 10 ||
+            (y === 16 || y === 21) && x >= 4 && x <= 13) {
+          color = CROISSANT_COLORS.toasted;
+        }
+        if (x > 24 && y > 7) color = CROISSANT_COLORS.crust;
+        if (x < 5 && y > 12 || x > 23 && y < 7) color = CROISSANT_COLORS.amber;
 
-    // Left tapered end: its thin pointed tip curls toward the middle.
-    shape(g, [
-      2, 12, 4, 11, 7, 14, 9, 14, 11, 17,
-      10, 21, 7, 20, 4, 17, 2, 15,
-    ], C.caramel);
-    shape(g, [3, 12, 5, 12, 8, 15, 9, 18, 7, 18, 4, 15], C.gold);
-    line(g, [3, 12, 5, 13, 6, 14], C.honey);
-    rect(g, 4, 12, 1, 1, C.light);
-    shape(g, [6, 17, 9, 19, 10, 22, 8, 21, 5, 19], C.roast);
-
-    // Right tapered end, curved back toward the central baked roll.
-    shape(g, [
-      23, 15, 26, 13, 29, 11, 30, 12,
-      30, 15, 28, 18, 25, 20, 22, 21,
-    ], C.caramel);
-    shape(g, [25, 14, 28, 12, 30, 13, 29, 16, 26, 18, 23, 19], C.gold);
-    line(g, [27, 13, 29, 12], C.light);
-    shape(g, [23, 19, 26, 20, 28, 18, 26, 21, 23, 23], C.roast);
-
-    // The fat central roll has its own toasted outer rim and buttery dome.
-    shape(g, [
-      8, 15, 9, 12, 12, 9, 16, 8, 20, 9, 23, 12,
-      25, 16, 24, 21, 21, 24, 18, 25,
-      13, 25, 10, 23, 8, 20,
-    ], C.roast);
-    shape(g, [
-      9, 15, 11, 12, 14, 10, 17, 9, 20, 10,
-      23, 13, 23, 20, 20, 23, 17, 24,
-      13, 23, 10, 21,
-    ], C.caramel);
-    shape(g, [
-      11, 14, 14, 11, 17, 10, 20, 11, 22, 14,
-      21, 18, 12, 18,
-    ], C.gold);
-    shape(g, [13, 12, 16, 10, 19, 11, 21, 13, 18, 13, 15, 14], C.honey);
-    line(g, [14, 11, 17, 10, 19, 11], C.light);
-
-    // Lamination: the three rolled sections have distinct dark seams and
-    // crisp butter highlights. These folds must read at native 32px size.
-    shape(g, [10, 12, 12, 13, 13, 17, 12, 21, 10, 23, 9, 20], C.crust);
-    line(g, [11, 12, 12, 15, 12, 18], C.roast);
-    line(g, [10, 16, 10, 19], C.honey);
-    shape(g, [19, 11, 21, 12, 23, 16, 23, 20, 21, 23, 19, 23, 21, 18], C.crust);
-    line(g, [20, 12, 21, 15, 22, 18], C.roast);
-    line(g, [23, 15, 23, 18], C.honey);
-    // A small brighter fold on the rounded lower front.
-    shape(g, [13, 18, 16, 17, 19, 18, 20, 21, 18, 23, 14, 23, 12, 21], C.gold);
-    rect(g, 14, 18, 4, 1, C.honey);
-    rect(g, 16, 13, 2, 1, C.light);
-    rect(g, 15, 10, 1, 1, C.flour);
-
-    // The face sits below the dough folds; no oversized cartoon eyes.
-    rect(g, 14, 19, 2, 2, C.ink);
-    rect(g, 19, 19, 2, 2, C.ink);
-    rect(g, 13, 21, 1, 1, C.cheek);
-    rect(g, 21, 21, 1, 1, C.cheek);
-    if (firing) {
-      rect(g, 17, 21, 2, 2, C.ink);
-      rect(g, 17, 23, 1, 1, C.flour);
-    } else if (winding) {
-      rect(g, 16, 22, 3, 1, C.ink);
-      rect(g, 13, 18, 3, 1, C.roast);
-      rect(g, 19, 18, 3, 1, C.roast);
-    } else {
-      rect(g, 16, 22, 4, 1, C.ink);
-      rect(g, 17, 23, 2, 1, C.flour);
+        // Firing changes only a few crust pixels on the right-hand tip.
+        // The entire filled mask and black silhouette stay unchanged.
+        if (!border && x >= 24 && y >= 8 && y <= 11) {
+          if (pose === 'windup') color = CROISSANT_COLORS.butter;
+          if (pose === 'fire') color = CROISSANT_COLORS.highlight;
+          if (pose === 'recoil') color = CROISSANT_COLORS.toasted;
+        }
+        if (border) color = CROISSANT_COLORS.outline;
+        rect(g, x + 1, y + 2, 1, 1, color);
+      }
     }
 
-    // Animation changes only pastry layers, never adds a permanent gun.
-    if (winding) {
-      // The right point lifts slightly before launching its flaky crust.
-      shape(g, [25, 13, 29, 9, 31, 9, 31, 11, 28, 14], C.gold);
-      line(g, [27, 12, 29, 10], C.light);
-    } else if (firing) {
-      // The leading tip flicks forward; the renderer supplies flying crumbs.
-      shape(g, [25, 14, 29, 12, 31, 13, 31, 16, 28, 18], C.honey);
-      rect(g, 30, 14, 2, 2, C.light);
-      rect(g, 29, 17, 2, 1, C.gold);
-    } else if (recoiling) {
-      // Dough compresses and springs back to the same recognizable shape.
-      shape(g, [26, 15, 29, 13, 30, 16, 27, 19, 25, 19], C.roast);
-      rect(g, 27, 15, 2, 1, C.gold);
+    // Highlights in the broad front roll make it read at HUD-card size.
+    if (pose === 'idle' || pose === 'windup') {
+      rect(g, 13, 7, 2, 1, CROISSANT_COLORS.highlight);
+      rect(g, 10, 23, 2, 1, CROISSANT_COLORS.highlight);
     }
-  });
+  }, false);
 }
 
 /** A broad, scored, sturdy whole loaf. Separate identity from future Baguette. */
