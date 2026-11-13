@@ -46,7 +46,7 @@ test('Croissant sends crumb projectiles and makes a small hit burst without chan
   assert.ok(renderer.includes('croissantPoseForTimer(p.timer, hasTarget)'));
   assert.ok(renderer.includes("if (shot.ice)"));
   assert.ok(renderer.includes("if (f.kind === 'crumb')"));
-  assert.ok(sprites.includes('No eyes, feet or weapon'));
+  assert.ok(sprites.includes('Butter-family Croissant'));
   assert.ok(sprites.includes('CROISSANT_PROFILE'));
 });
 
@@ -65,9 +65,9 @@ test('Croissant windup, muzzle blast, and recoil are distinct and timed to real 
   const art = readFileSync(new URL('../dist/art/heroSprites.js', import.meta.url), 'utf8');
   const renderer = readFileSync(new URL('../dist/art/render.js', import.meta.url), 'utf8');
   assert.ok(art.includes('Reference-led side profile'));
-  assert.ok(art.includes('the croissant itself is the entire silhouette'.replace('the croissant', 'The croissant')) === false || art.includes('croissant itself is the entire silhouette'));
-  assert.ok(art.includes('vertical seam on each rolled segment'));
-  assert.ok(art.includes('No eyes, feet or weapon'));
+  assert.ok(art.includes('its tiny face is drawn inside the lower curl'));
+  assert.ok(art.includes('two readable folded bands'));
+  assert.ok(art.includes('No arms, feet or gun'));
   assert.ok(renderer.includes('tipY = drawY + 14'));
   assert.ok(renderer.includes("croissantPoseForTimer(p.timer, hasTarget)"));
   assert.ok(renderer.includes("pose === 'fire'"));
@@ -75,7 +75,7 @@ test('Croissant windup, muzzle blast, and recoil are distinct and timed to real 
   assert.ok(renderer.includes('Math.floor(shot.x * 5)'));
 });
 
-test('reference silhouette renders one side-view croissant with no extra face or limbs', async () => {
+test('Butter-family croissant keeps its reference silhouette with a tiny face and shared palette', async () => {
   const { CROISSANT_PROFILE, croissantSprite } = await import('../dist/art/heroSprites.js');
   assert.equal(CROISSANT_PROFILE.length, 27);
   assert.deepEqual(CROISSANT_PROFILE[0], [10, 18], 'top ridge is narrow');
@@ -114,14 +114,23 @@ test('reference silhouette renders one side-view croissant with no extra face or
     const positions = [...idle.keys()].sort();
     assert.equal(positions.length, CROISSANT_PROFILE.reduce((sum, [l, r]) => sum + r - l + 1, 0));
     for (const variant of [windup, fire, recoil])
-      assert.deepEqual([...variant.keys()].sort(), positions, 'attack never adds legs, faces or guns');
-    assert.equal(idle.get('11,2'), '#1b120b', 'top edge is bold dark outline');
+      assert.deepEqual([...variant.keys()].sort(), positions, 'firing does not add limbs, a gun or outside pixels');
+    assert.equal(idle.get('11,2'), '#2b1608', 'outlines match Butter family chocolate-brown');
     assert.ok(idle.has('29,12'), 'long upper tip is solid croissant');
     assert.ok(!idle.has('29,19'), 'inside of croissant curl is transparent');
     assert.ok(idle.has('11,28'), 'hanging tapered tail remains visible');
     assert.ok(!idle.has('22,28'), 'no second foot under the tail');
     assert.notEqual(idle.get('27,11'), fire.get('27,11'), 'firing only changes tip shading');
-    assert.ok(new Set(idle.values()).size >= 6, 'folds have readable gold-toasted contrast');
+    assert.equal(idle.get('14,7'), '#fff4b9', 'Butter-style cream highlight on the upper roll');
+    assert.equal(idle.get('6,19'), '#514234', 'eye reuses Butter Block facial tone');
+    assert.equal(idle.get('11,19'), '#514234', 'matching second eye');
+    assert.equal(idle.get('5,22'), '#d97868', 'cheek reuses Butter Block accent');
+    assert.equal(idle.get('9,22'), '#845b38', 'tiny smile reuses Butter Block facial shading');
+    assert.notEqual(fire.get('9,22'), idle.get('9,22'), 'firing expression changes inside the croissant');
+    assert.ok(new Set(idle.values()).size >= 7, 'folds retain broad warm colors and contrast');
+    const butterSource = readFileSync(new URL('../dist/art/sprites.js', import.meta.url), 'utf8');
+    for (const shared of ['#2b1608', '#514234', '#d97868', '#fff4b9'])
+      assert.ok(butterSource.includes(shared), 'Croissant palette must be sourced from Butter style: ' + shared);
   } finally {
     if (originalDocument === undefined) delete globalThis.document;
     else globalThis.document = originalDocument;
