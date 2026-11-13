@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.10 - Croissant pastry-first rebuild (2026-11-13)
+
+- Replace the previous bread-creature and permanent crumb-blaster art with a new hand-painted 32x32 croissant built around a low, wide, golden crescent and two short inward-curled tips.
+- Give it a rounded buttery middle, distinctly tapered ends, three readable laminated rolls, toasted seams and restrained face details so the silhouette remains recognizable at HUD and gameplay size.
+- Keep the idle sprite free of guns, barrels and accessories. The existing windup/fire/recoil phases instead animate the croissant's own flaky right-hand tip when it launches crumbs.
+- Move the brief firing flash to the actual croissant tip and align it vertically with outgoing crumb projectiles.
+- Preserve firing rate, damage, health, cost, game progression, menu, royalty, battlefield layout and save compatibility.
+- Update art regression tests to enforce the new pastry-first design intent without changing unrelated sprites.
+
 ## 0.9.9 - Croissant pixel-art redesign and three-stage shot animation (2026-11-13)
 
 - Redraw the Croissant sprite in the original 32x32 canvas with a stronger upturned crescent, clearer laminated folds, toasted crust edges, subtle flour details and expressive pastry face.
