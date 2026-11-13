@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.14 - Croissant outline and menu scale cleanup (2026-11-13)
+
+- Retain the Royal Chouquette-inspired Croissant sprite and add the same restrained, one-pixel chocolate-brown edge treatment that defines Butter and other bakery units. The existing warm colors, facial expression and attack timing stay unchanged.
+- Correct the main menu's oversized Croissant: reduce its title-scene draw size from 49px to 35px, position it neatly on the bakery counter between Loaf and Butter, and resize its contact shadow to match.
+- Keep the true native 32x32 Croissant, gameplay size, cards, balance, other sprites, save data and board layout unchanged.
+- Extend sprite pixel regressions with alpha-aware outline tests and add a main-menu scale regression test.
+
 ## 0.9.13 - Royal Chouquette family Croissant art (2026-11-13)
 
 - Rebuild the Croissant's 32x32 pixel art to match the real Royal Chouquettes' existing pixel-art language instead of the previous hard-edged reference sprite.
