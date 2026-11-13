@@ -48,13 +48,36 @@ export function incomingKinds(level: Level): EnemyKind[] {
   return kinds.filter((kind, index) => level.weights[index] > 0);
 }
 
-/** Representative lineup; random-wave enemy COUNTS aren't predetermined. */
+/**
+ * One sample actor per Hooman in the level's final-wave size.
+ * Tutorials use each exact scripted spawn, including duplicates. Rush waves
+ * have random composition, so a sample includes every possible enemy kind
+ * then fills the remaining positions using the level's actual spawn weights.
+ * The sample count is exact for finalWaveSize, not a claim about the
+ * randomized composition or the total number spawned across the shift.
+ */
 export function previewActors(level: Level): EnemyKind[] {
-  if (level.tutorial) return level.tutorial.flatMap(step => (step.spawn ?? []).map(actor => actor.kind));
+  if (level.tutorial)
+    return level.tutorial.flatMap(step => (step.spawn ?? []).map(actor => actor.kind));
   const kinds = incomingKinds(level);
-  if (!kinds.length) return [];
-  const previewCount = Math.min(8, Math.max(4, kinds.length * 2));
-  return Array.from({ length: previewCount }, (_, index) => kinds[index % kinds.length]);
+  if (!kinds.length || level.finalWaveSize <= 0) return [];
+  const target = Math.max(kinds.length, level.finalWaveSize);
+  const lineup: EnemyKind[] = [...kinds];
+  const orderedKinds = Object.keys(ENEMIES) as EnemyKind[];
+  const relativeWeight = (kind: EnemyKind) => level.weights[orderedKinds.indexOf(kind)] ?? 0;
+  const totalWeight = kinds.reduce((sum, kind) => sum + relativeWeight(kind), 0);
+  while (lineup.length < target) {
+    // Choose whichever kind is most under-represented relative to the
+    // actual weights, tie-breaking by the stable catalog order.
+    let next = kinds[0], greatestShortfall = -Infinity;
+    for (const kind of kinds) {
+      const expected = totalWeight ? relativeWeight(kind) / totalWeight * target : target / kinds.length;
+      const shortfall = expected - lineup.filter(existing => existing === kind).length;
+      if (shortfall > greatestShortfall) { next = kind; greatestShortfall = shortfall; }
+    }
+    lineup.push(next);
+  }
+  return lineup;
 }
 
 /** Persistent live scene drawn once per preview frame, with a long street beyond it. */
