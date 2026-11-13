@@ -61,7 +61,7 @@ export function croissantPoseForTimer(timer: number, targetAhead: boolean): Croi
 /**
  * Reference-led side profile, not a character with crescent horns.
  * The horizontal laminated crown bends around into a vertical left-hand tail.
- * No eyes, feet or weapon: the croissant itself is the entire silhouette.
+ * No arms, feet or gun: its tiny face is drawn inside the lower curl.
  * Rows are left/right extents of filled pixels in a 29x27 reference grid.
  */
 export const CROISSANT_PROFILE: ReadonlyArray<readonly [number, number]> = [
@@ -72,20 +72,25 @@ export const CROISSANT_PROFILE: ReadonlyArray<readonly [number, number]> = [
 ];
 
 const CROISSANT_COLORS = {
-  outline: '#1b120b',
-  toasted: '#874319',
-  crust: '#aa5416',
-  amber: '#cd7418',
-  orange: '#ee9416',
-  gold: '#ffb51d',
-  butter: '#ffdb39',
-  highlight: '#fff052',
+  // Butter's outline and facial tones, with a warmer toasted-pastry body.
+  outline: '#2b1608',
+  shadow: '#845b38',
+  toast: '#b3681f',
+  caramel: '#d99a3b',
+  gold: '#e9ae4e',
+  butter: '#ffd36c',
+  light: '#ffe493',
+  highlight: '#fff4b9',
+  eye: '#514234',
+  smile: '#845b38',
+  cheek: '#d97868',
 } as const;
 
 /**
- * A pure, crisp pixel-grid sprite in the photographed croissant's side-view
- * orientation. Every fold stays inside the pastry mask, never on a floating
- * face or accessory. The rightmost tip provides the crumb firing origin.
+ * Butter-family Croissant. Preserve the supplied side-view croissant profile
+ * while using Butter Block's soft chocolate outline, chunky golden shading,
+ * two readable folded bands and a tiny sweet face on the hanging pastry.
+ * No arms, feet or idle weapon; the tip itself launches crumb projectiles.
  */
 export function croissantSprite(pose: CroissantPose = 'idle'): HTMLCanvasElement {
   return sprite(g => {
@@ -93,51 +98,58 @@ export function croissantSprite(pose: CroissantPose = 'idle'): HTMLCanvasElement
     for (let y = 0; y < spans.length; y++) {
       const [left, right] = spans[y];
       for (let x = left; x <= right; x++) {
-        const top = y > 0 ? spans[y - 1] : null;
-        const bottom = y < spans.length - 1 ? spans[y + 1] : null;
-        const border = x === left || x === right || !top || !bottom ||
-          x < top[0] || x > top[1] || x < bottom[0] || x > bottom[1];
+        const above = y > 0 ? spans[y - 1] : null;
+        const below = y < spans.length - 1 ? spans[y + 1] : null;
+        const edge = x === left || x === right || !above || !below ||
+          x < above[0] || x > above[1] || x < below[0] || x > below[1];
 
-        // Broad golden flakes and deeply baked fold bands, matching the
-        // example's high-contrast orange/yellow/brown palette.
-        let color: string = CROISSANT_COLORS.orange;
-        if (y <= 3) color = CROISSANT_COLORS.gold;
-        if (x >= 6 && x <= 12 && y >= 11) color = CROISSANT_COLORS.gold;
-        if (x <= 10 && y >= 17) color = CROISSANT_COLORS.gold;
-        if (x >= 10 && x <= 19 && y >= 3 && y <= 10) color = CROISSANT_COLORS.gold;
-        if (x >= 13 && x <= 20 && y >= 4 && y <= 8) color = CROISSANT_COLORS.butter;
-        if (x >= 4 && x <= 8 && y >= 12 && y <= 19) color = CROISSANT_COLORS.gold;
-        if (x >= 6 && x <= 11 && y >= 18 && y <= 24) color = CROISSANT_COLORS.butter;
-        if (x >= 9 && x <= 14 && y >= 10 && y <= 16) color = CROISSANT_COLORS.butter;
-        if (x >= 6 && x <= 10 && y >= 7 && y <= 10) color = CROISSANT_COLORS.butter;
+        // The Butter Block uses broad blocks of yellow with warm side shadow:
+        // use exactly that rendering language on a gently toasted crust.
+        let color: string = CROISSANT_COLORS.caramel;
+        if (y <= 3 || x >= 11 && y <= 10) color = CROISSANT_COLORS.gold;
+        if (x >= 8 && x <= 19 && y >= 4 && y <= 12) color = CROISSANT_COLORS.butter;
+        if (x >= 5 && x <= 12 && y >= 12 && y <= 23) color = CROISSANT_COLORS.butter;
+        if (x >= 12 && x <= 18 && y >= 3 && y <= 8) color = CROISSANT_COLORS.light;
+        if (x >= 6 && x <= 10 && y >= 15 && y <= 21) color = CROISSANT_COLORS.light;
+        if (x >= 23 && y >= 5 && y <= 10) color = CROISSANT_COLORS.gold;
+        if (x <= 4 && y >= 11 || x >= 24 && y >= 9) color = CROISSANT_COLORS.toast;
 
-        // One vertical seam on each rolled segment plus two clear bands on
-        // the hanging tail: individual folds, not noisy random pixel marks.
-        if ((x === 15 || x === 16) && y >= 2 && y <= 8 ||
-            (x === 21 || x === 22) && y >= 4 && y <= 9 ||
-            (x === 9 || x === 10) && y >= 5 && y <= 10 ||
-            (y === 16 || y === 21) && x >= 4 && x <= 13) {
-          color = CROISSANT_COLORS.toasted;
-        }
-        if (x > 24 && y > 7) color = CROISSANT_COLORS.crust;
-        if (x < 5 && y > 12 || x > 23 && y < 7) color = CROISSANT_COLORS.amber;
+        // Two big pastry folds along the upper roll, and two on the lower
+        // curl. Crisp warm shadow instead of the previous harsh black lines.
+        const upperFold = (x === 12 && y >= 4 && y <= 10) ||
+          (x === 21 && y >= 4 && y <= 9);
+        const lowerFold = (y === 14 && x >= 4 && x <= 12) ||
+          (y === 23 && x >= 7 && x <= 11);
+        if (upperFold || lowerFold) color = CROISSANT_COLORS.shadow;
 
-        // Firing changes only a few crust pixels on the right-hand tip.
-        // The entire filled mask and black silhouette stay unchanged.
-        if (!border && x >= 24 && y >= 8 && y <= 11) {
-          if (pose === 'windup') color = CROISSANT_COLORS.butter;
+        // Keep the shooting pose contained inside the pastry silhouette.
+        if (!edge && x >= 24 && y >= 8 && y <= 11) {
+          if (pose === 'windup') color = CROISSANT_COLORS.light;
           if (pose === 'fire') color = CROISSANT_COLORS.highlight;
-          if (pose === 'recoil') color = CROISSANT_COLORS.toasted;
+          if (pose === 'recoil') color = CROISSANT_COLORS.shadow;
         }
-        if (border) color = CROISSANT_COLORS.outline;
+        if (edge) color = CROISSANT_COLORS.outline;
         rect(g, x + 1, y + 2, 1, 1, color);
       }
     }
 
-    // Highlights in the broad front roll make it read at HUD-card size.
-    if (pose === 'idle' || pose === 'windup') {
-      rect(g, 13, 7, 2, 1, CROISSANT_COLORS.highlight);
-      rect(g, 10, 23, 2, 1, CROISSANT_COLORS.highlight);
+    // Butter-like highlight clusters: one on the crown, one on the curled
+    // tail. Both are fully inside the original croissant silhouette.
+    rect(g, 14, 7, 3, 2, CROISSANT_COLORS.highlight);
+    rect(g, 7, 16, 3, 1, CROISSANT_COLORS.highlight);
+
+    // Same tiny eye and blush colors as Butter Block. Place the face on the
+    // thick lower curl, without changing the unmistakable croissant outline.
+    rect(g, 6, 19, 2, pose === 'windup' ? 1 : 2, CROISSANT_COLORS.eye);
+    rect(g, 11, 19, 2, pose === 'windup' ? 1 : 2, CROISSANT_COLORS.eye);
+    rect(g, 5, 22, 1, 1, CROISSANT_COLORS.cheek);
+    rect(g, 13, 22, 1, 1, CROISSANT_COLORS.cheek);
+    if (pose === 'fire') {
+      rect(g, 9, 22, 2, 2, CROISSANT_COLORS.smile);
+      rect(g, 9, 23, 1, 1, CROISSANT_COLORS.highlight);
+    } else {
+      rect(g, 8, 22, 3, 1, CROISSANT_COLORS.smile);
+      rect(g, 9, 23, 1, 1, CROISSANT_COLORS.smile);
     }
   }, false);
 }

@@ -64,11 +64,12 @@ export function drawBattlefield(canvas: HTMLCanvasElement, state: GameState, lev
       // The croissant's tip releases a quick flaky burst, not a gun muzzle.
       // Its centre lines up with the real crumb projectile at lane +18px.
       const tipX = p.column * TILE + 30, tipY = drawY + 14;
-      x.fillStyle = '#fff4c2'; x.fillRect(tipX, tipY - 1, 3, 3);
-      x.fillStyle = '#f8cd7c'; x.fillRect(tipX + 3, tipY, 3, 2);
+      // Butter's soft cream glint and honey-colored pixels, not a gun muzzle.
+      x.fillStyle = '#fff7d3'; x.fillRect(tipX, tipY - 1, 3, 3);
+      x.fillStyle = '#ffe493'; x.fillRect(tipX + 3, tipY, 3, 2);
       x.fillRect(tipX + 1, tipY - 4, 2, 2);
       x.fillRect(tipX + 1, tipY + 3, 2, 2);
-      x.fillStyle = '#a75b2b'; x.fillRect(tipX + 6, tipY - 2, 2, 2);
+      x.fillStyle = '#d99a3b'; x.fillRect(tipX + 6, tipY - 2, 2, 2);
     }
     x.globalAlpha = 1;
   }
@@ -84,16 +85,14 @@ export function drawBattlefield(canvas: HTMLCanvasElement, state: GameState, lev
       x.fillStyle = OL; x.fillRect(sx - 1, sy - 1, 6, 6);
       x.fillStyle = '#8fe3ff'; x.fillRect(sx, sy, 4, 4);
     } else {
-      // Irregular baked-crumb ammunition: compact crust core, flaky orbiting
-      // chips, and a one-pixel trail that tumbles as the projectile moves.
+      // A compact golden crust crumb with two clear trailing flakes.
       const wobble = Math.floor(shot.x * 5) % 2;
-      x.fillStyle = '#683a20'; x.fillRect(sx - 1, sy - 2, 6, 5);
-      x.fillStyle = '#d48c43'; x.fillRect(sx, sy - 1, 5, 3);
-      x.fillStyle = '#ffdc91'; x.fillRect(sx + 1, sy - 2, 3, 2);
-      x.fillStyle = '#fff0bd'; x.fillRect(sx + 2, sy - 2, 1, 1);
-      x.fillStyle = '#b66f34'; x.fillRect(sx - 5, sy + wobble, 2, 2);
-      x.fillStyle = '#edb65f'; x.fillRect(sx - 8, sy - 3 + wobble, 2, 1);
-      x.fillStyle = '#f6d79d'; x.fillRect(sx - 10, sy + 2 - wobble, 1, 1);
+      x.fillStyle = '#845b38'; x.fillRect(sx - 1, sy - 1, 5, 4);
+      x.fillStyle = '#d99a3b'; x.fillRect(sx, sy - 1, 4, 3);
+      x.fillStyle = '#ffd36c'; x.fillRect(sx + 1, sy - 1, 2, 2);
+      x.fillStyle = '#fff4b9'; x.fillRect(sx + 1, sy - 1, 1, 1);
+      x.fillStyle = '#e9ae4e'; x.fillRect(sx - 4, sy + wobble, 2, 1);
+      x.fillStyle = '#ffe493'; x.fillRect(sx - 7, sy - 2 + wobble, 1, 1);
     }
   }
   // Butter is a small collectible pat, with restrained sparkle and transparent silhouette.
