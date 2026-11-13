@@ -1,5 +1,5 @@
 import { createSpriteAtlas, drawBattlefield, type SpriteAtlas } from '../art/render.js';
-import { APPROACH_DURATION_MS, APPROACH_HOLD_MS, APPROACH_PAN_MS, drawApproachFrame, drawApproachWorld, incomingKinds } from '../art/approach.js';
+import { APPROACH_DURATION_MS, APPROACH_HOLD_MS, APPROACH_PAN_MS, drawApproachFrame, drawApproachWorld, incomingKinds, previewActors } from '../art/approach.js';
 import { DEFENDERS, ENEMIES } from '../game/catalog.js';
 import { campaignLevelLabel, nextPlayableLevel, stageCompleteMessage } from '../game/campaign.js';
 import { GameEngine } from '../game/engine.js';
@@ -46,7 +46,6 @@ export class GameApp {
   private animation = 0;
   private introAnimation = 0;
   private introStartedAt: number | null = null;
-  private revealTimer = 0;
   private bannerTimer = 0;
   private previousFrame = 0;
   private frameCount = 0;
@@ -400,7 +399,17 @@ export class GameApp {
     const roster = byId<HTMLElement>('approach-roster');
     const previewCanvas = byId<HTMLCanvasElement>('approach-canvas');
     const level = this.engine.level;
+    const preview = previewActors(level);
     roster.replaceChildren();
+
+    // Scripted tutorial counts are exact. Random rushes have no fixed
+    // overall enemy total: show the actual final-wave size as a sample.
+    const count = document.createElement('span');
+    count.className = 'roster-count';
+    count.textContent = level.tutorial
+      ? preview.length + ' SCRIPTED HOOMAN' + (preview.length === 1 ? '' : 'S')
+      : preview.length + ' FINAL-WAVE SAMPLE';
+    roster.append(count);
     for (const kind of incomingKinds(level)) {
       const entry = document.createElement('span');
       entry.className = 'roster-kind';
@@ -449,19 +458,8 @@ export class GameApp {
     // The familiar "OVENS READY / BAKE" countdown is part of the preview now.
     // Crossing the existing intro threshold starts tutorial steps normally.
     this.engine.state.intro = .01;
+    // Camera arrives directly in live gameplay: no curtains or lane sweeps.
     this.resume();
-    const curtain = byId<HTMLElement>('lane-reveal');
-    curtain.replaceChildren();
-    for (let row = 0; row < ROWS; row++) {
-      const strip = document.createElement('div');
-      strip.className = 'lane-cover';
-      strip.style.setProperty('--row', String(row));
-      curtain.append(strip);
-    }
-    curtain.classList.remove('revealing');
-    void curtain.offsetWidth;
-    curtain.classList.add('revealing');
-    this.revealTimer = window.setTimeout(() => curtain.classList.remove('revealing'), 2700);
   }
 
   private setTip(message: string): void {
@@ -644,15 +642,12 @@ export class GameApp {
     cancelAnimationFrame(this.animation);
     this.animation = 0;
     cancelAnimationFrame(this.introAnimation);
-    clearTimeout(this.revealTimer);
     clearTimeout(this.bannerTimer);
     this.introAnimation = 0;
     this.introStartedAt = null;
     byId<HTMLElement>('approach-intro').hidden = true;
     byId<HTMLElement>('game-screen').classList.remove('cinematic');
-    this.revealTimer = 0;
     this.bannerTimer = 0;
-    byId<HTMLElement>('lane-reveal').classList.remove('revealing');
   }
 
   private resume(): void {
