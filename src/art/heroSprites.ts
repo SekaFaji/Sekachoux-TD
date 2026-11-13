@@ -33,18 +33,20 @@ function sprite(draw:(g:C)=>void, addOutline=true):HTMLCanvasElement {
   if(!g)throw new Error('Character sprite requires 2D Canvas');
   g.imageSmoothingEnabled=false;
   draw(g);
-  const data=g.getImageData(0,0,32,32).data;
-  const occupied=(x:number,y:number)=> x>=0&&y>=0&&x<32&&y<32&&data[(y*32+x)*4+3]>0;
-  for(let y=0;y<32;y++)for(let x=0;x<32;x++){
-    if(occupied(x,y))continue;
-    if(occupied(x-1,y)||occupied(x+1,y)||occupied(x,y-1)||occupied(x,y+1))
-      rect(g,x,y,1,1,INK);
+  if(addOutline) {
+    const data=g.getImageData(0,0,32,32).data;
+    const occupied=(x:number,y:number)=> x>=0&&y>=0&&x<32&&y<32&&data[(y*32+x)*4+3]>0;
+    for(let y=0;y<32;y++)for(let x=0;x<32;x++){
+      if(occupied(x,y))continue;
+      if(occupied(x-1,y)||occupied(x+1,y)||occupied(x,y-1)||occupied(x,y+1))
+        rect(g,x,y,1,1,INK);
+    }
   }
-  return addOutline ? outline(canvas) : canvas;
+  return canvas;
 }
 
 /**
- * Animated Croissant poses share the same toasted silhouette and pastry-gun.
+ * Animated Croissant poses share one side-profile pastry silhouette, with no gun.
  * Timings are entirely visual; GameEngine still owns firing and damage.
  */
 export type CroissantPose = 'idle' | 'windup' | 'fire' | 'recoil';
