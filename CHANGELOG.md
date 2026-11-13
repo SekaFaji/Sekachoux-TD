@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.12 - Butter-family Croissant style pass (2026-11-13)
+
+- Repaint the user-reference side-view Croissant using the existing Butter Block sprite as the style benchmark, including its chocolate-brown outline (#2b1608), soft golden clusters, cream glints, cheek pink and tiny facial features.
+- Keep the distinctive hooked upper curve and tapering lower section, while simplifying toasted fold seams into broad, warm shading instead of harsh black bands.
+- Add a subtle face within the thick pastry curl, with expressive windup and firing poses but no visible arms, feet, gun or accessory.
+- Recolor Croissant's crumb projectiles and firing-tip burst to the Butter family palette. Preserve real shot timing, damage, health and butter costs.
+- Leave the other pastries, Hoomans, menus, level mechanics, royalty, saves and the battle scene unchanged.
+- Extend pixel-level tests to verify the shared palette, outline, face, highlights and unchanged silhouette across attack frames.
+
 ## 0.9.11 - Croissant sprite rebuilt from supplied side-profile reference (2026-11-13)
 
 - Replace the previous front-facing character Croissant with an original 32x32 sprite based on the provided L-curved side-view silhouette: long laminated top, hooked right tip and hanging, inward-tapered lower arm.
