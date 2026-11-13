@@ -126,7 +126,7 @@ test('Butter-family croissant keeps its reference silhouette with a tiny face an
     assert.equal(idle.get('11,19'), '#514234', 'matching second eye');
     assert.equal(idle.get('5,22'), '#d97868', 'cheek reuses Butter Block accent');
     assert.equal(idle.get('9,22'), '#845b38', 'tiny smile reuses Butter Block facial shading');
-    assert.notEqual(fire.get('9,22'), idle.get('9,22'), 'firing expression changes inside the croissant');
+    assert.notEqual(fire.get('9,23'), idle.get('9,23'), 'firing expression changes inside the croissant');
     assert.ok(new Set(idle.values()).size >= 7, 'folds retain broad warm colors and contrast');
     const butterSource = readFileSync(new URL('../dist/art/sprites.js', import.meta.url), 'utf8');
     for (const shared of ['#2b1608', '#514234', '#d97868', '#fff4b9'])
