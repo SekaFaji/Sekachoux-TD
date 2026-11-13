@@ -160,10 +160,12 @@ export function drawBakeryTitleScene(canvas:HTMLCanvasElement,atlas:SpriteAtlas,
   }
   // Small contact shadows and shared in-game actor sprites, no fake mascots.
   px(c,10,155,24,3,'rgba(33,29,23,.28)');
-  px(c,25,150,43,4,'rgba(33,29,23,.32)');
+  px(c,36,150,31,3,'rgba(33,29,23,.32)');
   px(c,74,153,28,3,'rgba(33,29,23,.3)');
   actor(c,atlas,'loaf',5,120+Math.sin(t*1.3)*1.2,31);
-  actor(c,atlas,'croissant',22,101+Math.sin(t*1.7)*1.7,49);
+  // Keep the menu Croissant near Butter's footprint, not 49px tall.
+  // This affects title-scene presentation only, not the 32px game sprite.
+  actor(c,atlas,'croissant',35,115+Math.sin(t*1.7)*1.7,35);
   actor(c,atlas,'butter',72,120+Math.sin(t*2+1.8)*1.5,36);
   actor(c,atlas,'pin',92,140+Math.sin(t*1.1)*.5,21);
 
