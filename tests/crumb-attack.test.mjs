@@ -41,7 +41,9 @@ test('Croissant sends crumb projectiles and makes a small hit burst without chan
   assert.ok(struck, 'Croissant should fire and hit a customer in its lane');
   const renderer = readFileSync(new URL('../dist/art/render.js', import.meta.url), 'utf8');
   const sprites = readFileSync(new URL('../dist/art/heroSprites.js', import.meta.url), 'utf8');
-  assert.ok(renderer.includes("croissant-attack"));
+  const atlas = readFileSync(new URL('../dist/art/sprites.js', import.meta.url), 'utf8');
+  assert.ok(atlas.includes("'croissant-attack'"));
+  assert.ok(renderer.includes('croissantPoseForTimer(p.timer, hasTarget)'));
   assert.ok(renderer.includes("if (shot.ice)"));
   assert.ok(renderer.includes("if (f.kind === 'crumb')"));
   assert.ok(sprites.includes('crumb-spitting muzzle'));
