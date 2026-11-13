@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.9 - Croissant pixel-art redesign and three-stage shot animation (2026-11-13)
+
+- Redraw the Croissant sprite in the original 32x32 canvas with a stronger upturned crescent, clearer laminated folds, toasted crust edges, subtle flour details and expressive pastry face.
+- Give its baked-in crumb blaster a consistent silhouette in idle, aiming, firing, and recoil poses so it reads as a crumb-shooting pastry even when standing still.
+- Animate a short anticipatory windup only when enemies are ahead, then muzzle flash and recoil tied to real 1.4-second shot timings. Keep its 100 Butter price, 60 health, 1 damage, firing rate, and placement rules untouched.
+- Refine crumbs with tumbling gold-brown crust flakes and a smaller trailing chip; preserve the existing impact effects, game HUD, royalty lives, and cinematic layout.
+- Extend regression tests for frame mappings, firing timings, sprite factories, and unchanged combat.
+
 ## 0.9.8 - Full-height bakery battle and crumb-firing Croissant (2026-11-13)
 
 - Remove the empty green strips above and below the battlefield by making the live room fill the entire space beneath the unchanged HUD.

@@ -43,55 +43,132 @@ function sprite(draw:(g:C)=>void):HTMLCanvasElement {
   return canvas;
 }
 
-/** Golden crescent, layered laminated dough, brave little face and feet. */
-export function croissantSprite(attack=false):HTMLCanvasElement {
-  return sprite(g=>{
-    // Feet, tucked under a puffy center.
-    rect(g,9,24,4,5,C.crust);rect(g,19,24,4,5,C.crust);
-    rect(g,8,28,6,2,C.boot);rect(g,18,28,6,2,C.boot);
-    rect(g,9,25,4,2,C.honey);rect(g,19,25,4,2,C.honey);
-    // The upward-curling tips identify a true croissant from a plain bun.
-    shape(g,[3,21,3,16,5,11,7,9,9,8,11,11,12,16,10,21,7,24,5,24],C.crust);
-    shape(g,[4,20,5,15,7,12,9,12,10,17,9,20,7,22,5,23],C.caramel);
-    shape(g,[5,16,6,13,8,12,9,14,8,19,6,21],C.gold);
-    line(g,[5,16,7,13],C.light,2);
-    shape(g,[21,12,23,9,26,10,28,14,29,21,28,24,25,24,22,21,20,17],C.crust);
-    shape(g,[23,14,24,11,26,13,28,18,28,22,26,23,24,20],C.caramel);
-    line(g,[25,13,27,17,27,20],C.gold,1);
-    // Puffed center and toasted edges. Separate diagonal bands show folds.
-    shape(g,[9,13,10,9,13,7,19,7,22,9,24,12,24,20,22,24,18,26,13,26,9,23,8,19],C.crust);
-    shape(g,[10,13,12,9,15,8,19,9,22,11,23,17,22,22,19,24,13,24,10,21,9,18],C.caramel);
-    shape(g,[11,13,13,10,16,9,19,10,21,12,20,14,16,14,13,15],C.gold);
-    line(g,[13,11,16,10,18,11],C.flour);
-    rect(g,15,9,3,1,C.flour);
-    shape(g,[10,16,13,14,15,14,13,20,11,22,9,20],C.roast);
-    line(g,[10,16,12,15],C.honey);
-    shape(g,[20,14,22,15,22,20,20,23,18,22,19,17],C.roast);
-    line(g,[20,15,20,19],C.gold);
-    shape(g,[14,15,18,15,20,18,19,23,16,24,13,22,12,19],C.honey);
-    line(g,[13,17,14,16],C.flour);
-    rect(g,12,13,1,2,C.caramel);rect(g,21,12,1,2,C.honey);
-    // Charming but small, expressive face (not giant googly eyes).
-    rect(g,13,17,3,3,C.eyes);rect(g,18,17,3,3,C.eyes);
-    rect(g,14,17,1,3,C.ink);rect(g,19,17,1,3,C.ink);
-    rect(g,12,20,2,1,C.cheek);rect(g,21,20,2,1,C.cheek);
-    line(g,[15,22,17,23,19,22],C.ink);
-    rect(g,7,21,3,2,C.honey);rect(g,23,20,3,3,C.gold);
-    rect(g,7,22,2,2,C.caramel);rect(g,24,22,2,2,C.caramel);
-    if(attack){
-      // A tiny crust-powered crumb launcher grows from the leading pastry tip.
-      // It is a bakery nozzle, not a separate realistic weapon.
-      rect(g,22,19,4,5,C.roast);       // braced shoulder
-      rect(g,24,18,4,4,C.caramel);    // outstretched golden arm
-      rect(g,26,17,4,4,C.crust);      // short pastry barrel
-      rect(g,27,17,3,2,C.honey);
-      rect(g,29,18,3,3,C.gold);       // crumb-spitting muzzle
-      rect(g,30,18,2,1,C.flour);
-      rect(g,23,23,3,2,C.roast);      // arm recoil fold
-      rect(g,16,22,3,2,C.ink);       // determined open-mouth firing face
-      rect(g,16,22,1,1,C.flour);
-    }else{
-      rect(g,4,12,1,2,C.light);
+/**
+ * Animated Croissant poses share the same toasted silhouette and pastry-gun.
+ * Timings are entirely visual; GameEngine still owns firing and damage.
+ */
+export type CroissantPose = 'idle' | 'windup' | 'fire' | 'recoil';
+
+export function croissantPoseForTimer(timer: number, targetAhead: boolean): CroissantPose {
+  if (timer > 1.30 && timer <= 1.4) return 'fire';
+  if (timer > 1.08 && timer <= 1.30) return 'recoil';
+  if (timer > 0 && timer <= .10 && targetAhead) return 'windup';
+  return 'idle';
+}
+
+/** Hand-painted 32px crescent with folded lamination and a baked-in crumb gun. */
+export function croissantSprite(pose: CroissantPose = 'idle'): HTMLCanvasElement {
+  return sprite(g => {
+    const aiming = pose === 'windup';
+    const firing = pose === 'fire';
+    const recovering = pose === 'recoil';
+
+    // Separate little boots ground the character even during recoil.
+    rect(g, 10, 25, 5, 4, C.crust);
+    rect(g, 19, 25, 5, 4, C.crust);
+    rect(g, 9, 28, 7, 2, C.boot);
+    rect(g, 18, 28, 7, 2, C.boot);
+    rect(g, 11, 26, 3, 2, C.gold);
+    rect(g, 20, 26, 3, 2, C.gold);
+    rect(g, 10, 29, 4, 1, C.caramel);
+    rect(g, 19, 29, 4, 1, C.caramel);
+
+    // Long, sharp, upturned crescent horns (not a round bread bun).
+    shape(g, [2, 20, 1, 16, 2, 11, 4, 8, 7, 6, 9, 7,
+      12, 13, 11, 19, 8, 23, 5, 25, 3, 23], C.crust);
+    shape(g, [3, 19, 3, 13, 5, 10, 7, 8, 9, 11, 10, 16,
+      8, 21, 6, 23, 4, 22], C.caramel);
+    shape(g, [4, 16, 5, 11, 7, 10, 9, 14, 8, 19, 5, 22], C.gold);
+    line(g, [4, 15, 5, 12, 7, 10], C.honey);
+    rect(g, 5, 10, 2, 1, C.light);
+    shape(g, [21, 13, 23, 8, 26, 6, 29, 7, 31, 11,
+      31, 17, 29, 23, 26, 25, 23, 22, 21, 18], C.crust);
+    shape(g, [24, 12, 26, 9, 28, 9, 30, 13, 30, 18,
+      28, 22, 26, 23, 24, 20], C.caramel);
+    shape(g, [27, 10, 29, 12, 29, 18, 27, 21, 26, 18], C.gold);
+    line(g, [27, 10, 28, 13, 28, 16], C.honey);
+    rect(g, 28, 9, 1, 2, C.light);
+
+    // Raised, plump center: every tapered fold has its own shade.
+    shape(g, [8, 17, 9, 12, 11, 9, 14, 7, 19, 7,
+      22, 9, 24, 13, 25, 18, 23, 23, 20, 26,
+      13, 26, 9, 23], C.crust);
+    shape(g, [9, 16, 10, 12, 13, 9, 18, 8,
+      21, 10, 23, 14, 23, 21, 20, 24,
+      13, 24, 10, 22], C.caramel);
+    shape(g, [11, 13, 14, 10, 18, 9, 21, 12,
+      21, 15, 11, 17], C.gold);
+    line(g, [13, 11, 16, 9, 19, 11], C.light);
+    rect(g, 15, 9, 2, 1, C.flour);
+    // Crisp diagonal dark seam to separate the left laminated segment.
+    shape(g, [10, 13, 12, 14, 12, 18, 11, 21, 9, 22, 9, 18], C.roast);
+    line(g, [11, 14, 10, 17, 10, 19], C.honey);
+    // Distinct toasted fold on the right, not a featureless solid fill.
+    shape(g, [20, 13, 22, 14, 23, 19, 21, 22,
+      19, 22, 20, 18], C.roast);
+    line(g, [20, 13, 21, 16, 21, 18], C.honey);
+    shape(g, [13, 16, 17, 15, 20, 17, 20, 22,
+      18, 24, 14, 24, 12, 21], C.honey);
+    rect(g, 14, 15, 4, 1, C.light);
+    rect(g, 12, 13, 1, 2, C.caramel);
+    rect(g, 21, 12, 1, 2, C.honey);
+
+    // Fine baked-crust crackles and a hint of flour, not visual noise.
+    rect(g, 6, 19, 1, 1, C.honey);
+    rect(g, 14, 11, 1, 1, C.flour);
+    rect(g, 19, 11, 1, 1, C.light);
+    rect(g, 23, 16, 1, 1, C.gold);
+    rect(g, 16, 13, 2, 1, C.caramel);
+
+    // Face: determined on the windup, excited in the burst, warm at rest.
+    rect(g, 12, 18, 2, 1, C.cheek);
+    rect(g, 21, 18, 2, 1, C.cheek);
+    if (aiming) {
+      line(g, [12, 17, 15, 18], C.ink);
+      line(g, [19, 18, 22, 17], C.ink);
+      rect(g, 16, 21, 3, 1, C.ink);
+    } else {
+      rect(g, 13, 16, 3, 3, C.eyes);
+      rect(g, 19, 16, 3, 3, C.eyes);
+      rect(g, 14, 16, 1, 3, C.ink);
+      rect(g, 20, 16, 1, 3, C.ink);
+      rect(g, 14, 15, 2, 1, C.caramel);
+      rect(g, 19, 15, 2, 1, C.caramel);
+      if (firing) {
+        rect(g, 16, 20, 3, 3, C.ink);
+        rect(g, 17, 22, 1, 1, C.cheek);
+      } else if (recovering) {
+        line(g, [15, 21, 17, 22, 19, 21], C.ink);
+      } else {
+        line(g, [15, 21, 17, 23, 19, 21], C.ink);
+        rect(g, 16, 22, 3, 1, C.flour);
+      }
+    }
+
+    // Little left arm balances the weapon stance.
+    rect(g, 7, 21, 4, 2, C.roast);
+    rect(g, 7, 20, 2, 3, C.honey);
+    if (aiming) rect(g, 6, 18, 2, 3, C.gold);
+
+    // Baked-in crumb blaster: a readable pastry barrel even in the idle card.
+    // All of this is crust and flaky pastry, not a modern metal gun.
+    const barrelY = aiming ? 16 : firing ? 18 : 19;
+    rect(g, 22, 20, 4, 3, C.roast);
+    rect(g, 23, 19, 4, 3, C.gold);
+    rect(g, 25, barrelY, 5, 4, C.crust);
+    rect(g, 26, barrelY + 1, 5, 2, C.caramel);
+    rect(g, 27, barrelY, 3, 1, C.honey);
+    rect(g, 30, barrelY, 2, 4, C.roast);
+    rect(g, 31, barrelY + 1, 1, 2, C.light);
+    rect(g, 26, barrelY + 3, 2, 2, C.gold);
+    // crumb-spitting muzzle, clearly distinct from the croissant's horn.
+    if (firing) {
+      rect(g, 24, 22, 3, 2, C.honey);
+      rect(g, 22, 24, 2, 1, C.caramel); // compressed recoil fold
+    } else if (recovering) {
+      rect(g, 24, 23, 3, 1, C.roast);
+    } else if (aiming) {
+      rect(g, 23, 17, 3, 2, C.light); // raised supporting arm
     }
   });
 }

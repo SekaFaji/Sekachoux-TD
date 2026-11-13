@@ -34,7 +34,9 @@ const CR: P3 = ['#f3c47a', '#d99a45', '#a8651f'], RD: P3 = ['#ff8a7a', '#d8403c'
 export const WD: P3 = ['#ecc890', '#d49a55', '#a8662a'];
 export const SPR: Record<string, () => HTMLCanvasElement> = {
   croissant: () => croissantSprite(),
-  'croissant-attack': () => croissantSprite(true),
+  'croissant-windup': () => croissantSprite('windup'),
+  'croissant-attack': () => croissantSprite('fire'),
+  'croissant-recoil': () => croissantSprite('recoil'),
   butter: () => art(g => {
     // A characterful wrapped pat of butter, rather than a flat yellow box.
     px(g, 3, 26, '#716052', 26, 2); // warm contact shadow

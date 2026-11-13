@@ -1,4 +1,5 @@
 import { SPR, human, OL } from './sprites.js';
+import { croissantPoseForTimer } from './heroSprites.js';
 import { drawBakeryWorktop } from './worktop.js';
 import { DEFENDERS, ENEMIES } from '../game/catalog.js';
 import { COLUMNS, ROWS, TILE, LANE_HEIGHT, type GameState } from '../game/types.js';
@@ -46,20 +47,27 @@ export function drawBattlefield(canvas: HTMLCanvasElement, state: GameState, lev
   }
   for (const p of state.defenders) {
     x.globalAlpha = (p.kind === 'pie' && p.timer > 0 ? .6 : 1) * (.5 + .5 * Math.min(1, p.health / DEFENDERS[p.kind].hp));
-    // Use actual attack/brace poses only at their matching game moments.
-    const shooting = p.kind === 'croissant' && p.timer > 1.15 && p.timer <= 1.4;
+    // Anticipation is shown just before a real shot; firing and recoil only
+    // happen after the simulation has reset the Croissant's 1.4s shot timer.
+    const hasTarget = p.kind === 'croissant' && state.enemies.some(z =>
+      z.row === p.row && z.x > p.column && z.health > 0);
+    const pose = p.kind === 'croissant' ? croissantPoseForTimer(p.timer, hasTarget) : 'idle';
     const blocking = p.kind === 'loaf' && state.enemies.some(z =>
       z.row === p.row && Math.abs(z.x - p.column - .6) < .5);
-    const poseKey = shooting ? 'croissant-attack' : blocking ? 'loaf-guard' : p.kind;
+    const poseKey = p.kind === 'croissant' && pose !== 'idle'
+      ? 'croissant-' + (pose === 'fire' ? 'attack' : pose)
+      : blocking ? 'loaf-guard' : p.kind;
     const drawY = p.row * LANE_HEIGHT + 4 + Math.round(Math.sin(state.elapsed * 3 + p.column + p.row));
-    // A one-pixel recoil, brief muzzle flash and baked-crumb burst show the shot.
-    x.drawImage(sprites.images[poseKey], p.column * TILE - (shooting ? 1 : 0), drawY);
-    if (shooting && p.timer > 1.24) {
-      const muzzleX = p.column * TILE + 30, muzzleY = drawY + 18;
-      x.fillStyle = '#fff5c5'; x.fillRect(muzzleX + 1, muzzleY - 1, 3, 3);
-      x.fillStyle = '#f7bb5b'; x.fillRect(muzzleX + 3, muzzleY, 3, 1);
-      x.fillRect(muzzleX + 1, muzzleY - 3, 1, 2);
-      x.fillRect(muzzleX + 1, muzzleY + 3, 1, 2);
+    const recoil = pose === 'fire' ? -2 : pose === 'recoil' ? -1 : pose === 'windup' ? 1 : 0;
+    x.drawImage(sprites.images[poseKey], p.column * TILE + recoil, drawY);
+    if (p.kind === 'croissant' && pose === 'fire') {
+      // The flash lives at the pastry barrel; short enough to read as a shot.
+      const muzzleX = p.column * TILE + 30, muzzleY = drawY + 20;
+      x.fillStyle = '#fff9d7'; x.fillRect(muzzleX, muzzleY - 1, 4, 3);
+      x.fillStyle = '#ffd57b'; x.fillRect(muzzleX + 3, muzzleY, 4, 1);
+      x.fillRect(muzzleX + 1, muzzleY - 4, 2, 2);
+      x.fillRect(muzzleX + 1, muzzleY + 3, 2, 2);
+      x.fillStyle = '#bc7036'; x.fillRect(muzzleX + 6, muzzleY - 2, 2, 2);
     }
     x.globalAlpha = 1;
   }
@@ -75,12 +83,16 @@ export function drawBattlefield(canvas: HTMLCanvasElement, state: GameState, lev
       x.fillStyle = OL; x.fillRect(sx - 1, sy - 1, 6, 6);
       x.fillStyle = '#8fe3ff'; x.fillRect(sx, sy, 4, 4);
     } else {
-      // Croissant ammunition is an irregular cluster of actual crust crumbs.
-      x.fillStyle = '#774326'; x.fillRect(sx - 1, sy - 2, 6, 5);
-      x.fillStyle = '#edb65f'; x.fillRect(sx, sy - 1, 4, 3);
-      x.fillStyle = '#ffe6a0'; x.fillRect(sx + 1, sy - 1, 2, 1);
-      x.fillStyle = '#c8833d'; x.fillRect(sx - 5, sy + 1, 2, 2);
-      x.fillStyle = '#f5cc83'; x.fillRect(sx - 8, sy - 3, 2, 1);
+      // Irregular baked-crumb ammunition: compact crust core, flaky orbiting
+      // chips, and a one-pixel trail that tumbles as the projectile moves.
+      const wobble = Math.floor(shot.x * 5) % 2;
+      x.fillStyle = '#683a20'; x.fillRect(sx - 1, sy - 2, 6, 5);
+      x.fillStyle = '#d48c43'; x.fillRect(sx, sy - 1, 5, 3);
+      x.fillStyle = '#ffdc91'; x.fillRect(sx + 1, sy - 2, 3, 2);
+      x.fillStyle = '#fff0bd'; x.fillRect(sx + 2, sy - 2, 1, 1);
+      x.fillStyle = '#b66f34'; x.fillRect(sx - 5, sy + wobble, 2, 2);
+      x.fillStyle = '#edb65f'; x.fillRect(sx - 8, sy - 3 + wobble, 2, 1);
+      x.fillStyle = '#f6d79d'; x.fillRect(sx - 10, sy + 2 - wobble, 1, 1);
     }
   }
   // Butter is a small collectible pat, with restrained sparkle and transparent silhouette.

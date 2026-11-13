@@ -41,8 +41,33 @@ test('Croissant sends crumb projectiles and makes a small hit burst without chan
   assert.ok(struck, 'Croissant should fire and hit a customer in its lane');
   const renderer = readFileSync(new URL('../dist/art/render.js', import.meta.url), 'utf8');
   const sprites = readFileSync(new URL('../dist/art/heroSprites.js', import.meta.url), 'utf8');
-  assert.ok(renderer.includes("croissant-attack"));
+  const atlas = readFileSync(new URL('../dist/art/sprites.js', import.meta.url), 'utf8');
+  assert.ok(atlas.includes("'croissant-attack'"));
+  assert.ok(renderer.includes('croissantPoseForTimer(p.timer, hasTarget)'));
   assert.ok(renderer.includes("if (shot.ice)"));
   assert.ok(renderer.includes("if (f.kind === 'crumb')"));
   assert.ok(sprites.includes('crumb-spitting muzzle'));
+});
+
+test('Croissant windup, muzzle blast, and recoil are distinct and timed to real shots', async () => {
+  const { croissantPoseForTimer } = await import('../dist/art/heroSprites.js');
+  assert.equal(croissantPoseForTimer(.07, true), 'windup');
+  assert.equal(croissantPoseForTimer(.07, false), 'idle');
+  assert.equal(croissantPoseForTimer(1.39, true), 'fire');
+  assert.equal(croissantPoseForTimer(1.18, true), 'recoil');
+  assert.equal(croissantPoseForTimer(.7, true), 'idle');
+
+  const { SPR } = await import('../dist/art/sprites.js');
+  for (const key of ['croissant', 'croissant-windup', 'croissant-attack', 'croissant-recoil']) {
+    assert.equal(typeof SPR[key], 'function', key + ' must have a 32px frame');
+  }
+  const art = readFileSync(new URL('../dist/art/heroSprites.js', import.meta.url), 'utf8');
+  const renderer = readFileSync(new URL('../dist/art/render.js', import.meta.url), 'utf8');
+  assert.ok(art.includes('Long, sharp, upturned crescent horns'));
+  assert.ok(art.includes('Distinct toasted fold on the right'));
+  assert.ok(art.includes('crumb-spitting muzzle'));
+  assert.ok(renderer.includes("croissantPoseForTimer(p.timer, hasTarget)"));
+  assert.ok(renderer.includes("pose === 'fire'"));
+  assert.ok(renderer.includes("pose === 'windup'"));
+  assert.ok(renderer.includes('Math.floor(shot.x * 5)'));
 });

@@ -66,7 +66,8 @@ test('hand-authored Croissant and Loaf Bread have independent idle and action sp
   const art=readFileSync(new URL('../dist/art/heroSprites.js',import.meta.url),'utf8');
   assert.ok(art.includes('croissantSprite'));
   assert.ok(art.includes('loafSprite'));
-  assert.ok(art.includes("attack"));
+  assert.ok(art.includes('croissantPoseForTimer'));
+  assert.ok(art.includes("'fire'"));
   assert.ok(art.includes("guard"));
   // The new artwork is hand-painted in 32px geometry, not enlarged stock art.
   assert.ok(art.includes('g.fillRect'));
