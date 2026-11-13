@@ -63,12 +63,28 @@ test('each Hooman role has readable unique costume details and two actual stride
     return pixels;
   };
   try {
+    // One prototype only: existing three other character sprites are still
+    // rendered by the exact legacy code path and retain their costume pixels.
+    const customerA = render('walk',0), customerB = render('walk',1);
+    assert.notEqual(customerA.get('9,26'),customerB.get('9,26'),'stride shifts the near leg');
+    assert.notEqual(customerA.get('7,23'),customerB.get('7,23'),'near arm has a distinct swing');
     for(const kind of ['walk','jog','critic','insp']){
       const a=render(kind,0),b=render(kind,1);
       assert.ok(a.size>180 && a.size<900,kind+' stays readable at 32px');
       assert.notDeepEqual([...a.entries()], [...b.entries()],kind+' must actually stride');
     }
-    assert.equal(render('walk',0).get('4,21'),'#f5deaf','Customer has a takeaway bag');
+    // The prototype Customer no longer uses a front-facing shopper/bag.
+    // Unequal eyes, a projecting left nose and an offset jaw face the incoming
+    // Hooman in its actual right-to-left travel direction.
+    const customer = render('walk', 0);
+    assert.equal(customer.get('7,8'),'#fff3db','large near eye leads on the left');
+    assert.equal(customer.get('15,9'),'#48372b','smaller far eye is set back');
+    assert.equal(customer.get('5,11'),'#8b563d','nose points into the left-moving direction');
+    assert.equal(customer.get('7,13'),'#ffefdc','open jaw has readable tiny teeth');
+    assert.equal(customer.get('17,18'),'#c96553','striped red tie marks a hunched brown jacket');
+    assert.equal(customer.get('20,20'),'#825235','jacket has a warm brown back plane');
+    assert.equal(customer.get('6,28'),'#44342b','near shoe extends to the left of the coat');
+    assert.ok(!customer.has('29,11'),'forward-leaning head is not a centered face');
     assert.equal(render('jog',0).get('11,6'),'#fc7b70','Jogger has a colored headband');
     assert.equal(render('critic',0).get('25,22'),'#8d715c','Critic carries a notepad');
     assert.equal(render('insp',0).get('16,4'),'#5b9e70','Inspector cap has a green emblem');
