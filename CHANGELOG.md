@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.13 - Royal Chouquette family Croissant art (2026-11-13)
+
+- Rebuild the Croissant's 32x32 pixel art to match the real Royal Chouquettes' existing pixel-art language instead of the previous hard-edged reference sprite.
+- Keep a clearly curved croissant silhouette: long rounded horizontal upper pastry, tapered crumb-shooting right tip and lower curled tail; never add a gun, arms or feet.
+- Apply the actual royal pastry palette and rendering method: warm toasted brown edges, stacked honey-gold pixel clusters, soft cream flakes, dark 2px eyes, matching pink cheeks and a pale smile.
+- Give the Croissant subtle Royal-style expression changes on windup/fire/recoil, keeping its silhouette stable and existing true projectile timing unchanged.
+- Match Croissant crumb projectiles and their flash to the same Royal Chouquette colors, while leaving royal sprites, Butter Block, other pastries and game mechanics untouched.
+- Add pixel-level regression tests for the Royal colors, recognizable curved profile, expressions and no extra silhouette objects. Preserve game balance, level progress and saves.
+
 ## 0.9.12 - Butter-family Croissant style pass (2026-11-13)
 
 - Repaint the user-reference side-view Croissant using the existing Butter Block sprite as the style benchmark, including its chocolate-brown outline (#2b1608), soft golden clusters, cream glints, cheek pink and tiny facial features.

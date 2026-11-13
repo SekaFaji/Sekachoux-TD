@@ -46,47 +46,37 @@ test('Croissant sends crumb projectiles and makes a small hit burst without chan
   assert.ok(renderer.includes('croissantPoseForTimer(p.timer, hasTarget)'));
   assert.ok(renderer.includes("if (shot.ice)"));
   assert.ok(renderer.includes("if (f.kind === 'crumb')"));
-  assert.ok(sprites.includes('Butter-family Croissant'));
-  assert.ok(sprites.includes('CROISSANT_PROFILE'));
+  assert.ok(sprites.includes('same bakery-character family as the Royal'));
+  assert.ok(sprites.includes('CROISSANT_ROYAL_PALETTE'));
 });
 
-test('Croissant windup, muzzle blast, and recoil are distinct and timed to real shots', async () => {
+test('Croissant keeps the established shooting timing and four sprite frames', async () => {
   const { croissantPoseForTimer } = await import('../dist/art/heroSprites.js');
   assert.equal(croissantPoseForTimer(.07, true), 'windup');
   assert.equal(croissantPoseForTimer(.07, false), 'idle');
   assert.equal(croissantPoseForTimer(1.39, true), 'fire');
   assert.equal(croissantPoseForTimer(1.18, true), 'recoil');
   assert.equal(croissantPoseForTimer(.7, true), 'idle');
-
   const { SPR } = await import('../dist/art/sprites.js');
-  for (const key of ['croissant', 'croissant-windup', 'croissant-attack', 'croissant-recoil']) {
-    assert.equal(typeof SPR[key], 'function', key + ' must have a 32px frame');
-  }
-  const art = readFileSync(new URL('../dist/art/heroSprites.js', import.meta.url), 'utf8');
-  const renderer = readFileSync(new URL('../dist/art/render.js', import.meta.url), 'utf8');
-  assert.ok(art.includes('Reference-led side profile'));
-  assert.ok(art.includes('its tiny face is drawn inside the lower curl'));
-  assert.ok(art.includes('two readable folded bands'));
-  assert.ok(art.includes('No arms, feet or gun'));
+  for (const name of ['croissant','croissant-windup','croissant-attack','croissant-recoil'])
+    assert.equal(typeof SPR[name], 'function', name + ' must remain available');
+  const renderer = readFileSync(new URL('../dist/art/render.js',import.meta.url),'utf8');
+  assert.ok(renderer.includes('croissantPoseForTimer(p.timer, hasTarget)'));
   assert.ok(renderer.includes('tipY = drawY + 14'));
-  assert.ok(renderer.includes("croissantPoseForTimer(p.timer, hasTarget)"));
   assert.ok(renderer.includes("pose === 'fire'"));
-  assert.ok(renderer.includes("pose === 'windup'"));
   assert.ok(renderer.includes('Math.floor(shot.x * 5)'));
 });
 
-test('Butter-family croissant keeps its reference silhouette with a tiny face and shared palette', async () => {
-  const { CROISSANT_PROFILE, croissantSprite } = await import('../dist/art/heroSprites.js');
-  assert.equal(CROISSANT_PROFILE.length, 27);
-  assert.deepEqual(CROISSANT_PROFILE[0], [10, 18], 'top ridge is narrow');
-  assert.ok(CROISSANT_PROFILE[10][1] >= 28, 'upper arm reaches to the right-hand tip');
-  assert.ok(CROISSANT_PROFILE[18][1] <= 14, 'negative space opens under the top arm');
-  assert.ok(CROISSANT_PROFILE[26][0] >= 9, 'bottom tail curves inward');
+test('Croissant uses real Royal Chouquette palette and shares their expressive pixel-art face', async () => {
+  const { croissantSprite, CROISSANT_ROYAL_PALETTE: P } = await import('../dist/art/heroSprites.js');
+  const royalArt = readFileSync(new URL('../dist/art/royaltyArt.js', import.meta.url), 'utf8');
+  for (const color of Object.values(P)) {
+    assert.ok(royalArt.includes(color), 'Croissant color must come from the Royal Chouquettes: ' + color);
+  }
 
-  // Exercise the real procedural 32x32 canvas art through a one-function
-  // pixel canvas double, not just a source-text comment assertion.
-  const originalDocument = globalThis.document;
-  const render = pose => {
+  // Exercise the actual 32x32 sprite painter, retaining every colored pixel.
+  const oldDocument = globalThis.document;
+  const makePixels = pose => {
     const pixels = new Map();
     const ctx = {
       fillStyle: '',
@@ -98,7 +88,7 @@ test('Butter-family croissant keeps its reference silhouette with a tiny face an
     globalThis.document = {
       createElement: tag => {
         assert.equal(tag, 'canvas');
-        return { width: 0, height: 0, getContext: type => type === '2d' ? ctx : null };
+        return { width: 0, height: 0, getContext: mode => mode === '2d' ? ctx : null };
       },
     };
     const canvas = croissantSprite(pose);
@@ -107,32 +97,34 @@ test('Butter-family croissant keeps its reference silhouette with a tiny face an
     return pixels;
   };
   try {
-    const idle = render('idle');
-    const windup = render('windup');
-    const fire = render('fire');
-    const recoil = render('recoil');
-    const positions = [...idle.keys()].sort();
-    assert.equal(positions.length, CROISSANT_PROFILE.reduce((sum, [l, r]) => sum + r - l + 1, 0));
-    for (const variant of [windup, fire, recoil])
-      assert.deepEqual([...variant.keys()].sort(), positions, 'firing does not add limbs, a gun or outside pixels');
-    assert.equal(idle.get('11,2'), '#2b1608', 'outlines match Butter family chocolate-brown');
-    assert.ok(idle.has('29,12'), 'long upper tip is solid croissant');
-    assert.ok(!idle.has('29,19'), 'inside of croissant curl is transparent');
-    assert.ok(idle.has('11,28'), 'hanging tapered tail remains visible');
-    assert.ok(!idle.has('22,28'), 'no second foot under the tail');
-    assert.notEqual(idle.get('27,11'), fire.get('27,11'), 'firing only changes tip shading');
-    assert.equal(idle.get('14,7'), '#fff4b9', 'Butter-style cream highlight on the upper roll');
-    assert.equal(idle.get('6,19'), '#514234', 'eye reuses Butter Block facial tone');
-    assert.equal(idle.get('11,19'), '#514234', 'matching second eye');
-    assert.equal(idle.get('5,22'), '#d97868', 'cheek reuses Butter Block accent');
-    assert.equal(idle.get('9,22'), '#845b38', 'tiny smile reuses Butter Block facial shading');
-    assert.notEqual(fire.get('9,23'), idle.get('9,23'), 'firing expression changes inside the croissant');
-    assert.ok(new Set(idle.values()).size >= 7, 'folds retain broad warm colors and contrast');
-    const butterSource = readFileSync(new URL('../dist/art/sprites.js', import.meta.url), 'utf8');
-    for (const shared of ['#2b1608', '#514234', '#d97868', '#fff4b9'])
-      assert.ok(butterSource.includes(shared), 'Croissant palette must be sourced from Butter style: ' + shared);
+    const idle = makePixels('idle');
+    const windup = makePixels('windup');
+    const fire = makePixels('fire');
+    const recoil = makePixels('recoil');
+    const occupied = [...idle.keys()].sort();
+
+    assert.ok(occupied.length > 350 && occupied.length < 510, 'Royal-sized pastry fills its sprite');
+    for (const frame of [windup, fire, recoil]) {
+      assert.deepEqual([...frame.keys()].sort(), occupied, 'poses preserve Croissant shape without guns or extra limbs');
+    }
+
+    assert.ok(idle.has('17,6'), 'rounded top arch of the pastry is visible');
+    assert.ok(idle.has('29,14'), 'right-hand pastry tip remains visible');
+    assert.ok(!idle.has('29,20'), 'curled opening underneath the forward tip stays empty');
+    assert.ok(idle.has('10,29'), 'hanging tail curves down');
+    assert.ok(!idle.has('20,28'), 'lower-right space remains empty');
+    assert.equal(idle.get('7,18'), P.eye, 'left eye matches Royal');
+    assert.equal(idle.get('13,18'), P.eye, 'right eye matches Royal');
+    assert.equal(idle.get('5,20'), P.cheek, 'left pink Royal cheek');
+    assert.equal(idle.get('15,20'), P.cheek, 'right pink Royal cheek');
+    assert.equal(idle.get('11,22'), P.cream, 'cream Royal smile');
+    assert.equal(idle.get('18,9'), P.flour, 'crisp Royal pastry glint');
+    assert.notEqual(fire.get('11,22'), idle.get('11,22'), 'firing changes the expression');
+    assert.notEqual(windup.get('7,19'), idle.get('7,19'), 'windup squints');
+    assert.notEqual(fire.get('27,13'), idle.get('27,13'), 'only pastry tip glows while firing');
+    assert.ok(new Set(idle.values()).size >= 9, 'warm Royal shading must not flatten into one color');
   } finally {
-    if (originalDocument === undefined) delete globalThis.document;
-    else globalThis.document = originalDocument;
+    if (oldDocument === undefined) delete globalThis.document;
+    else globalThis.document = oldDocument;
   }
 });
