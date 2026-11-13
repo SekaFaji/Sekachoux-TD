@@ -162,7 +162,9 @@ export function croissantSprite(pose: CroissantPose = 'idle'): HTMLCanvasElement
       rect(g,29,14,1,1,P.light);
     }
     if (pose === 'recoil') rect(g,26,13,2,2,P.toast);
-  }, false);
+    // The shared sprite helper adds a crisp one-pixel chocolate ink rim,
+    // matching the visible outline on Butter and the other bakery units.
+  }, true);
 }
 
 /** A broad, scored, sturdy whole loaf. Separate identity from future Baguette. */
